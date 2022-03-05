@@ -1,0 +1,6 @@
+{
+  "short_name": "Help Ukraine",
+  "name": "Help Ukraine",
+  "start_url": "./index.html",
+  "display": "standalone"
+}

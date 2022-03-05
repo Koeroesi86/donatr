@@ -1,0 +1,111 @@
+import React, {FC, useCallback, useEffect, useState} from "react";
+import {CreateNeedResource, NeedResource} from "../../types";
+import axios from "axios";
+import {Box, Button, Card, CardContent, TextField} from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import debounce from "lodash.debounce";
+import {useIntl} from "react-intl";
+
+const api = {
+  all: (locationId?: string): Promise<NeedResource[]> => {
+    const url = new URL(window.location.origin);
+    url.pathname = '/api/needs';
+    if (locationId) {
+      url.searchParams.set('locationId', locationId);
+    }
+    return axios.get<NeedResource[]>(url.toJSON()).then(r => r.data);
+  },
+  one: (id: string): Promise<NeedResource> =>
+    axios.get<NeedResource>(`/api/needs/${id}`).then(r => r.data),
+  create: (data: CreateNeedResource): Promise<NeedResource[]> =>
+    axios.post<NeedResource[]>('/api/needs', data).then(r => r.data),
+  update: (data: NeedResource): Promise<NeedResource[]> =>
+    axios.put<NeedResource[]>(`/api/needs/${data.id}`, data).then(r => r.data),
+  remove: (data: NeedResource): Promise<void> =>
+    axios.delete(`/api/needs/${data.id}`),
+}
+
+interface EditNeedsProps {
+  locationId: string;
+}
+
+const EditNeeds: FC<EditNeedsProps> = ({ locationId }) => {
+  const intl = useIntl();
+  const [needs, setNeeds] = useState<NeedResource[]>([]);
+  const [enteredText, setEnteredText] = useState('');
+  const debouncedUpdate = debounce((data: NeedResource) => {
+    api.update(data).then(() => refresh());
+  }, 2000);
+
+  const refresh = useCallback(() => {
+    api.all(locationId).then(o => setNeeds(o));
+  }, [locationId]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return (
+    <Card>
+      <CardContent>
+        {needs.map(need => (
+          <Box key={need.id} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
+            <Box sx={{ flexGrow: 1, px: 1 }}>
+              <TextField
+                label={intl.formatMessage({ id: 'input.need.name' })}
+                variant="standard"
+                defaultValue={need.name}
+                fullWidth
+                onChange={(e) => debouncedUpdate({
+                  id: need.id,
+                  locationId: need.locationId,
+                  name: e.target.value,
+                })}
+              />
+            </Box>
+            <Box>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
+
+                  api.remove(need).then(() => refresh());
+                }}
+              >
+                <DeleteIcon />
+              </Button>
+            </Box>
+          </Box>
+        ))}
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
+          <Box sx={{ flexGrow: 1, px: 1 }}>
+            <TextField
+              label={intl.formatMessage({ id: 'input.need.name.new' })}
+              variant="standard"
+              fullWidth
+              value={enteredText}
+              onChange={(e) => setEnteredText(e.target.value)}
+            />
+          </Box>
+          <Box>
+            <Button
+              variant="contained"
+              disabled={!enteredText}
+              onClick={() => {
+                api.create({name: enteredText, locationId}).then((o) => {
+                  setEnteredText('');
+                  setNeeds(o);
+                });
+              }}
+            >
+              <AddIcon />
+            </Button>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default EditNeeds;
