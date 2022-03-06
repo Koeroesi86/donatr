@@ -2,11 +2,9 @@ import React, {FC, useEffect, useState} from "react";
 import {CreateOrganisationResource, OrganisationResource} from "../../types";
 import axios from "axios";
 import {Box, Button, Card, CardContent, TextField} from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import debounce from "lodash.debounce";
-import EditLocations from "../edit-locations";
 import {useIntl} from "react-intl";
+import EditOrganisation from "../edit-organisation";
 
 const api = {
   all: (): Promise<OrganisationResource[]> =>
@@ -23,9 +21,6 @@ const EditOrganisations: FC = () => {
   const intl = useIntl();
   const [organisations, setOrganisations] = useState<OrganisationResource[]>([]);
   const [enteredText, setEnteredText] = useState('');
-  const debouncedUpdate = debounce((data: OrganisationResource) => {
-    api.update(data).then(() => api.all()).then(d => setOrganisations(d));
-  }, 2000);
   useEffect(() => {
     api.all().then(o => setOrganisations(o))
   }, []);
@@ -33,44 +28,7 @@ const EditOrganisations: FC = () => {
     <Card>
       <CardContent>
         {organisations.map(organisation => (
-          <Box key={organisation.id}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
-              <Box sx={{ flexGrow: 1, px: 1 }}>
-                <TextField
-                  label={intl.formatMessage({ id: 'input.organisation.name' })}
-                  variant="standard"
-                  defaultValue={organisation.name}
-                  fullWidth
-                  onChange={(e) => debouncedUpdate({
-                    id: organisation.id,
-                    name: e.target.value,
-                  })}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      debouncedUpdate({
-                        id: organisation.id,
-                        // @ts-ignore
-                        name: e.target.value,
-                      });
-                    }
-                  }}
-                />
-              </Box>
-              <Box>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
-
-                    api.remove(organisation).then(() => api.all()).then(setOrganisations);
-                  }}
-                >
-                  <DeleteIcon />
-                </Button>
-              </Box>
-            </Box>
-            <EditLocations organisationId={organisation.id} />
-          </Box>
+          <EditOrganisation key={organisation.id} id={organisation.id} />
         ))}
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
           <Box sx={{ flexGrow: 1, px: 1 }}>
