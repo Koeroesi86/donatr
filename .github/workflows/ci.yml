@@ -1,5 +1,8 @@
 name: CI
 on: push
+env:
+  NODE_ENV: "development"
+  YARN_CACHE_FOLDER: ${{ github.workspace }}/.cache/yarn
 jobs:
   build:
     name: Build
@@ -9,5 +12,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 16
+      - uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.cache
       - run: yarn install --frozen-lockfile
       - run: yarn build
