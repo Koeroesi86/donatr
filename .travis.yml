@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - "12"
+env:
+  global:
+    - NODE_ENV="development"
+    - YARN_CACHE_FOLDER=$TRAVIS_BUILD_DIR/.cache/yarn
+    - TRAVIS_TAG="$(git rev-parse --short ${TRAVIS_COMMIT})"
+cache:
+  directories:
+    - node_modules
+    - .cache
+jobs:
+  include:
+    - stage: Build
+      script:
+        - yarn build

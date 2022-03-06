@@ -1,4 +1,4 @@
-# [help.koro.si](https://help.koro.si)
+# [help.koro.si](https://help.koro.si) [![Build Status](https://travis-ci.com/Koeroesi86/help.koro.si.svg?branch=main)](https://travis-ci.com/Koeroesi86/help.koro.si)
 
 A platform to help donations reach the place where they are most needed.
 
