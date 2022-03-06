@@ -112,6 +112,9 @@ export default class JsonProvider implements Provider {
 
     if (!fs.existsSync(fileName)) return;
 
+    const location = await this.getLocation(id);
+    await Promise.all(location.needs.map((async (need) => this.removeNeed(need.id))));
+
     await fs.promises.unlink(fileName);
   };
 
@@ -127,6 +130,9 @@ export default class JsonProvider implements Provider {
     const fileName = path.resolve(this.basePath, `./organisation/${id}.json`);
 
     if (!fs.existsSync(fileName)) return;
+
+    const organisation = await this.getOrganisation(id);
+    await Promise.all(organisation.locations.map((async (location) => this.removeLocation(location.id))));
 
     await fs.promises.unlink(fileName);
   };
