@@ -45,6 +45,15 @@ const EditOrganisations: FC = () => {
                     id: organisation.id,
                     name: e.target.value,
                   })}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      debouncedUpdate({
+                        id: organisation.id,
+                        // @ts-ignore
+                        name: e.target.value,
+                      });
+                    }
+                  }}
                 />
               </Box>
               <Box>
@@ -71,6 +80,14 @@ const EditOrganisations: FC = () => {
               fullWidth
               value={enteredText}
               onChange={(e) => setEnteredText(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  api.create({name: enteredText}).then((o) => {
+                    setEnteredText('');
+                    setOrganisations(o);
+                  });
+                }
+              }}
             />
           </Box>
           <Box>

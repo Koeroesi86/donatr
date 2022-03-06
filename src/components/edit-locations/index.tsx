@@ -68,6 +68,16 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId }) => {
                     organisationId: location.organisationId,
                     name: e.target.value,
                   })}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      debouncedUpdate({
+                        id: location.id,
+                        organisationId: location.organisationId,
+                        // @ts-ignore
+                        name: e.target.value,
+                      });
+                    }
+                  }}
                 />
               </Box>
               <Box>
@@ -105,6 +115,14 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId }) => {
                   setEnteredText('');
                   setLocations(o);
                 });
+              }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  api.create({name: enteredText, organisationId}).then((o) => {
+                    setEnteredText('');
+                    setLocations(o);
+                  });
+                }
               }}
             >
               <AddIcon />

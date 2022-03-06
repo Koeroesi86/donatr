@@ -34,13 +34,22 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId }) => {
   const intl = useIntl();
   const [needs, setNeeds] = useState<NeedResource[]>([]);
   const [enteredText, setEnteredText] = useState('');
-  const debouncedUpdate = debounce((data: NeedResource) => {
-    api.update(data).then(() => refresh());
-  }, 2000);
-
   const refresh = useCallback(() => {
     api.all(locationId).then(o => setNeeds(o));
   }, [locationId]);
+  const update = useCallback((data: NeedResource) => {
+    api.update(data).then(() => refresh());
+  }, [refresh]);
+  const debouncedUpdate = useCallback(debounce(
+    (data: NeedResource) => update(data),
+    2000
+  ), [update]);
+  const create = useCallback(() => {
+    api.create({name: enteredText, locationId}).then((o) => {
+      setEnteredText('');
+      setNeeds(o);
+    });
+  }, [enteredText, locationId]);
 
   useEffect(() => {
     refresh();
@@ -62,6 +71,16 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId }) => {
                   locationId: need.locationId,
                   name: e.target.value,
                 })}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    update({
+                      id: need.id,
+                      locationId: need.locationId,
+                      // @ts-ignore
+                      name: e.target.value,
+                    });
+                  }
+                }}
               />
             </Box>
             <Box>
@@ -85,6 +104,11 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId }) => {
               variant="standard"
               fullWidth
               value={enteredText}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  create();
+                }
+              }}
               onChange={(e) => setEnteredText(e.target.value)}
             />
           </Box>
@@ -92,12 +116,7 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId }) => {
             <Button
               variant="contained"
               disabled={!enteredText}
-              onClick={() => {
-                api.create({name: enteredText, locationId}).then((o) => {
-                  setEnteredText('');
-                  setNeeds(o);
-                });
-              }}
+              onClick={() => create()}
             >
               <AddIcon />
             </Button>
