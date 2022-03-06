@@ -1,4 +1,4 @@
-# [help.koro.si](https://help.koro.si) [![Build Status](https://app.travis-ci.com/Koeroesi86/help.koro.si.svg?branch=main)](https://app.travis-ci.com/Koeroesi86/help.koro.si)
+# [help.koro.si](https://help.koro.si) [![CI](https://github.com/Koeroesi86/help.koro.si/actions/workflows/ci.yml/badge.svg)](https://github.com/Koeroesi86/help.koro.si/actions/workflows/ci.yml)
 
 A platform to help donations reach the place where they are most needed.
 
