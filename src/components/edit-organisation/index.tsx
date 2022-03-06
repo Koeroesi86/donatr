@@ -1,24 +1,13 @@
 import React, {FC, useEffect, useState} from "react";
 import {CreateOrganisationResource, OrganisationResource} from "../../types";
-import axios from "axios";
 import {Box, Button, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditLocations from "../edit-locations";
 import {useIntl} from "react-intl";
 import debounce from "lodash.debounce";
+import {ApiClient} from "../../utils";
 
-const api = {
-  all: (): Promise<OrganisationResource[]> =>
-    axios.get<OrganisationResource[]>('/api/organisations').then(r => r.data),
-  one: (id: string): Promise<OrganisationResource> =>
-    axios.get<OrganisationResource>(`/api/organisations/${id}`).then(r => r.data),
-  create: (data: CreateOrganisationResource): Promise<OrganisationResource[]> =>
-    axios.post<OrganisationResource[]>('/api/organisations', data).then(r => r.data),
-  update: (data: OrganisationResource): Promise<OrganisationResource> =>
-    axios.put<OrganisationResource>(`/api/organisations/${data.id}`, data).then(r => r.data),
-  remove: (data: OrganisationResource): Promise<void> =>
-    axios.delete(`/api/organisations/${data.id}`),
-}
+const api = new ApiClient<OrganisationResource, CreateOrganisationResource>('organisations');
 
 interface EditOrganisationProps {
   id: string;
