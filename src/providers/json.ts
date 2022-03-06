@@ -1,44 +1,39 @@
 import path from 'path';
-import fs from 'fs';
 import {
   Location,
   LocationResource,
   LocationsFilters,
-  Need, NeedResource,
+  Need,
+  NeedResource,
   NeedsFilters,
-  Organisation, OrganisationResource,
+  Organisation,
+  OrganisationResource,
   Provider,
   Translations
 } from "../types";
 import * as translations from "./translations";
-
-const getResourceIds = async (dirName: string): Promise<string[]> => {
-  if (!fs.existsSync(dirName)) {
-    return [];
-  }
-
-  const fileNames = await fs.promises.readdir(dirName);
-  const ids = fileNames
-    .filter(f => f.endsWith('.json'))
-    .map(f => f.replace('.json', ''));
-
-  return ids;
-};
+import JsonResource from "./jsonResource";
 
 export default class JsonProvider implements Provider {
   private readonly basePath: string;
+  private readonly locationResources: JsonResource<LocationResource>;
+  private readonly needResources: JsonResource<NeedResource>;
+  private readonly organisationResources: JsonResource<OrganisationResource>;
 
   constructor(props: { basePath: string }) {
     this.basePath = props.basePath;
+
+    this.needResources = new JsonResource<NeedResource>(path.resolve(this.basePath, './need/'));
+    this.locationResources = new JsonResource<LocationResource>(path.resolve(this.basePath, './location/'));
+    this.organisationResources = new JsonResource<OrganisationResource>(path.resolve(this.basePath, './organisation/'));
   }
 
   getLocation = async (id: string): Promise<Location | undefined> => {
-    const fileName = path.resolve(this.basePath, `./location/${id}.json`);
+    const location = await this.locationResources.one(id);
 
-    if (!fs.existsSync(fileName)) return undefined;
-
-    const content = fs.readFileSync(fileName, 'utf8');
-    const location: LocationResource = JSON.parse(content);
+    if (!location) {
+      return undefined;
+    }
 
     return {
       ...location,
@@ -47,46 +42,33 @@ export default class JsonProvider implements Provider {
   };
 
   getLocations = async (filters?: LocationsFilters): Promise<Location[]> => {
-    const dirName = path.resolve(this.basePath, './location/');
-
-    const ids = await getResourceIds(dirName);
-    const allLocations = await Promise.all(ids.map(async (id) => this.getLocation(id)));
+    const allLocations = await Promise.all(
+      (await this.locationResources.all())
+        .map(async (loc) => ({ ...loc, ...await this.getLocation(loc.id) }))
+    );
 
     return allLocations
-      .filter(Boolean)
       .filter(l => filters && filters.organisationId ? l.organisationId === filters.organisationId : true);
   };
 
   getNeed = async (id: string): Promise<Need | undefined> => {
-    const fileName = path.resolve(this.basePath, `./need/${id}.json`);
-
-    if (!fs.existsSync(fileName)) return undefined;
-
-    const content = fs.readFileSync(fileName, 'utf8');
-    const need: NeedResource = JSON.parse(content);
-
-    return need;
+    return this.needResources.one(id);
   };
 
   getNeeds = async (filters?: NeedsFilters): Promise<Need[]> => {
-    const dirName = path.resolve(this.basePath, './need/');
-
-    const ids = await getResourceIds(dirName);
-    const allNeeds = await Promise.all(ids.map(async (id) => this.getNeed(id)));
+    const allNeeds = await this.needResources.all();
 
     return allNeeds
-      .filter(Boolean)
       .filter(n => filters && filters.search ? n.name.includes(filters.search) : true)
       .filter(n => filters && filters.locationId ? n.locationId === filters.locationId : true);
   };
 
   getOrganisation = async (id: string): Promise<Organisation | undefined> => {
-    const fileName = path.resolve(this.basePath, `./organisation/${id}.json`);
+    const organisation = await this.organisationResources.one(id);
 
-    if (!fs.existsSync(fileName)) return undefined;
-
-    const content = fs.readFileSync(fileName, 'utf8');
-    const organisation: OrganisationResource = JSON.parse(content);
+    if (!organisation) {
+      return undefined;
+    }
 
     return {
       ...organisation,
@@ -95,12 +77,11 @@ export default class JsonProvider implements Provider {
   };
 
   getOrganisations = async (): Promise<Organisation[]> => {
-    const dirName = path.resolve(this.basePath, './organisation/');
-
-    const ids = await getResourceIds(dirName);
-
-    const o = await Promise.all(ids.map(async (id) => this.getOrganisation(id)));
-    return o.filter(Boolean);
+    const organisations = await this.organisationResources.all();
+    return Promise.all(organisations.map(async (organisation) => ({
+      ...organisation,
+      ...await this.getOrganisation(organisation.id)
+    })));
   };
 
   getTranslations = async (code: 'en' | 'hu'): Promise<Translations> => {
@@ -108,48 +89,41 @@ export default class JsonProvider implements Provider {
   };
 
   removeLocation = async (id: string): Promise<void> => {
-    const fileName = path.resolve(this.basePath, `./location/${id}.json`);
-
-    if (!fs.existsSync(fileName)) return;
-
     const location = await this.getLocation(id);
-    await Promise.all(location.needs.map((async (need) => this.removeNeed(need.id))));
 
-    await fs.promises.unlink(fileName);
+    if (!location) {
+      return;
+    }
+
+    await Promise.all(location.needs.map((async (need) => this.removeNeed(need.id))));
+    await this.locationResources.remove(id);
   };
 
   removeNeed = async (id: string): Promise<void> => {
-    const fileName = path.resolve(this.basePath, `./need/${id}.json`);
-
-    if (!fs.existsSync(fileName)) return;
-
-    await fs.promises.unlink(fileName);
+    await this.needResources.remove(id);
   };
 
   removeOrganisation = async (id: string): Promise<void> => {
-    const fileName = path.resolve(this.basePath, `./organisation/${id}.json`);
-
-    if (!fs.existsSync(fileName)) return;
-
     const organisation = await this.getOrganisation(id);
-    await Promise.all(organisation.locations.map((async (location) => this.removeLocation(location.id))));
 
-    await fs.promises.unlink(fileName);
+    if (!organisation) {
+      return;
+    }
+
+    await Promise.all(organisation.locations.map((async (location) => this.removeLocation(location.id))));
+    await this.organisationResources.remove(id);
   };
 
   setLocation = async (location: LocationResource): Promise<void> => {
-    const fileName = path.resolve(this.basePath, `./location/${location.id}.json`);
-    await fs.promises.writeFile(fileName, JSON.stringify(location, null, 2), 'utf8');
+    await this.locationResources.set(location);
   };
 
   setNeed = async (need: NeedResource): Promise<void> => {
-    const fileName = path.resolve(this.basePath, `./need/${need.id}.json`);
-    await fs.promises.writeFile(fileName, JSON.stringify(need, null, 2), 'utf8');
+    await this.needResources.set(need);
   };
 
   setOrganisation = async (organisation: OrganisationResource): Promise<void> => {
-    const fileName = path.resolve(this.basePath, `./organisation/${organisation.id}.json`);
-    await fs.promises.writeFile(fileName, JSON.stringify(organisation, null, 2), 'utf8');
+    await this.organisationResources.set(organisation);
   };
 
 }
