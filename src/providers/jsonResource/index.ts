@@ -15,27 +15,8 @@ export default class JsonResource<T extends BaseResource> {
 
   constructor(basePath: string) {
     this.basePath = basePath;
-  }
 
-  private getResourceIds = async (): Promise<string[]> => {
-    if (!fs.existsSync(this.basePath)) {
-      return [];
-    }
-
-    const fileNames = await fs.promises.readdir(this.basePath);
-    const ids = fileNames
-      .filter(f => f.endsWith('.json'))
-      .map(f => path.basename(f, '.json'));
-
-    return ids;
-  };
-
-  private ensureWatcher = async (): Promise<void> => {
-    if (this.watcher) {
-      if (!this.isReady) await new Promise(r => this.watcher.once('ready', r));
-      return;
-    }
-
+    // MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 ready listeners added to [FSWatcher]
     this.watcher = chokidar.watch(path.resolve(this.basePath), {
       ignored: '.gitkeep',
       persistent: true,
@@ -45,8 +26,6 @@ export default class JsonResource<T extends BaseResource> {
         pollInterval: 100
       },
     });
-
-    // Add event listeners.
     this.watcher
       .on('all', async (event, filePath) => {
         if (path.extname(filePath) !== '.json') return;
@@ -66,9 +45,29 @@ export default class JsonResource<T extends BaseResource> {
           delete this.cache[id];
         }
       });
+  }
 
-    await new Promise(r => this.watcher.once('ready', r));
-    this.isReady = true;
+  private getResourceIds = async (): Promise<string[]> => {
+    if (!fs.existsSync(this.basePath)) {
+      return [];
+    }
+
+    const fileNames = await fs.promises.readdir(this.basePath);
+    const ids = fileNames
+      .filter(f => f.endsWith('.json'))
+      .map(f => path.basename(f, '.json'));
+
+    return ids;
+  };
+
+  private waitForCache = async () => await new Promise(r => this.watcher.once('ready', r));
+
+  private ensureWatcher = async (): Promise<void> => {
+    if (this.isCacheReady) {
+      return;
+    }
+
+    await this.waitForCache();
   }
 
   all = async (): Promise<T[]> => {
