@@ -7,19 +7,30 @@ import {
   Box,
   Container,
   createTheme,
-  CssBaseline, Link,
+  CssBaseline,
+  FormControl,
+  InputLabel,
+  Link,
+  MenuItem,
+  Select,
   ThemeProvider,
   Toolbar,
   Typography
 } from "@mui/material";
 import axios from "axios";
 import {FormattedMessage, IntlProvider} from "react-intl";
+import Flag from 'react-world-flags';
 import {Translations} from "../../types";
 import Needs from "../needs";
 import LocationRoute from "../location-route";
 import EditRoute from "../edit-route";
 
 const mdTheme = createTheme();
+
+const localeIcons: { [k: string]: React.ReactElement } = {
+  "hu-HU": <Flag code="HU" height="24" />,
+  "en-GB": <Flag code="GB" height="24" />,
+}
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
   let resolved = useResolvedPath(to);
@@ -32,11 +43,16 @@ const NavLink: FC<{ to: string }> = ({ to, children }) => {
   )
 }
 
-const App: FC = ()  => {
+interface AppProps {
+  initialLocale: string;
+}
+
+const App: FC<AppProps> = ({ initialLocale })  => {
   const [messages, setMessages] = useState<Translations>({});
-  const [locale] = useState('hu');
+  const [locale, setLocale] = useState(initialLocale);
   useEffect(() => {
     axios.get(`/api/translations/${locale}`).then(({ data }) => setMessages(data)).catch(console.error);
+    sessionStorage.setItem('language', locale);
   }, [locale]);
 
   if (Object.keys(messages).length === 0) return null;
@@ -66,6 +82,16 @@ const App: FC = ()  => {
                   <FormattedMessage id="page.edit" />
                 </NavLink>
               </Box>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={locale}
+                onChange={(e) => setLocale(e.target.value)}
+              >
+                {Object.keys(localeIcons).map((key) => (
+                  <MenuItem value={key} key={key}>{localeIcons[key]}</MenuItem>
+                ))}
+              </Select>
             </Toolbar>
           </Container>
         </AppBar>

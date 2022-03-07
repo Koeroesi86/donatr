@@ -6,7 +6,7 @@ import App from './components/app';
 if (window) {
   render(
     <HashRouter>
-      <App />
+      <App initialLocale={sessionStorage.getItem('language') || navigator.language} />
     </HashRouter>,
     document.getElementById('root'));
 }
