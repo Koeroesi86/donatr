@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useState} from "react";
-import {CreateOrganisationResource, OrganisationResource} from "../../types";
+import {Organisation, OrganisationResource} from "../../types";
 import {Box, Button, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditLocations from "../edit-locations";
@@ -7,15 +7,16 @@ import {useIntl} from "react-intl";
 import debounce from "lodash.debounce";
 import {ApiClient} from "../../utils";
 
-const api = new ApiClient<OrganisationResource, CreateOrganisationResource>('organisations');
+const api = new ApiClient<Organisation, 'locations'>('organisations');
 
 interface EditOrganisationProps {
   id: string;
+  initialState?: Organisation;
 }
 
-const EditOrganisation: FC<EditOrganisationProps> = ({ id }) => {
+const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState }) => {
   const intl = useIntl();
-  const [organisation, setOrganisation] = useState<OrganisationResource>();
+  const [organisation, setOrganisation] = useState<Organisation>(initialState);
 
   const debouncedUpdate = debounce((data: OrganisationResource) => {
     api.update(data).then(() => api.one(data.id)).then(d => setOrganisation(d));
