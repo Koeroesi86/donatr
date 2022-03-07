@@ -84,8 +84,12 @@ export default class JsonProvider implements Provider {
     })));
   };
 
-  getTranslations = async (code: 'en' | 'hu'): Promise<Translations> => {
-    return translations[code] ? translations[code] : translations.en;
+  getTranslations = async (code: string): Promise<Translations> => {
+    const c = code.replace('-', '_');
+    if (!(c in translations)) return translations.en;
+
+    // @ts-ignore
+    return translations[c];
   };
 
   removeLocation = async (id: string): Promise<void> => {

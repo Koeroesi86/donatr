@@ -1,6 +1,6 @@
 import {Translations} from "../../types";
 
-const en: Translations = {
+const hu: Translations = {
   'site.name': 'Segítsük Ukrajnát',
   'page.home': 'Főoldal',
   'page.organisations': 'Szervezetek',
@@ -16,4 +16,4 @@ const en: Translations = {
   'dialog.confirm.delete': 'Biztos hogy törölni szeretnéd?',
 };
 
-export default en;
+export default hu;
