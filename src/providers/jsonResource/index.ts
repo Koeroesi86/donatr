@@ -10,13 +10,15 @@ export default class JsonResource<T extends BaseResource> {
   private readonly basePath: string;
   private readonly cache: { [k: string]: T } = {};
   private watcher: FSWatcher;
-  private isReady: boolean = false;
   private isCacheReady: boolean = false;
 
   constructor(basePath: string) {
     this.basePath = basePath;
 
-    // MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 ready listeners added to [FSWatcher]
+    if (!fs.existsSync(basePath)) {
+      fs.mkdirSync(basePath, { recursive: true });
+    }
+
     this.watcher = chokidar.watch(path.resolve(this.basePath), {
       ignored: '.gitkeep',
       persistent: true,

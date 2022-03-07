@@ -29,7 +29,7 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState }) => {
   if (!organisation) return null;
 
   return (
-    <Box key={organisation.id}>
+    <Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
         <Box sx={{ flexGrow: 1, px: 1 }}>
           <TextField

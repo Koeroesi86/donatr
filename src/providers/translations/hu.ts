@@ -14,6 +14,7 @@ const hu: Translations = {
   'input.organisation.name': 'Szervezet neve',
   'input.organisation.name.new': 'Szervezet hozzáadása',
   'dialog.confirm.delete': 'Biztos hogy törölni szeretnéd?',
+  'input.edit.login.code': 'Belépési kód',
 };
 
 export default hu;

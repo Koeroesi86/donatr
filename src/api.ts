@@ -142,6 +142,30 @@ const worker: Worker = async (event, callback) => {
       callback(createResponse(404, { message: 'no endpoint like this.' }));
       return;
     }
+
+    if (event.pathFragments[1] === 'access') {
+      if (event.pathFragments.length === 2) {
+        const accesses = await provider.getAccesses();
+        callback(createResponse(200, accesses));
+        return;
+      }
+
+      if (event.pathFragments.length === 3) {
+        if (event.httpMethod === 'PUT') {
+          await provider.setAccess(JSON.parse(event.body));
+        }
+        if (event.httpMethod === 'DELETE') {
+          await provider.removeAccess(event.pathFragments[2]);
+          callback(createResponse(200, ''));
+          return;
+        }
+        const access = await provider.getAccess(event.pathFragments[2]);
+        if (access) {
+          callback(createResponse(200, access));
+          return;
+        }
+      }
+    }
   } catch (e) {
     console.error(e);
     callback(createResponse(e.statusCode || 400, { message: e.message }));

@@ -1,5 +1,6 @@
 import path from 'path';
 import {
+  Access,
   Location,
   LocationResource,
   LocationsFilters,
@@ -19,13 +20,20 @@ export default class JsonProvider implements Provider {
   private readonly locationResources: JsonResource<LocationResource>;
   private readonly needResources: JsonResource<NeedResource>;
   private readonly organisationResources: JsonResource<OrganisationResource>;
+  private accessResources: JsonResource<Access>;
 
   constructor(props: { basePath: string }) {
     this.basePath = props.basePath;
 
-    this.needResources = new JsonResource<NeedResource>(path.resolve(this.basePath, './need/'));
-    this.locationResources = new JsonResource<LocationResource>(path.resolve(this.basePath, './location/'));
-    this.organisationResources = new JsonResource<OrganisationResource>(path.resolve(this.basePath, './organisation/'));
+    const needResourcesPath = path.resolve(this.basePath, './need/');
+    const locationResourcesPath = path.resolve(this.basePath, './location/');
+    const organisationResourcesPath = path.resolve(this.basePath, './organisation/');
+    const accessResourcesPath = path.resolve(this.basePath, './access/');
+
+    this.needResources = new JsonResource<NeedResource>(needResourcesPath);
+    this.locationResources = new JsonResource<LocationResource>(locationResourcesPath);
+    this.organisationResources = new JsonResource<OrganisationResource>(organisationResourcesPath);
+    this.accessResources = new JsonResource<Access>(accessResourcesPath);
   }
 
   getLocation = async (id: string): Promise<Location | undefined> => {
@@ -128,6 +136,28 @@ export default class JsonProvider implements Provider {
 
   setOrganisation = async (organisation: OrganisationResource): Promise<void> => {
     await this.organisationResources.set(organisation);
+  };
+
+  getAccesses = async (): Promise<Access[]> => {
+    return this.accessResources.all();
+  };
+
+  getAccess = async (code: string): Promise<Access | undefined> => {
+    const accesses = await this.accessResources.all();
+
+    return accesses.find(access => access.code === code);
+  };
+
+  setAccess = async (access: Access): Promise<void> => {
+    await this.accessResources.set(access);
+  };
+
+  removeAccess = async (code: string): Promise<void> => {
+    const access = await this.getAccess(code);
+
+    if (access) {
+      await this.accessResources.remove(access.id);
+    }
   };
 
 }

@@ -14,6 +14,7 @@ const en: Translations = {
   'input.organisation.name': 'Organisation\'s name',
   'input.organisation.name.new': 'Add new organisation',
   'dialog.confirm.delete': 'Are you sure you want to delete?',
+  'input.edit.login.code': 'Access code',
 };
 
 export default en;

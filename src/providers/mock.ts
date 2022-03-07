@@ -1,6 +1,6 @@
 import {locations, needs, organisations} from "./mocks";
 import {en} from "./translations";
-import {Provider} from "../types";
+import {Access, Provider} from "../types";
 
 export default class MockProvider implements Provider {
   getLocations = () => Promise.resolve(locations);
@@ -16,4 +16,8 @@ export default class MockProvider implements Provider {
   setLocation = () => Promise.resolve();
   setNeed = () => Promise.resolve();
   setOrganisation = () => Promise.resolve();
+  getAccess = (code: string): Promise<Access | undefined> => Promise.resolve(undefined);
+  getAccesses = (): Promise<Access[]> => Promise.resolve([]);
+  removeAccess = (code: string): Promise<void> => Promise.resolve();
+  setAccess = (access: Access): Promise<void> => Promise.resolve();
 }

@@ -1,7 +1,7 @@
 import React, {FC} from "react";
 import {FormattedMessage} from "react-intl";
 import {Typography} from "@mui/material";
-import EditOrganisations from "../edit-organisations";
+import {Outlet} from "@mui/icons-material";
 
 const EditRoute: FC = () => {
   return (
@@ -9,7 +9,7 @@ const EditRoute: FC = () => {
       <Typography variant="h2" sx={{ py: 2 }}>
         <FormattedMessage id="page.edit" />
       </Typography>
-      <EditOrganisations />
+      <Outlet />
     </>
   )
 };

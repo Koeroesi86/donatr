@@ -7,7 +7,7 @@ interface BaseResource {
 export default class ApiClient<T extends BaseResource, OmitFields extends keyof T, F extends { [k: string]: string } = undefined> {
   private readonly resource: string;
 
-  constructor(resource: 'locations' | 'organisations' | 'needs') {
+  constructor(resource: 'locations' | 'organisations' | 'needs' | 'access') {
     this.resource = resource;
   }
 

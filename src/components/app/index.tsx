@@ -8,8 +8,6 @@ import {
   Container,
   createTheme,
   CssBaseline,
-  FormControl,
-  InputLabel,
   Link,
   MenuItem,
   Select,
@@ -23,7 +21,8 @@ import Flag from 'react-world-flags';
 import {Translations} from "../../types";
 import Needs from "../needs";
 import LocationRoute from "../location-route";
-import EditRoute from "../edit-route";
+import EditRouteProtected from "../edit-route-protected";
+import EditRouteLogin from "../edit-route-login";
 
 const mdTheme = createTheme();
 
@@ -78,7 +77,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                 <NavLink to="/needs">
                   <FormattedMessage id="page.needs" />
                 </NavLink>
-                <NavLink to="/edit">
+                <NavLink to="/login">
                   <FormattedMessage id="page.edit" />
                 </NavLink>
               </Box>
@@ -100,8 +99,9 @@ const App: FC<AppProps> = ({ initialLocale })  => {
             <Route path="/" element={<Home />} />
             <Route path="/organisations" element={<Organisations />} />
             <Route path="/needs" element={<Needs />} />
-            <Route path="/location/:locationId" element={<LocationRoute/>}/>
-            <Route path="/edit" element={<EditRoute />} />
+            <Route path="/location/:locationId" element={<LocationRoute/>} />
+            <Route path="/login" element={<EditRouteLogin />} />
+            <Route path="/edit/:code" element={<EditRouteProtected/>} />
           </Routes>
         </Container>
       </Box>
