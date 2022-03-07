@@ -77,6 +77,10 @@ export type Access = FullAccess | OrganisationsAccess | LocationsAccess;
 export type NeedResource = Need;
 export type LocationResource = Omit<Location, 'needs'>;
 export type OrganisationResource = Omit<Organisation, 'locations'>;
+export interface TranslationsResource {
+  id: string;
+  translations: Translations;
+}
 
 export type CreateNeedResource = Omit<NeedResource, 'id'>;
 export type CreateLocationResource = Omit<LocationResource, 'id'>;

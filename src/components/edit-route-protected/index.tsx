@@ -5,6 +5,8 @@ import {Access} from "../../types";
 import EditOrganisations from "../edit-organisations";
 import {Typography} from "@mui/material";
 import {FormattedMessage} from "react-intl";
+import EditOrganisation from "../edit-organisation";
+import EditLocation from "../edit-location";
 
 const api = new ApiClient<Access, undefined>('access');
 
@@ -28,8 +30,14 @@ const EditRouteProtected: FC = () => {
       <FormattedMessage id="page.edit" />
     </Typography>
     {"all" in access && access.all && (
-      <EditOrganisations/>
+      <EditOrganisations />
     )}
+    {"organisationIds" in access && access.organisationIds && access.organisationIds.map((id) => (
+      <EditOrganisation key={id} id={id} />
+    ))}
+    {"locationIds" in access && access.locationIds && access.locationIds.map((id) => (
+      <EditLocation key={id} id={id} />
+    ))}
   </>
 };
 
