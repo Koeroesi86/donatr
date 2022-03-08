@@ -1,14 +1,14 @@
 import React, {FC, useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {ApiClient} from "../../utils";
-import {Access} from "../../types";
+import {Access, AccessFilters} from "../../types";
 import EditOrganisations from "../edit-organisations";
 import {Typography} from "@mui/material";
 import {FormattedMessage} from "react-intl";
 import EditOrganisation from "../edit-organisation";
 import EditLocation from "../edit-location";
 
-const api = new ApiClient<Access, undefined>('access');
+const api = new ApiClient<Access, undefined, AccessFilters>('access');
 
 const EditRouteProtected: FC = () => {
   const {code} = useParams();
@@ -16,9 +16,15 @@ const EditRouteProtected: FC = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    api.one(code)
-      .then(setAccess)
-      .catch(() => navigate('/login'));
+    api.all({ code })
+      .then(([access]) => {
+        if (access) {
+          setAccess(access);
+        } else {
+          navigate('/login')
+        }
+      })
+      .catch(console.error);
   }, [code, navigate]);
   
   if (!access) return null;

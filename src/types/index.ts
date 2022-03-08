@@ -74,6 +74,8 @@ export interface LocationsAccess {
 
 export type Access = FullAccess | OrganisationsAccess | LocationsAccess;
 
+export type AccessFilters = { code?: string; };
+
 export type NeedResource = Need;
 export type LocationResource = Omit<Location, 'needs'>;
 export type OrganisationResource = Omit<Organisation, 'locations'>;
@@ -100,7 +102,7 @@ export interface Provider {
   removeLocation: (id: string) => Promise<void>;
   setNeed: (location: Need) => Promise<void>;
   removeNeed: (id: string) => Promise<void>;
-  getAccesses: () => Promise<Access[]>;
+  getAccesses: (filters?: AccessFilters) => Promise<Access[]>;
   getAccess: (code: string) => Promise<Access | undefined>;
   setAccess: (access: Access) => Promise<void>;
   removeAccess: (code: string) => Promise<void>;

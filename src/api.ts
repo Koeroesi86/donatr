@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuid } from "uuid";
 import {JsonProvider} from "./providers";
-import {Provider, ResponseEvent, Worker} from "./types";
+import {AccessFilters, Provider, ResponseEvent, Worker} from "./types";
 import debounce from "lodash.debounce";
 
 const keepAliveTimeout = 30 * 1000;
@@ -145,7 +145,8 @@ const worker: Worker = async (event, callback) => {
 
     if (event.pathFragments[1] === 'access') {
       if (event.pathFragments.length === 2) {
-        const accesses = await provider.getAccesses();
+        const filters = event.queryStringParameters as AccessFilters;
+        const accesses = await provider.getAccesses(filters);
         callback(createResponse(200, accesses));
         return;
       }

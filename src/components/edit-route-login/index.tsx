@@ -3,10 +3,10 @@ import {FormattedMessage, useIntl} from "react-intl";
 import {useNavigate} from "react-router-dom";
 import {Box, Button, TextField, Typography} from "@mui/material";
 import LoginIcon from '@mui/icons-material/Login';
-import {Access} from "../../types";
+import {Access, AccessFilters} from "../../types";
 import {ApiClient} from "../../utils";
 
-const api = new ApiClient<Access, undefined>('access');
+const api = new ApiClient<Access, undefined, AccessFilters>('access');
 
 const EditRouteLogin: FC = () => {
   const intl = useIntl();
@@ -28,8 +28,12 @@ const EditRouteLogin: FC = () => {
             onChange={(e) => setCode(e.target.value)}
             onKeyPress={(e) => {
               if (e.key === "Enter") {
-                api.one(code)
-                  .then(() => navigate(`/edit/${code}`))
+                api.all({ code })
+                  .then(([access]) => {
+                    if (access) {
+                      navigate(`/edit/${code}`);
+                    }
+                  })
                   .catch(console.error);
               }
             }}

@@ -1,6 +1,6 @@
 import path from 'path';
 import {
-  Access,
+  Access, AccessFilters,
   Location,
   LocationResource,
   LocationsFilters,
@@ -138,26 +138,22 @@ export default class JsonProvider implements Provider {
     await this.organisationResources.set(organisation);
   };
 
-  getAccesses = async (): Promise<Access[]> => {
-    return this.accessResources.all();
+  getAccesses = async (filters?: AccessFilters): Promise<Access[]> => {
+    const results = await this.accessResources.all();
+    return results
+      .filter((access) => filters && filters.code ? access.code === filters.code : true);
   };
 
-  getAccess = async (code: string): Promise<Access | undefined> => {
-    const accesses = await this.accessResources.all();
-
-    return accesses.find(access => access.code === code);
+  getAccess = async (id: string): Promise<Access | undefined> => {
+    return this.accessResources.one(id);
   };
 
   setAccess = async (access: Access): Promise<void> => {
     await this.accessResources.set(access);
   };
 
-  removeAccess = async (code: string): Promise<void> => {
-    const access = await this.getAccess(code);
-
-    if (access) {
-      await this.accessResources.remove(access.id);
-    }
+  removeAccess = async (id: string): Promise<void> => {
+    await this.accessResources.remove(id);
   };
 
 }
