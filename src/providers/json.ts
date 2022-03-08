@@ -10,7 +10,8 @@ import {
   Organisation,
   OrganisationResource,
   Provider,
-  Translations
+  Translations,
+  TranslationsResource,
 } from "../types";
 import * as translations from "./translations";
 import JsonResource from "./jsonResource";
@@ -21,6 +22,7 @@ export default class JsonProvider implements Provider {
   private readonly needResources: JsonResource<NeedResource>;
   private readonly organisationResources: JsonResource<OrganisationResource>;
   private accessResources: JsonResource<Access>;
+  private translationResources: JsonResource<TranslationsResource>;
 
   constructor(props: { basePath: string }) {
     this.basePath = props.basePath;
@@ -29,11 +31,13 @@ export default class JsonProvider implements Provider {
     const locationResourcesPath = path.resolve(this.basePath, './location/');
     const organisationResourcesPath = path.resolve(this.basePath, './organisation/');
     const accessResourcesPath = path.resolve(this.basePath, './access/');
+    const translationResourcesPath = path.resolve(this.basePath, './translation/');
 
     this.needResources = new JsonResource<NeedResource>(needResourcesPath);
     this.locationResources = new JsonResource<LocationResource>(locationResourcesPath);
     this.organisationResources = new JsonResource<OrganisationResource>(organisationResourcesPath);
     this.accessResources = new JsonResource<Access>(accessResourcesPath);
+    this.translationResources = new JsonResource<TranslationsResource>(translationResourcesPath);
   }
 
   getLocation = async (id: string): Promise<Location | undefined> => {
@@ -93,11 +97,20 @@ export default class JsonProvider implements Provider {
   };
 
   getTranslations = async (code: string): Promise<Translations> => {
-    const c = code.replace('-', '_');
-    if (!(c in translations)) return translations.en;
+    const translation = await this.translationResources.one(code);
 
-    // @ts-ignore
-    return translations[c];
+    if (!translation) {
+      return translations.en;
+    }
+
+    return {
+      ...translations.en,
+      ...translation.translations,
+    };
+  };
+
+  setTranslations = async (id: string, translations: Translations) => {
+    await this.translationResources.set({ id, translations });
   };
 
   removeLocation = async (id: string): Promise<void> => {

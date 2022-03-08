@@ -135,7 +135,10 @@ const worker: Worker = async (event, callback) => {
       if (!event.pathFragments[2]) throw new Error('No language specified.')
 
       if (event.pathFragments.length === 3) {
-        const translations = await provider.getTranslations(event.pathFragments[2].replace('-', '_'));
+        if (event.httpMethod === 'PUT') {
+          await provider.setTranslations(event.pathFragments[2], JSON.parse(event.body));
+        }
+        const translations = await provider.getTranslations(event.pathFragments[2]);
         callback(createResponse(200, translations));
         return;
       }
