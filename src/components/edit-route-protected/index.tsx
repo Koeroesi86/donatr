@@ -7,6 +7,7 @@ import {Typography} from "@mui/material";
 import {FormattedMessage} from "react-intl";
 import EditOrganisation from "../edit-organisation";
 import EditLocation from "../edit-location";
+import EditAccesses from "../edit-accesses";
 
 const api = new ApiClient<Access, undefined, AccessFilters>('access');
 
@@ -27,9 +28,9 @@ const EditRouteProtected: FC = () => {
       .catch(console.error);
   }, [code, navigate]);
   
-  if (!access) return null;
-
-  console.log('access', access);
+  if (!access) {
+    return null;
+  }
 
   return <>
     <Typography variant="h2" sx={{ py: 2 }}>
@@ -38,12 +39,18 @@ const EditRouteProtected: FC = () => {
     {"all" in access && access.all && (
       <EditOrganisations />
     )}
-    {"organisationIds" in access && access.organisationIds && access.organisationIds.map((id) => (
-      <EditOrganisation key={id} id={id} />
-    ))}
+    {"organisationIds" in access && access.organisationIds && (
+      access.organisationIds.map((id) => (
+        <EditOrganisation key={id} id={id} />
+      ))
+    )}
     {"locationIds" in access && access.locationIds && access.locationIds.map((id) => (
       <EditLocation key={id} id={id} />
     ))}
+    {/* WIP */}
+    {/*{"all" in access && access.all && (*/}
+    {/*  <EditAccesses />*/}
+    {/*)}*/}
   </>
 };
 

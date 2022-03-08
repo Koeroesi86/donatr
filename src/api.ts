@@ -148,6 +148,12 @@ const worker: Worker = async (event, callback) => {
 
     if (event.pathFragments[1] === 'access') {
       if (event.pathFragments.length === 2) {
+        if (event.httpMethod === 'POST') {
+          await provider.setAccess({
+            ...JSON.parse(event.body),
+            id: uuid(),
+          });
+        }
         const filters = event.queryStringParameters as AccessFilters;
         const accesses = await provider.getAccesses(filters);
         callback(createResponse(200, accesses));
