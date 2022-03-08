@@ -62,7 +62,7 @@ export default class JsonResource<T extends BaseResource> {
     return ids;
   };
 
-  private waitForCache = async () => await new Promise(r => this.watcher.once('ready', r));
+  private waitForCache = () => new Promise(r => this.watcher.once('ready', r));
 
   private ensureWatcher = async (): Promise<void> => {
     if (this.isCacheReady) {
@@ -97,9 +97,10 @@ export default class JsonResource<T extends BaseResource> {
     if (!fs.existsSync(fileName)) return undefined;
 
     const content = await fs.promises.readFile(fileName, 'utf8');
-    const need: T = JSON.parse(content);
+    const data: T = JSON.parse(content);
+    this.cache[id] = data;
 
-    return need;
+    return data;
   };
 
   remove = async (id: string): Promise<void> => {
@@ -109,11 +110,13 @@ export default class JsonResource<T extends BaseResource> {
     if (!fs.existsSync(fileName)) return;
 
     await fs.promises.unlink(fileName);
+    delete this.cache[id];
   };
 
   set = async (data: T): Promise<void> => {
     await this.ensureWatcher();
     const fileName = path.resolve(this.basePath, `./${data.id}.json`);
     await fs.promises.writeFile(fileName, JSON.stringify(data, null, 2), 'utf8');
+    this.cache[data.id] = data;
   }
 }
