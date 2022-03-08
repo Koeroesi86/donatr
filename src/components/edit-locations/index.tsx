@@ -55,7 +55,7 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId }) => {
     <Card>
       <CardContent>
         {locations.map(location => (
-          <Box key={location.id}>
+          <Box key={`edit-location-${location.id}`}>
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', my: 2 }}>
               <Box sx={{ flexGrow: 1 }}>
                 <TextField

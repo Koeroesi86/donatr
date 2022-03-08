@@ -34,7 +34,7 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState }) => {
   }
 
   return (
-    <Box key={location.id}>
+    <Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', my: 2 }}>
         <Box sx={{ flexGrow: 1 }}>
           <TextField

@@ -27,18 +27,18 @@ const Organisations: FC = () => {
         <FormattedMessage id="page.organisations" />
       </Typography>
       {organisations.map(organisation => (
-        <Accordion key={organisation.id}>
+        <Accordion key={`organisation-${organisation.id}`}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             {organisation.name}
           </AccordionSummary>
           <AccordionDetails>
             {organisation.locations.map(l => (
-              <Accordion key={l.id}>
+              <Accordion key={`organisation-${organisation.id}-location-${l.id}`}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>{l.name}</AccordionSummary>
                 <AccordionDetails>
                   <List>
                     {l.needs.map(need => (
-                      <ListItem key={need.id}>
+                      <ListItem key={`organisation-${organisation.id}-location-${l.id}-need ${need.id}`}>
                         <ListItemIcon>
                           <ShoppingBagIcon />
                         </ListItemIcon>

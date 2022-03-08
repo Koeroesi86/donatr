@@ -41,11 +41,11 @@ const EditRouteProtected: FC = () => {
     )}
     {"organisationIds" in access && access.organisationIds && (
       access.organisationIds.map((id) => (
-        <EditOrganisation key={id} id={id} />
+        <EditOrganisation key={`edit-organisaion-${id}`} id={id} />
       ))
     )}
     {"locationIds" in access && access.locationIds && access.locationIds.map((id) => (
-      <EditLocation key={id} id={id} />
+      <EditLocation key={`edit-location-${id}`} id={id} />
     ))}
     {/* WIP */}
     {/*{"all" in access && access.all && (*/}

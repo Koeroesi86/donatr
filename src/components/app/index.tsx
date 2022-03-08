@@ -88,7 +88,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                 onChange={(e) => setLocale(e.target.value)}
               >
                 {Object.keys(localeIcons).map((key) => (
-                  <MenuItem value={key} key={key}>{localeIcons[key]}</MenuItem>
+                  <MenuItem value={key} key={`locale-${key}`}>{localeIcons[key]}</MenuItem>
                 ))}
               </Select>
             </Toolbar>

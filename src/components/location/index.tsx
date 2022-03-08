@@ -25,7 +25,7 @@ const Location: FC<LocationProps> = ({ id, open = false }) => {
       <AccordionDetails>
         <List>
           {loc.needs.map(need => (
-            <ListItem key={need.id}>
+            <ListItem key={`location-${loc.id}-need-${need.id}`}>
               <ListItemIcon>
                 <ShoppingBagIcon />
               </ListItemIcon>

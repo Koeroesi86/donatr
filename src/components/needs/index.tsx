@@ -40,7 +40,7 @@ const Needs: FC = () => {
       />
       <List>
         {listing.map(need => (
-          <ListItem key={need.id}>
+          <ListItem key={`need-${need.id}`}>
             <ListItemIcon>
               <ShoppingBagIcon />
             </ListItemIcon>
