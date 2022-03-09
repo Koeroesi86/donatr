@@ -17,4 +17,4 @@ jobs:
           path: ${{ github.workspace }}/.cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
       - run: yarn install --frozen-lockfile
-      - run: yarn build
+      - run: yarn test
