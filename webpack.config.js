@@ -6,12 +6,12 @@ const WebpackBar = require('webpackbar');
 
 process.env.PUBLIC_URL = process.env.PUBLIC_URL || '/';
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isProd = process.env.NODE_ENV !== 'dev';
 
 module.exports = [
   {
     devtool: 'cheap-module-source-map',
-    mode: isDev ? 'development' : 'production',
+    mode: isProd ? 'production' : 'development',
     entry: {
       bundle: './src/client.tsx',
     },
@@ -93,7 +93,7 @@ module.exports = [
   },
   {
     devtool: false,
-    mode: isDev ? 'development' : 'production',
+    mode: isProd ? 'production' : 'development',
     entry: {
       index: './src/api.ts',
     },
