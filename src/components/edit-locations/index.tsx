@@ -1,12 +1,13 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
 import {CreateLocationResource, LocationResource} from "../../types";
 import axios from "axios";
-import {Box, Button, Card, CardContent, TextField} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, TextField} from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import debounce from "lodash.debounce";
 import EditNeeds from "../edit-needs";
 import {useIntl} from "react-intl";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const api = {
   all: (organisationId?: string): Promise<LocationResource[]> => {
@@ -30,9 +31,10 @@ const api = {
 interface EditLocationsProps {
   ids?: string[];
   organisationId: string;
+  initialOpen?: boolean;
 }
 
-const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId }) => {
+const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpen = true }) => {
   const intl = useIntl();
   const [locations, setLocations] = useState<LocationResource[]>([]);
   const [enteredText, setEnteredText] = useState('');
@@ -57,46 +59,53 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId }) => {
     <Card>
       <CardContent>
         {locations.map(location => (
-          <Box key={`edit-location-${location.id}`}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', my: 2 }}>
-              <Box sx={{ flexGrow: 1 }}>
-                <TextField
-                  label={intl.formatMessage({ id: 'input.location.name' })}
-                  variant="standard"
-                  defaultValue={location.name}
-                  fullWidth
-                  onChange={(e) => debouncedUpdate({
-                    id: location.id,
-                    organisationId: location.organisationId,
-                    name: e.target.value,
-                  })}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      debouncedUpdate({
+          <Accordion defaultExpanded={initialOpen} key={`edit-location-${location.id}`}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              {location.name}
+            </AccordionSummary>
+            <AccordionDetails>
+              <Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', my: 2 }}>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <TextField
+                      label={intl.formatMessage({ id: 'input.location.name' })}
+                      variant="standard"
+                      defaultValue={location.name}
+                      fullWidth
+                      onChange={(e) => debouncedUpdate({
                         id: location.id,
                         organisationId: location.organisationId,
-                        // @ts-ignore
                         name: e.target.value,
-                      });
-                    }
-                  }}
-                />
-              </Box>
-              <Box>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
+                      })}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          debouncedUpdate({
+                            id: location.id,
+                            organisationId: location.organisationId,
+                            // @ts-ignore
+                            name: e.target.value,
+                          });
+                        }
+                      }}
+                    />
+                  </Box>
+                  <Box>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
 
-                    api.remove(location).then(() => refresh());
-                  }}
-                >
-                  <DeleteIcon />
-                </Button>
+                        api.remove(location).then(() => refresh());
+                      }}
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </Box>
+                </Box>
+                <EditNeeds locationId={location.id} />
               </Box>
-            </Box>
-            <EditNeeds locationId={location.id} />
-          </Box>
+            </AccordionDetails>
+          </Accordion>
         ))}
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <Box sx={{ flexGrow: 1 }}>

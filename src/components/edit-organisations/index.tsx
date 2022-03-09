@@ -21,7 +21,12 @@ const EditOrganisations: FC = () => {
     <Card>
       <CardContent>
         {organisations.map(organisation => (
-          <EditOrganisation key={`edit-organisation-${organisation.id}`} id={organisation.id} />
+          <EditOrganisation
+            key={`edit-organisation-${organisation.id}`}
+            id={organisation.id}
+            initialOpen={false}
+            initialState={organisation}
+          />
         ))}
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
           <Box sx={{ flexGrow: 1, px: 1 }}>
