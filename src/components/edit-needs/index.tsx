@@ -33,7 +33,7 @@ interface EditNeedsProps {
 
 const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
   const intl = useIntl();
-  const [needs, setNeeds] = useState<NeedResource[]>(initialState);
+  const [needs, setNeeds] = useState<NeedResource[]>(initialState.sort((a, b) => a.name.localeCompare(b.name)));
   const [enteredText, setEnteredText] = useState('');
   const refresh = useCallback(() => {
     api.all(locationId)

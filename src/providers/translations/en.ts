@@ -18,6 +18,8 @@ const en: Translations = {
   'input.access.code': 'Entry code',
   'input.access.translations.checkbox': 'Translations',
   'input.access.all.checkbox': 'Full Access',
+  'page.edit.accesses.title': 'Accesses',
+  'page.edit.accesses.new.title': 'Create new access',
 };
 
 export default en;

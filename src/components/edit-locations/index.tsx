@@ -18,7 +18,7 @@ interface EditLocationsProps {
 
 const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpen = true, initialState = [] }) => {
   const intl = useIntl();
-  const [locations, setLocations] = useState<LocationResource[]>(initialState);
+  const [locations, setLocations] = useState<LocationResource[]>(initialState.sort((a, b) => a.name.localeCompare(b.name)));
   const [enteredText, setEnteredText] = useState('');
 
   const refresh = useCallback(() => {

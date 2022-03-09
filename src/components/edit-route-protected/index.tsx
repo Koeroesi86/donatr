@@ -48,9 +48,9 @@ const EditRouteProtected: FC = () => {
       <EditLocation key={`edit-location-${id}`} id={id} />
     ))}
     {/* WIP */}
-    {/*{"all" in access && access.all && (*/}
-    {/*  <EditAccesses />*/}
-    {/*)}*/}
+    {"all" in access && access.all && (
+      <EditAccesses />
+    )}
   </>
 };
 
