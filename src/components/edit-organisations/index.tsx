@@ -13,7 +13,9 @@ const EditOrganisations: FC = () => {
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [enteredText, setEnteredText] = useState('');
   useEffect(() => {
-    api.all().then(o => setOrganisations(o))
+    api.all().then(o => setOrganisations(
+      o.sort((a, b) => a.name.localeCompare(b.name)
+    )));
   }, []);
   return (
     <Card>

@@ -4,9 +4,11 @@ import {Need} from "../../types";
 import {InputAdornment, Link, List, ListItem, ListItemIcon, ListItemText, TextField} from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import SearchIcon from '@mui/icons-material/Search';
-import axios from "axios";
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
+import {ApiClient} from "../../utils";
+
+const api = new ApiClient<Need, undefined, { s: string }>('needs');
 
 const Needs: FC = () => {
   const [term, setTerm] = useState<string>('');
@@ -16,11 +18,10 @@ const Needs: FC = () => {
   const [listing, setListing] = useState<Need[]>([]);
 
   useEffect(() => {
-    // eslint-disable-next-line no-restricted-globals
-    const url = new URL(location.origin);
-    url.pathname = '/api/needs';
-    url.searchParams.set('s', term);
-    axios.get(url.toJSON()).then(({ data }) => setListing(data)).catch(console.error);
+    api.all({ s: term })
+      .then((data) => data.sort((a, b) => a.name.localeCompare(b.name)))
+      .then((data) => setListing(data))
+      .catch(console.error);
   }, [term]);
 
   return (

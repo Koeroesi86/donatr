@@ -35,7 +35,9 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId }) => {
   const [needs, setNeeds] = useState<NeedResource[]>([]);
   const [enteredText, setEnteredText] = useState('');
   const refresh = useCallback(() => {
-    api.all(locationId).then(o => setNeeds(o));
+    api.all(locationId)
+      .then((l) => l.sort((a, b) => a.name.localeCompare(b.name)))
+      .then(o => setNeeds(o));
   }, [locationId]);
   const update = useCallback((data: NeedResource) => {
     api.update(data).then(() => refresh());

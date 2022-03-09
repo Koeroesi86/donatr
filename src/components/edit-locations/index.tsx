@@ -44,7 +44,9 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId }) => {
     (ids
         ? Promise.all(ids.map((id: string) => api.one(id)))
         : api.all(organisationId)
-    ).then(o => setLocations(o));
+    )
+      .then((l) => l.sort((a, b) => a.name.localeCompare(b.name)))
+      .then(o => setLocations(o));
   }, [ids, organisationId]);
 
   useEffect(() => {

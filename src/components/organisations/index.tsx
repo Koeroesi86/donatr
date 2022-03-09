@@ -14,12 +14,17 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import {FormattedMessage} from "react-intl";
+import {ApiClient} from "../../utils";
 
+const api = new ApiClient<Organisation, 'locations'>('organisations');
 
 const Organisations: FC = () => {
   const [organisations, setOrganisations] = useState<Organisation[]>([])
   useEffect(() => {
-    axios.get<Organisation[]>('/api/organisations').then(r => setOrganisations(r.data))
+    api.all()
+      .then((data) => data.sort((a, b) => a.name.localeCompare(b.name)))
+      .then((data) => setOrganisations(data))
+      .catch(console.error);
   }, [])
   return (
     <>
