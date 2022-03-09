@@ -4,7 +4,7 @@ interface BaseResource {
   id: string;
 }
 
-export default class ApiClient<T extends BaseResource, OmitFields extends keyof T, F extends { [k: string]: string } = undefined> {
+export default class ApiClient<T extends BaseResource, OmitFields extends keyof Omit<T, 'id'>, F extends { [k: string]: string } = undefined> {
   private readonly resource: string;
 
   constructor(resource: 'locations' | 'organisations' | 'needs' | 'access') {

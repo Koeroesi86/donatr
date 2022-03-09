@@ -18,6 +18,7 @@ interface EditOrganisationProps {
 
 const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initialOpen = true }) => {
   const intl = useIntl();
+  const [isExpanded, setIsExpanded] = useState(initialOpen);
   const [organisation, setOrganisation] = useState<Organisation>(initialState);
 
   const debouncedUpdate = debounce((data: OrganisationResource) => {
@@ -25,13 +26,15 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
   }, 2000);
 
   useEffect(() => {
-    api.one(id).then(o => setOrganisation(o))
-  }, [id]);
+    if (!initialState) {
+      api.one(id).then(o => setOrganisation(o))
+    }
+  }, [id, initialState]);
 
   if (!organisation) return null;
 
   return (
-    <Accordion defaultExpanded={initialOpen}>
+    <Accordion expanded={isExpanded} onChange={(_, ex) => setIsExpanded(ex)}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         {organisation.name}
       </AccordionSummary>
@@ -71,7 +74,13 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
             </Button>
           </Box>
         </Box>
-        <EditLocations organisationId={organisation.id} initialOpen={false} />
+        {isExpanded && (
+          <EditLocations
+            organisationId={organisation.id}
+            initialOpen={false}
+            initialState={organisation.locations}
+          />
+        )}
       </AccordionDetails>
     </Accordion>
   );

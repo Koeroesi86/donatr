@@ -28,11 +28,12 @@ const api = {
 
 interface EditNeedsProps {
   locationId: string;
+  initialState?: NeedResource[];
 }
 
-const EditNeeds: FC<EditNeedsProps> = ({ locationId }) => {
+const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
   const intl = useIntl();
-  const [needs, setNeeds] = useState<NeedResource[]>([]);
+  const [needs, setNeeds] = useState<NeedResource[]>(initialState);
   const [enteredText, setEnteredText] = useState('');
   const refresh = useCallback(() => {
     api.all(locationId)
