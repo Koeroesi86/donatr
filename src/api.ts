@@ -92,7 +92,9 @@ const worker: Worker = async (event, callback) => {
           return;
         }
         const location = await provider.getLocation(event.pathFragments[2]);
-        callback(createResponse(200, location));
+        if (location) {
+          callback(createResponse(200, location));
+        }
         return;
       }
       callback(createResponse(404, { message: 'no endpoint like this.' }));
@@ -124,7 +126,9 @@ const worker: Worker = async (event, callback) => {
           return;
         }
         const need = await provider.getNeed(event.pathFragments[2]);
-        callback(createResponse(200, need));
+        if (need) {
+          callback(createResponse(200, need));
+        }
         return;
       }
       callback(createResponse(404, { message: 'no endpoint like this.' }));
