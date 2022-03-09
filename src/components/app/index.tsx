@@ -9,8 +9,6 @@ import {
   createTheme,
   CssBaseline,
   Link,
-  MenuItem,
-  Select,
   ThemeProvider,
   Toolbar,
   Typography
@@ -21,8 +19,8 @@ import Needs from "../needs";
 import LocationRoute from "../location-route";
 import EditRouteProtected from "../edit-route-protected";
 import EditRouteLogin from "../edit-route-login";
-import CountryFlag from "../country-flag";
 import {ApiClient} from "../../utils";
+import LocaleDropdown from "../locale-dropdown";
 
 const mdTheme = createTheme();
 
@@ -86,16 +84,11 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                   <FormattedMessage id="page.edit" />
                 </NavLink>
               </Box>
-              <Select
-                value={locale}
-                onChange={(e) => setLocale(e.target.value)}
-              >
-                {translations.map((t) => (
-                  <MenuItem key={`locale-${t.id}`} value={t.id} sx={{ py: 2 }}>
-                    <CountryFlag code={t.id.substring(3).toLowerCase()} width="30" />
-                  </MenuItem>
-                ))}
-              </Select>
+              <LocaleDropdown
+                locale={locale}
+                setLocale={setLocale}
+                translations={translations}
+              />
             </Toolbar>
           </Container>
         </AppBar>

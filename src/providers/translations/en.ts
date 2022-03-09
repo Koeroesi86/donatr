@@ -20,6 +20,8 @@ const en: Translations = {
   'input.access.all.checkbox': 'Full Access',
   'page.edit.accesses.title': 'Accesses',
   'page.edit.accesses.new.title': 'Create new access',
+  'language.dropdown.label': 'Language',
+  'input.needs.search.label': 'Search needs',
 };
 
 export default en;

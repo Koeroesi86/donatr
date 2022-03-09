@@ -5,12 +5,13 @@ import {InputAdornment, Link, List, ListItem, ListItemIcon, ListItemText, TextFi
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import SearchIcon from '@mui/icons-material/Search';
 import {Link as RLink} from "react-router-dom";
-import {FormattedMessage} from "react-intl";
+import {FormattedMessage, useIntl} from "react-intl";
 import {ApiClient} from "../../utils";
 
 const api = new ApiClient<Need, undefined, { s: string }>('needs');
 
 const Needs: FC = () => {
+  const intl = useIntl();
   const [term, setTerm] = useState<string>('');
   const search = useCallback(debounce((s: string) => {
     setTerm(s);
@@ -27,13 +28,14 @@ const Needs: FC = () => {
   return (
     <>
       <TextField
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
+        label={intl.formatMessage({ id: 'input.needs.search.label' })}
+        // InputProps={{
+        //   startAdornment: (
+        //     <InputAdornment position="start">
+        //       <SearchIcon />
+        //     </InputAdornment>
+        //   ),
+        // }}
         variant="standard"
         onChange={(e) => search(e.target.value)}
         fullWidth
