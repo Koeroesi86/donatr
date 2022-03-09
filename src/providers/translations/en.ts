@@ -23,6 +23,8 @@ const en: Translations = {
   'language.dropdown.label': 'Language',
   'input.needs.search.label': 'Search needs',
   'edit.translations.title': 'Translations',
+  'edit.translations.new.title': 'Create translation',
+  'create.translation.id.dropdown.label': 'Language',
 };
 
 export default en;

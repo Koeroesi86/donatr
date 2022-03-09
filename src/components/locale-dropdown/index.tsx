@@ -21,7 +21,7 @@ const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale, translatio
     >
       {translations.map((t) => (
         <MenuItem key={`locale-${t.id}`} value={t.id} sx={{ py: 2 }}>
-          <CountryFlag code={t.id.substring(3).toLowerCase()} width="30" />
+          <CountryFlag code={t.id.split('-').pop().toLowerCase()} width="30" />
         </MenuItem>
       ))}
     </Select>

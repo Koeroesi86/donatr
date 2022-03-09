@@ -1,11 +1,12 @@
-import React, {FC, Fragment, useCallback, useEffect, useState} from "react";
+import React, {FC, useCallback, useEffect, useState} from "react";
 import {TranslationsResource} from "../../types";
 import {ApiClient} from "../../utils";
-import {Accordion, AccordionDetails, AccordionSummary, Box, Card, CardContent, TextField} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, TextField} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {FormattedMessage} from "react-intl";
 import CountryFlag from "../country-flag";
 import debounce from "lodash.debounce";
+import CreateTranslationForm from "../create-translation-form";
 
 const api = new ApiClient<TranslationsResource>('translations');
 
@@ -59,7 +60,7 @@ const EditTranslations: FC = () => {
         {translations.map((translation) => (
           <Accordion key={`edit-translation-${translation.id}`}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <CountryFlag code={translation.id.substring(3).toLowerCase()} width="30" />
+              <CountryFlag code={translation.id.split('-').pop().toLowerCase()} width="30" />
             </AccordionSummary>
             <AccordionDetails>
               {Object.keys(translation.translations).sort().map((key) => (
@@ -82,6 +83,20 @@ const EditTranslations: FC = () => {
             </AccordionDetails>
           </Accordion>
         ))}
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <FormattedMessage id="edit.translations.new.title" />
+          </AccordionSummary>
+          <AccordionDetails>
+            <CreateTranslationForm
+              fallback={fallback.translations}
+              existingIds={translations.map(t => t.id)}
+              onSubmit={(t) => {
+                api.update(t).then(() => refresh()).catch(console.error)
+              }}
+            />
+          </AccordionDetails>
+        </Accordion>
       </AccordionDetails>
     </Accordion>
   );
