@@ -9,7 +9,8 @@ export default class MockProvider implements Provider {
   getNeed = () => Promise.resolve(needs[0]);
   getOrganisations = () => Promise.resolve(organisations);
   getOrganisation = () => Promise.resolve(organisations[0]);
-  getTranslations = () => Promise.resolve(en);
+  getTranslations = () => Promise.resolve([{ id: 'en', translations: en }]);
+  getTranslation = () => Promise.resolve({ id: 'en', translations: en });
   setTranslations = () => Promise.resolve();
   removeLocation = () => Promise.resolve();
   removeNeed = () => Promise.resolve();

@@ -96,18 +96,28 @@ export default class JsonProvider implements Provider {
     })));
   };
 
-  getTranslations = async (code: string): Promise<Translations> => {
+  getTranslation = async (code: string): Promise<TranslationsResource> => {
     const translation = await this.translationResources.one(code);
 
     if (!translation) {
-      return translations.en;
+      return {
+        id: 'en',
+        translations: translations.en,
+      };
     }
 
     return {
-      ...translations.en,
-      ...translation.translations,
+      ...translation,
+      translations: {
+        ...translations.en,
+        ...translation.translations,
+      },
     };
   };
+
+  getTranslations = (): Promise<TranslationsResource[]> => {
+    return this.translationResources.all();
+  }
 
   setTranslations = async (id: string, translations: Translations) => {
     await this.translationResources.set({ id, translations });

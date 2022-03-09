@@ -15,21 +15,16 @@ import {
   Toolbar,
   Typography
 } from "@mui/material";
-import axios from "axios";
 import {FormattedMessage, IntlProvider} from "react-intl";
-import Flag from 'react-world-flags';
-import {Translations} from "../../types";
+import {Translations, TranslationsResource} from "../../types";
 import Needs from "../needs";
 import LocationRoute from "../location-route";
 import EditRouteProtected from "../edit-route-protected";
 import EditRouteLogin from "../edit-route-login";
+import CountryFlag from "../country-flag";
+import {ApiClient} from "../../utils";
 
 const mdTheme = createTheme();
-
-const localeIcons: { [k: string]: React.ReactElement } = {
-  "hu-HU": <Flag code="HU" height="24" />,
-  "en-GB": <Flag code="GB" height="24" />,
-}
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
   let resolved = useResolvedPath(to);
@@ -42,16 +37,26 @@ const NavLink: FC<{ to: string }> = ({ to, children }) => {
   )
 }
 
+const api = new ApiClient<TranslationsResource, undefined>('translations');
+
 interface AppProps {
   initialLocale: string;
 }
 
 const App: FC<AppProps> = ({ initialLocale })  => {
+  const [translations, setTranslations] = useState<TranslationsResource[]>([]);
   const [messages, setMessages] = useState<Translations>({});
   const [locale, setLocale] = useState(initialLocale);
+
   useEffect(() => {
-    axios.get(`/api/translations/${locale}`).then(({ data }) => setMessages(data)).catch(console.error);
-    sessionStorage.setItem('language', locale);
+    api.all().then(setTranslations)
+  }, []);
+
+  useEffect(() => {
+    api.one(locale).then((t) => {
+      setMessages(t.translations);
+      sessionStorage.setItem('language', locale);
+    });
   }, [locale]);
 
   if (Object.keys(messages).length === 0) return null;
@@ -82,13 +87,13 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                 </NavLink>
               </Box>
               <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
                 value={locale}
                 onChange={(e) => setLocale(e.target.value)}
               >
-                {Object.keys(localeIcons).map((key) => (
-                  <MenuItem value={key} key={`locale-${key}`}>{localeIcons[key]}</MenuItem>
+                {translations.map((t) => (
+                  <MenuItem key={`locale-${t.id}`} value={t.id} sx={{ py: 2 }}>
+                    <CountryFlag code={t.id.substring(3).toLowerCase()} width="30" />
+                  </MenuItem>
                 ))}
               </Select>
             </Toolbar>

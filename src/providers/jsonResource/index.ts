@@ -62,19 +62,7 @@ export default class JsonResource<T extends BaseResource> {
     return ids;
   };
 
-  private waitForCache = () => new Promise(r => this.watcher.once('ready', r));
-
-  private ensureWatcher = async (): Promise<void> => {
-    if (this.isCacheReady) {
-      return;
-    }
-
-    await this.waitForCache();
-  }
-
   all = async (): Promise<T[]> => {
-    await this.ensureWatcher();
-
     if (this.isCacheReady) {
       return Object.keys(this.cache).map(k => this.cache[k]);
     }
@@ -86,8 +74,6 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   one = async (id: string): Promise<T | undefined> => {
-    await this.ensureWatcher();
-
     if(this.cache[id]) {
       return this.cache[id];
     }
@@ -104,7 +90,6 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   remove = async (id: string): Promise<void> => {
-    await this.ensureWatcher();
     const fileName = path.resolve(this.basePath, `./${id}.json`);
 
     if (!fs.existsSync(fileName)) return;
@@ -114,7 +99,6 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   set = async (data: T): Promise<void> => {
-    await this.ensureWatcher();
     const fileName = path.resolve(this.basePath, `./${data.id}.json`);
     await fs.promises.writeFile(fileName, JSON.stringify(data, null, 2), 'utf8');
     this.cache[data.id] = data;

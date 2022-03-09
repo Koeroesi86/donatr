@@ -136,16 +136,21 @@ const worker: Worker = async (event, callback) => {
     }
 
     if (event.pathFragments[1] === 'translations') {
-      if (!event.pathFragments[2]) throw new Error('No language specified.')
+      if (event.pathFragments.length === 2) {
+        const translations = await provider.getTranslations();
+        callback(createResponse(200, translations));
+        return;
+      }
 
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
           await provider.setTranslations(event.pathFragments[2], JSON.parse(event.body));
         }
-        const translations = await provider.getTranslations(event.pathFragments[2]);
-        callback(createResponse(200, translations));
+        const translation = await provider.getTranslation(event.pathFragments[2]);
+        callback(createResponse(200, translation));
         return;
       }
+
       callback(createResponse(404, { message: 'no endpoint like this.' }));
       return;
     }
