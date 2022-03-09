@@ -22,6 +22,7 @@ const en: Translations = {
   'page.edit.accesses.new.title': 'Create new access',
   'language.dropdown.label': 'Language',
   'input.needs.search.label': 'Search needs',
+  'edit.translations.title': 'Translations',
 };
 
 export default en;

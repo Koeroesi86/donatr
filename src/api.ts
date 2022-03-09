@@ -144,7 +144,7 @@ const worker: Worker = async (event, callback) => {
 
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
-          await provider.setTranslations(event.pathFragments[2], JSON.parse(event.body));
+          await provider.setTranslations(JSON.parse(event.body));
         }
         const translation = await provider.getTranslation(event.pathFragments[2]);
         callback(createResponse(200, translation));

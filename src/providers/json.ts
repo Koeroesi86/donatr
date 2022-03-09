@@ -119,8 +119,8 @@ export default class JsonProvider implements Provider {
     return this.translationResources.all();
   }
 
-  setTranslations = async (id: string, translations: Translations) => {
-    await this.translationResources.set({ id, translations });
+  setTranslations = async (translations: TranslationsResource): Promise<void> => {
+    await this.translationResources.set(translations);
   };
 
   removeLocation = async (id: string): Promise<void> => {

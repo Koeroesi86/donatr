@@ -97,7 +97,7 @@ export interface Provider {
   getNeed: (id: string) => Promise<Need | undefined>;
   getTranslations: () => Promise<TranslationsResource[]>;
   getTranslation: (code: string) => Promise<TranslationsResource>;
-  setTranslations: (code: string, translation: Translations) => Promise<void>;
+  setTranslations: (translation: TranslationsResource) => Promise<void>;
   setOrganisation: (organisation: Organisation) => Promise<void>;
   removeOrganisation: (id: string) => Promise<void>;
   setLocation: (location: LocationResource) => Promise<void>;

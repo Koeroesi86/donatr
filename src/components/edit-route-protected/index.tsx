@@ -8,6 +8,7 @@ import {FormattedMessage} from "react-intl";
 import EditOrganisation from "../edit-organisation";
 import EditLocation from "../edit-location";
 import EditAccesses from "../edit-accesses";
+import EditTranslations from "../edit-translations";
 
 const api = new ApiClient<Access, undefined, AccessFilters>('access');
 
@@ -47,9 +48,11 @@ const EditRouteProtected: FC = () => {
     {"locationIds" in access && access.locationIds && access.locationIds.map((id) => (
       <EditLocation key={`edit-location-${id}`} id={id} />
     ))}
-    {/* WIP */}
     {"all" in access && access.all && (
       <EditAccesses />
+    )}
+    {access.translations && (
+      <EditTranslations />
     )}
   </>
 };
