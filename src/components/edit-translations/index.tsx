@@ -63,9 +63,9 @@ const EditTranslations: FC = () => {
               <CountryFlag code={translation.id.split('-').pop().toLowerCase()} width="30" />
             </AccordionSummary>
             <AccordionDetails>
-              {Object.keys(translation.translations).sort().map((key) => (
+              {Object.keys(fallback.translations).sort().map((key) => (
                 <DebouncedTextField
-                  key={`edit-translation-${translation.id}-input-${translation.translations[key]}`}
+                  key={`edit-translation-${translation.id}-input-${key}`}
                   label={key}
                   defaultValue={translation.translations[key]}
                   helperText={fallback.translations[key]}
