@@ -4,16 +4,19 @@ import Home from "../home";
 import {Link as RLink, Route, Routes, useMatch, useResolvedPath} from "react-router-dom";
 import {
   AppBar,
-  Box,
+  Box, Button,
   Container,
   createTheme,
   CssBaseline,
+  Drawer,
+  IconButton,
   Link,
   ThemeProvider,
   Toolbar,
   Typography
 } from "@mui/material";
 import {FormattedMessage, IntlProvider} from "react-intl";
+import MenuIcon from '@mui/icons-material/Menu';
 import {Translations, TranslationsResource} from "../../types";
 import Needs from "../needs";
 import LocationRoute from "../location-route";
@@ -21,12 +24,13 @@ import EditRouteProtected from "../edit-route-protected";
 import EditRouteLogin from "../edit-route-login";
 import {ApiClient} from "../../utils";
 import LocaleDropdown from "../locale-dropdown";
+import SidebarContents from "../sidebar-contents";
 
 const mdTheme = createTheme();
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
-  let resolved = useResolvedPath(to);
-  let match = useMatch({ path: resolved.pathname, end: true });
+  const resolved = useResolvedPath(to);
+  const match = useMatch({path: resolved.pathname, end: true});
 
   return (
     <Link to={to} component={RLink} color="inherit" sx={{ padding: '0 12px' }} underline={match ? 'always' : 'hover'}>
@@ -45,6 +49,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
   const [translations, setTranslations] = useState<TranslationsResource[]>([]);
   const [messages, setMessages] = useState<Translations>({});
   const [locale, setLocale] = useState(initialLocale);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     api.all().then(setTranslations)
@@ -62,47 +67,62 @@ const App: FC<AppProps> = ({ initialLocale })  => {
   return (
     <ThemeProvider theme={mdTheme}>
       <IntlProvider messages={messages} locale={locale} defaultLocale="en">
-      <Box sx={{ flexGrow: 1 }}>
-        <CssBaseline />
-        <AppBar position="static">
+        <Box sx={{ flexGrow: 1 }}>
+          <CssBaseline />
+          <AppBar position="static">
+            <Container maxWidth="md">
+              <Toolbar>
+                <IconButton
+                  size="large"
+                  edge="start"
+                  color="inherit"
+                  aria-label="menu"
+                  sx={{ mr: 2 }}
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" component="div">
+                  <FormattedMessage id="site.name" />
+                </Typography>
+                <Box sx={{ flexGrow: 1, padding: '0 20px' }}>
+                  <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                    <NavLink to="/">
+                      <FormattedMessage id="page.home" />
+                    </NavLink>
+                    <NavLink to="/organisations">
+                      <FormattedMessage id="page.organisations" />
+                    </NavLink>
+                    <NavLink to="/needs">
+                      <FormattedMessage id="page.needs" />
+                    </NavLink>
+                    <NavLink to="/login">
+                      <FormattedMessage id="page.edit" />
+                    </NavLink>
+                  </Box>
+                </Box>
+                <LocaleDropdown
+                  locale={locale}
+                  setLocale={setLocale}
+                  translations={translations}
+                />
+              </Toolbar>
+            </Container>
+          </AppBar>
           <Container maxWidth="md">
-            <Toolbar>
-              <Typography variant="h6" component="div">
-                <FormattedMessage id="site.name" />
-              </Typography>
-              <Box sx={{ flexGrow: 1, padding: '0 20px' }}>
-                <NavLink to="/">
-                  <FormattedMessage id="page.home" />
-                </NavLink>
-                <NavLink to="/organisations">
-                  <FormattedMessage id="page.organisations" />
-                </NavLink>
-                <NavLink to="/needs">
-                  <FormattedMessage id="page.needs" />
-                </NavLink>
-                <NavLink to="/login">
-                  <FormattedMessage id="page.edit" />
-                </NavLink>
-              </Box>
-              <LocaleDropdown
-                locale={locale}
-                setLocale={setLocale}
-                translations={translations}
-              />
-            </Toolbar>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/organisations" element={<Organisations />} />
+              <Route path="/needs" element={<Needs />} />
+              <Route path="/location/:locationId" element={<LocationRoute/>} />
+              <Route path="/login" element={<EditRouteLogin />} />
+              <Route path="/edit/:code" element={<EditRouteProtected/>} />
+            </Routes>
           </Container>
-        </AppBar>
-        <Container maxWidth="md">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/organisations" element={<Organisations />} />
-            <Route path="/needs" element={<Needs />} />
-            <Route path="/location/:locationId" element={<LocationRoute/>} />
-            <Route path="/login" element={<EditRouteLogin />} />
-            <Route path="/edit/:code" element={<EditRouteProtected/>} />
-          </Routes>
-        </Container>
-      </Box>
+        </Box>
+        <Drawer open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
+          <SidebarContents />
+        </Drawer>
       </IntlProvider>
     </ThemeProvider>
   )
