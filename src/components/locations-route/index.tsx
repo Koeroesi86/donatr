@@ -7,6 +7,7 @@ import {Location, LocationsFilters} from "../../types";
 import {ApiClient} from "../../utils";
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
+import MapBlock from "../map-block";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -43,24 +44,23 @@ const LocationsRoute: FC = () => {
       <Typography variant="h2" sx={{ my: 2 }}>
         <FormattedMessage id="page.locations" />
       </Typography>
-      <MapContainer center={center} zoom={6} className={styles.map}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {locationsWithGeo.length > 0 && locationsWithGeo.map((loc) => (
-          <Marker position={{ lat: loc.location.lat, lng: loc.location.lng }} key={`marker-${loc.id}`}>
-            <Popup>
-              <Link to={`/locations/${loc.id}`} component={RLink} color="inherit">
-                {loc.location.text}
-              </Link>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      <MapBlock
+        center={center}
+        zoom={6}
+        className={styles.map}
+        markers={locationsWithGeo.map((loc) => ({
+          lat: loc.location.lat,
+          lng: loc.location.lng,
+          popup: (
+            <Link to={`/locations/${loc.id}`} component={RLink} color="inherit">
+              {loc.location.text}
+            </Link>
+          ),
+        }))}
+      />
       <List>
         {locations.map((loc) => (
-          <ListItemButton>
+          <ListItemButton component="a" href={`#/locations/${loc.id}`}>
             <ListItemText primary={loc.name} />
           </ListItemButton>
         ))}

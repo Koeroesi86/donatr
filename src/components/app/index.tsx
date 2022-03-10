@@ -71,7 +71,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
         <Box sx={{ flexGrow: 1 }}>
           <CssBaseline />
           <AppBar position="static">
-            <Container maxWidth="md">
+            <Container maxWidth="lg">
               <Toolbar>
                 <IconButton
                   size="large"
@@ -113,7 +113,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
               </Toolbar>
             </Container>
           </AppBar>
-          <Container maxWidth="md">
+          <Container maxWidth="lg">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/organisations" element={<Organisations />} />
@@ -126,7 +126,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
           </Container>
         </Box>
         <Drawer open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
-          <SidebarContents />
+          <SidebarContents onClose={() => setIsSidebarOpen(false)} />
         </Drawer>
       </IntlProvider>
     </ThemeProvider>
