@@ -51,7 +51,6 @@ const Search: FC<SearchProps> = ({ picked, onSelect }) => {
       renderInput={(params) => (
         <TextField
           {...params}
-          value={picked.text}
           label={intl.formatMessage({ id: 'input.location.search.location.label' })}
           fullWidth
         />
