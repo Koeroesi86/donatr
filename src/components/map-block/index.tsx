@@ -3,7 +3,7 @@ import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import {LatLngExpression} from "leaflet";
 
 interface MapBlockProps {
-  center: LatLngExpression;
+  center?: LatLngExpression;
   className?: string;
   zoom?: number;
   markers: { lat: number; lng: number; popup: ReactNode }[];
@@ -16,7 +16,15 @@ const MapBlock: FC<MapBlockProps> = ({ markers, className, center, zoom = 6 }) =
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     />
     {markers.map((marker) => (
-      <Marker position={{ lat: marker.lat, lng: marker.lng }} key={`marker-${marker.lat}-${marker.lng}`}>
+      <Marker
+        key={`marker-${marker.lat}-${marker.lng}`}
+        position={{ lat: marker.lat, lng: marker.lng }}
+        ref={m => {
+          if (markers.length === 1 && m && m.openPopup) {
+            m.openPopup();
+          }
+        }}
+      >
         <Popup>
           {marker.popup}
         </Popup>

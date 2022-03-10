@@ -4,6 +4,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import {Location as LocationType} from "../../types";
 import axios from "axios";
+import {FormattedMessage} from "react-intl";
 
 interface LocationProps {
   id: string;
@@ -23,6 +24,7 @@ const Location: FC<LocationProps> = ({ id, open = false }) => {
     <Accordion defaultExpanded={open}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>{loc.name}</AccordionSummary>
       <AccordionDetails>
+        <FormattedMessage id="page.needs" />
         <List>
           {loc.needs.map(need => (
             <ListItem key={`location-${loc.id}-need-${need.id}`}>
