@@ -1,5 +1,4 @@
 import React, {FC, useEffect, useState} from 'react';
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
 import {LatLngExpression} from "leaflet";
 import {Link, List, ListItemButton, ListItemText, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
@@ -52,9 +51,24 @@ const LocationsRoute: FC = () => {
           lat: loc.location.lat,
           lng: loc.location.lng,
           popup: (
-            <Link to={`/locations/${loc.id}`} component={RLink} color="inherit">
-              {loc.location.text}
-            </Link>
+            <>
+              <Link
+                to={`/locations/${loc.id}`}
+                component={RLink}
+                color="inherit"
+                sx={{ display: 'block' }}
+              >
+                {loc.location.text}
+              </Link>
+              <Link
+                href={`https://maps.google.com/maps?q=${loc.location.lat},${loc.location.lng}`}
+                target="_blank"
+                color="inherit"
+                sx={{ display: 'block' }}
+              >
+                Google
+              </Link>
+            </>
           ),
         }))}
       />

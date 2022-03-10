@@ -1,7 +1,17 @@
 import React, {FC, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
-import {Card, CardContent, List, ListItem, ListItemIcon, ListItemText, Theme, Typography} from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Link,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Theme,
+  Typography
+} from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import {ApiClient} from "../../utils";
 import {Location, LocationsFilters} from "../../types";
@@ -44,7 +54,16 @@ const LocationRoute: FC = () => {
           markers={[{
             lat: location.location.lat,
             lng: location.location.lng,
-            popup: location.location.text,
+            popup: <>
+              {location.location.text}
+              <Link
+                href={`https://maps.google.com/maps?q=${location.location.lat},${location.location.lng}`}
+                target="_blank"
+                sx={{ display: 'block' }}
+              >
+                Google
+              </Link>
+            </>,
           }]}
         />
       )}

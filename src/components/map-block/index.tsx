@@ -21,7 +21,7 @@ const MapBlock: FC<MapBlockProps> = ({ markers, className, center, zoom = 6 }) =
         position={{ lat: marker.lat, lng: marker.lng }}
         ref={m => {
           if (markers.length === 1 && m && m.openPopup) {
-            m.openPopup();
+            setTimeout(() => m.openPopup(), 10);
           }
         }}
       >
