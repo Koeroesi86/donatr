@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useState} from "react";
+import React, {FC, useCallback, useEffect, useState} from "react";
 import {LatLngExpression} from "leaflet";
 import {MapConsumer, MapContainer, Marker, Popup, TileLayer, useMapEvents} from "react-leaflet";
 import * as LCG from "leaflet-control-geocoder";
@@ -11,7 +11,10 @@ import {PickedLocation} from "../../types";
 // @ts-ignore
 const geocoder = new LCG.geocoders.nominatim();
 
-const Picker: FC<{ onPick: (pick: { lat: number; lng: number; }) => void | Promise<void> }> = ({ onPick }) => {
+interface PickerProps {
+  onPick: (pick: { lat: number; lng: number; }) => void | Promise<void>;
+}
+const Picker: FC<PickerProps> = ({ onPick }) => {
   useMapEvents({
     click: (e) => {
       onPick(e.latlng);
@@ -22,14 +25,15 @@ const Picker: FC<{ onPick: (pick: { lat: number; lng: number; }) => void | Promi
 };
 
 interface SearchProps {
-  picked: PickedLocation;
+  picked?: PickedLocation;
   onSelect: (picked: PickedLocation) => void | Promise<void>;
 }
 const Search: FC<SearchProps> = ({ picked, onSelect }) => {
   const intl = useIntl();
+  const [term, setTerm] = useState(picked?.text || '');
   const [options, setOptions] = useState<PickedLocation[]>([]);
-  const search = useCallback(debounce((term) => {
-    geocoder.geocode(term, (results: GeocodingResult[]) => {
+  const search = useCallback(debounce((t: string) => {
+    geocoder.geocode(t, (results: GeocodingResult[]) => {
       setOptions(results.map<PickedLocation>((r) => ({
         lat: r.center.lat,
         lng: r.center.lng,
@@ -38,16 +42,21 @@ const Search: FC<SearchProps> = ({ picked, onSelect }) => {
     });
   }, 1000), []);
 
+  useEffect(() => {
+    search(term);
+  }, [term, search]);
+
   return (
     <Autocomplete
       value={picked}
+      inputValue={term}
       options={options}
+      filterOptions={(a) => a}
+      filterSelectedOptions
       autoComplete
-      getOptionLabel={(option: PickedLocation) => option.text}
-      onChange={(event, newValue: PickedLocation) => {
-        onSelect(newValue);
-      }}
-      onInputChange={(e, newInputValue) => search(newInputValue)}
+      getOptionLabel={(option: string | PickedLocation) => typeof option === 'string' ? option : option.text}
+      onChange={(e, newValue: PickedLocation) => onSelect(newValue)}
+      onInputChange={(e, newInputValue) => setTerm(newInputValue)}
       renderInput={(params) => (
         <TextField
           {...params}
