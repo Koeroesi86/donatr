@@ -25,6 +25,7 @@ import EditRouteLogin from "../edit-route-login";
 import {ApiClient} from "../../utils";
 import LocaleDropdown from "../locale-dropdown";
 import SidebarContents from "../sidebar-contents";
+import LocationsRoute from "../locations-route";
 
 const mdTheme = createTheme();
 
@@ -93,6 +94,9 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                     <NavLink to="/organisations">
                       <FormattedMessage id="page.organisations" />
                     </NavLink>
+                    <NavLink to="/locations">
+                      <FormattedMessage id="page.locations" />
+                    </NavLink>
                     <NavLink to="/needs">
                       <FormattedMessage id="page.needs" />
                     </NavLink>
@@ -114,7 +118,8 @@ const App: FC<AppProps> = ({ initialLocale })  => {
               <Route path="/" element={<Home />} />
               <Route path="/organisations" element={<Organisations />} />
               <Route path="/needs" element={<Needs />} />
-              <Route path="/location/:locationId" element={<LocationRoute/>} />
+              <Route path="/locations" element={<LocationsRoute />} />
+              <Route path="/locations/:locationId" element={<LocationRoute />} />
               <Route path="/login" element={<EditRouteLogin />} />
               <Route path="/edit/:code" element={<EditRouteProtected/>} />
             </Routes>

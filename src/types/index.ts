@@ -25,10 +25,17 @@ export interface Organisation {
   locations: Location[];
 }
 
+export interface PickedLocation {
+  lat: number;
+  lng: number;
+  text: string;
+}
+
 export interface Location {
   id: string;
   organisationId: string;
   name: string;
+  location?: PickedLocation,
   needs: Need[];
 }
 

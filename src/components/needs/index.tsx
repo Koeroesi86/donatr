@@ -48,7 +48,7 @@ const Needs: FC = () => {
               <ShoppingBagIcon />
             </ListItemIcon>
             <ListItemText primary={need.name} />
-            <Link to={`/location/${need.locationId}`} component={RLink} color="inherit">
+            <Link to={`/locations/${need.locationId}`} component={RLink} color="inherit">
               <FormattedMessage id="page.needs.location.link" />
             </Link>
           </ListItem>

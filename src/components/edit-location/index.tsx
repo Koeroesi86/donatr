@@ -1,12 +1,13 @@
-import React, {FC, useCallback, useEffect, useState} from "react";
-import {Accordion, AccordionDetails, AccordionSummary, Box, Button, TextField} from "@mui/material";
+import React, {FC, useCallback, useEffect, useRef, useState} from "react";
+import {Accordion, AccordionDetails, AccordionSummary, Box, Button, Modal, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditNeeds from "../edit-needs";
-import {Location, LocationResource, LocationsFilters} from "../../types";
-import {useIntl} from "react-intl";
+import {Location, LocationResource, LocationsFilters, PickedLocation} from "../../types";
+import {FormattedMessage, useIntl} from "react-intl";
 import debounce from "lodash.debounce";
 import {ApiClient} from "../../utils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LocationPicker from "../location-picker";
 
 interface EditLocationProps {
   id: string;
@@ -20,6 +21,7 @@ const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
 const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = true }) => {
   const intl = useIntl();
   const [isExpanded, setIsExpanded] = useState(initialOpen);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [location, setLocation] = useState<LocationResource>(initialState);
   const debouncedUpdate = debounce((data: LocationResource) => {
     api.update(data).then(() => refresh());
@@ -80,6 +82,40 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
             </Button>
           </Box>
         </Box>
+        <Box>
+          <Button onClick={() => setIsLocationOpen(true)}>
+            {location.location ? (
+              <small>{location.location.text}</small>
+            ) : (
+              <FormattedMessage id="input.location.pick.location.label" />
+            )}
+          </Button>
+        </Box>
+        <Modal open={isLocationOpen} onClose={() => setIsLocationOpen(false)}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              bgcolor: 'background.paper',
+              border: '2px solid #000',
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <LocationPicker
+              picked={location.location}
+              onSave={(picked) => {
+                api.update({ ...location, location: picked }).then(() => {
+                  refresh();
+                  setIsLocationOpen(false);
+                });
+              }}
+            />
+          </Box>
+        </Modal>
         {isExpanded && (
           <EditNeeds locationId={location.id} />
         )}

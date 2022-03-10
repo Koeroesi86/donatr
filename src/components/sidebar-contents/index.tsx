@@ -25,6 +25,7 @@ const SidebarContents: FC = () => {
       <List>
         <RouteLink to="/" translation="page.home"/>
         <RouteLink to="/organisations" translation="page.organisations"/>
+        <RouteLink to="/locations" translation="page.locations" />
         <RouteLink to="/needs" translation="page.needs"/>
         <RouteLink to="/login" translation="page.edit"/>
       </List>

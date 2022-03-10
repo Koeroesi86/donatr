@@ -25,6 +25,10 @@ const en: Translations = {
   'edit.translations.title': 'Translations',
   'edit.translations.new.title': 'Create translation',
   'create.translation.id.dropdown.label': 'Language',
+  'input.location.pick.location.label' : 'Pick location',
+  'input.location.set.location.label' : 'Set location',
+  'page.locations': 'Locations',
+  'input.location.search.location.label': 'Search location',
 };
 
 export default en;

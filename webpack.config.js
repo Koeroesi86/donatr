@@ -87,6 +87,14 @@ module.exports = [
             from: path.resolve('./serverConfig.js'),
             to: path.resolve('./build/serverConfig.js'),
           },
+          {
+            from: path.resolve('./node_modules/leaflet/dist/images'),
+            to: path.resolve('./build/public/static/images'),
+          },
+          {
+            from: path.resolve('./node_modules/leaflet/dist/leaflet.css'),
+            to: path.resolve('./build/public/static/leaflet.css'),
+          },
         ]
       }),
     ]
