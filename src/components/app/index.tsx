@@ -69,70 +69,72 @@ const App: FC<AppProps> = ({ initialLocale })  => {
   return (
     <ThemeProvider theme={mdTheme}>
       <IntlProvider messages={messages} locale={locale} defaultLocale="en">
-        <Box sx={{ flexGrow: 1 }}>
-          <CssBaseline />
-          <AppBar position="static">
-            <Container maxWidth="lg">
-              <Toolbar>
-                <IconButton
-                  size="large"
-                  edge="start"
-                  color="inherit"
-                  aria-label="menu"
-                  sx={{ mr: 2 }}
-                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                >
-                  <MenuIcon />
-                </IconButton>
-                <Typography variant="h6" component="div">
-                  <FormattedMessage id="site.name" />
-                </Typography>
-                <Box sx={{ flexGrow: 1, padding: '0 20px' }}>
-                  <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                    <NavLink to="/">
-                      <FormattedMessage id="page.home" />
-                    </NavLink>
-                    <NavLink to="/organisations">
-                      <FormattedMessage id="page.organisations" />
-                    </NavLink>
-                    <NavLink to="/locations">
-                      <FormattedMessage id="page.locations" />
-                    </NavLink>
-                    <NavLink to="/needs">
-                      <FormattedMessage id="page.needs" />
-                    </NavLink>
-                    <NavLink to="/login">
-                      <FormattedMessage id="page.edit" />
-                    </NavLink>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <CssBaseline />
+            <AppBar position="static">
+              <Container maxWidth="lg">
+                <Toolbar>
+                  <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    aria-label="menu"
+                    sx={{ mr: 2 }}
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                  <Typography variant="h6" component="div">
+                    <FormattedMessage id="site.name" />
+                  </Typography>
+                  <Box sx={{ flexGrow: 1, padding: '0 20px' }}>
+                    <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                      <NavLink to="/">
+                        <FormattedMessage id="page.home" />
+                      </NavLink>
+                      <NavLink to="/organisations">
+                        <FormattedMessage id="page.organisations" />
+                      </NavLink>
+                      <NavLink to="/locations">
+                        <FormattedMessage id="page.locations" />
+                      </NavLink>
+                      <NavLink to="/needs">
+                        <FormattedMessage id="page.needs" />
+                      </NavLink>
+                      <NavLink to="/login">
+                        <FormattedMessage id="page.edit" />
+                      </NavLink>
+                    </Box>
                   </Box>
-                </Box>
-                <LocaleDropdown
-                  locale={locale}
-                  setLocale={setLocale}
-                  translations={translations}
-                />
-              </Toolbar>
+                  <LocaleDropdown
+                    locale={locale}
+                    setLocale={setLocale}
+                    translations={translations}
+                  />
+                </Toolbar>
+              </Container>
+            </AppBar>
+            <Container maxWidth="lg">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/organisations" element={<Organisations />} />
+                <Route path="/needs" element={<Needs />} />
+                <Route path="/locations" element={<LocationsRoute />} />
+                <Route path="/locations/:locationId" element={<LocationRoute />} />
+                <Route path="/login" element={<EditRouteLogin />} />
+                <Route path="/edit/:code" element={<EditRouteProtected/>} />
+              </Routes>
+            </Container>
+          </Box>
+          <AppBar position="static" sx={{ mt: 2, py: 1 }}>
+            <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Link href="https://github.com/Koeroesi86/help.koro.si" target="_blank" title="Github" color="inherit">
+                <GitHubIcon />
+              </Link>
             </Container>
           </AppBar>
-          <Container maxWidth="lg">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/organisations" element={<Organisations />} />
-              <Route path="/needs" element={<Needs />} />
-              <Route path="/locations" element={<LocationsRoute />} />
-              <Route path="/locations/:locationId" element={<LocationRoute />} />
-              <Route path="/login" element={<EditRouteLogin />} />
-              <Route path="/edit/:code" element={<EditRouteProtected/>} />
-            </Routes>
-          </Container>
         </Box>
-        <AppBar position="static" sx={{ mt: 2, py: 1 }}>
-          <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Link href="https://github.com/Koeroesi86/help.koro.si" target="_blank" title="Github" color="inherit">
-              <GitHubIcon />
-            </Link>
-          </Container>
-        </AppBar>
         <Drawer open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
           <SidebarContents onClose={() => setIsSidebarOpen(false)} />
         </Drawer>
