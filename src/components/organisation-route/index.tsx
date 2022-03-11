@@ -1,12 +1,15 @@
 import React, {FC, useEffect, useState} from "react";
-import {ApiClient} from "../../utils";
-import {Organisation} from "../../types";
 import {Link as RLink, useParams} from "react-router-dom";
 import {createStyles, makeStyles} from "@mui/styles";
 import {Link, List, ListItemButton, ListItemIcon, ListItemText, Theme, Typography} from "@mui/material";
-import MapBlock from "../map-block";
 import {LatLngExpression} from "leaflet";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import ReactMarkdown from "react-markdown";
+import RemarkBreaks from "remark-breaks";
+import RemarkGfm from "remark-gfm";
+import {ApiClient} from "../../utils";
+import {Organisation} from "../../types";
+import MapBlock from "../map-block";
 
 const api = new ApiClient<Organisation>('organisations');
 
@@ -70,6 +73,15 @@ const OrganisationRoute: FC = () => {
           ),
         }))}
       />
+      {organisation.description && (
+        <ReactMarkdown
+          linkTarget="_blank"
+          skipHtml
+          unwrapDisallowed
+          children={organisation.description}
+          remarkPlugins={[RemarkBreaks, RemarkGfm]}
+        />
+      )}
       <List>
         {organisation.locations.map((loc) => (
           <ListItemButton component={RLink} to={`/locations/${loc.id}`}>

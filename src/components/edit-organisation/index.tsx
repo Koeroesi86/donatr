@@ -48,17 +48,31 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
               fullWidth
               onChange={(e) => debouncedUpdate({
                 id: organisation.id,
+                description: organisation.description,
                 name: e.target.value,
               })}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   debouncedUpdate({
                     id: organisation.id,
+                    description: organisation.description,
                     // @ts-ignore
                     name: e.target.value,
                   });
                 }
               }}
+            />
+            <TextField
+              label={intl.formatMessage({ id: 'input.organisation.description' })}
+              variant="standard"
+              defaultValue={organisation.description}
+              fullWidth
+              multiline
+              onChange={(e) => debouncedUpdate({
+                id: organisation.id,
+                name: organisation.name,
+                description: e.target.value
+              })}
             />
           </Box>
           <Box>

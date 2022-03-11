@@ -13,6 +13,7 @@ const en: Translations = {
   'input.location.name.new': 'Add new location',
   'input.organisation.name': 'Organisation\'s name',
   'input.organisation.name.new': 'Add new organisation',
+  'input.organisation.description': 'Description',
   'dialog.confirm.delete': 'Are you sure you want to delete?',
   'input.edit.login.code': 'Access code',
   'input.access.code': 'Entry code',
