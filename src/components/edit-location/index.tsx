@@ -55,6 +55,7 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
               onChange={(e) => debouncedUpdate({
                 id: location.id,
                 organisationId: location.organisationId,
+                location: location.location,
                 name: e.target.value,
               })}
               onKeyPress={(e) => {
@@ -62,6 +63,7 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
                   debouncedUpdate({
                     id: location.id,
                     organisationId: location.organisationId,
+                    location: location.location,
                     // @ts-ignore
                     name: e.target.value,
                   });
