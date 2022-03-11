@@ -8,8 +8,9 @@ import {
   Typography
 } from "@mui/material";
 import {FormattedMessage, useIntl} from "react-intl";
-import {ApiClient} from "../../utils";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
+import {Link} from "react-router-dom";
+import {ApiClient} from "../../utils";
 
 const api = new ApiClient<Organisation, 'locations'>('organisations');
 
@@ -31,8 +32,8 @@ const OrganisationsRoute: FC = () => {
         {organisations.map(organisation => (
           <ListItemButton
             key={`organisation-${organisation.id}`}
-            component="a"
-            href={`#/organisations/${organisation.id}`}
+            to={`/organisations/${organisation.id}`}
+            component={Link}
           >
             <ListItemIcon>
               <CorporateFareIcon />

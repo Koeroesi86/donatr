@@ -1,7 +1,7 @@
 import React, {FC} from "react";
 import {useIntl} from "react-intl";
 import {Box, Divider, IconButton, List, ListItemButton, ListItemIcon, ListItemText, useTheme} from "@mui/material";
-import {useMatch, useResolvedPath} from "react-router-dom";
+import {Link, useMatch, useResolvedPath} from "react-router-dom";
 import HomeIcon from '@mui/icons-material/Home';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -18,10 +18,10 @@ interface RouteLinkProps {
 const RouteLink: FC<RouteLinkProps> = ({ children, onClick, to, translation }) => {
   const intl = useIntl();
   const resolved = useResolvedPath(to);
-  const match = useMatch({path: resolved.pathname, end: true});
+  const match = useMatch({ path: resolved.pathname, end: true });
 
   return (
-    <ListItemButton component="a" href={`#${to}`} selected={!!match} sx={{ pr: 4 }} onClick={onClick}>
+    <ListItemButton component={Link} to={to} selected={!!match} sx={{ pr: 4 }} onClick={onClick}>
       <ListItemIcon>
         {children}
       </ListItemIcon>

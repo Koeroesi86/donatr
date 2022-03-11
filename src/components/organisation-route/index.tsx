@@ -72,7 +72,7 @@ const OrganisationRoute: FC = () => {
       />
       <List>
         {organisation.locations.map((loc) => (
-          <ListItemButton component="a" href={`#/locations/${loc.id}`}>
+          <ListItemButton component={RLink} to={`/locations/${loc.id}`}>
             <ListItemIcon>
               <LocationOnIcon />
             </ListItemIcon>
