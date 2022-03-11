@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useState} from "react";
-import Organisations from "../organisations";
+import OrganisationsRoute from "../organisations-route";
 import Home from "../home";
 import {Link as RLink, Route, Routes, useMatch, useResolvedPath} from "react-router-dom";
 import {
@@ -27,6 +27,7 @@ import {ApiClient} from "../../utils";
 import LocaleDropdown from "../locale-dropdown";
 import SidebarContents from "../sidebar-contents";
 import LocationsRoute from "../locations-route";
+import OrganisationRoute from "../organisation-route";
 
 const mdTheme = createTheme();
 
@@ -118,10 +119,15 @@ const App: FC<AppProps> = ({ initialLocale })  => {
             <Container maxWidth="lg">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/organisations" element={<Organisations />} />
+                <Route path="/organisations">
+                  <Route index element={<OrganisationsRoute />} />
+                  <Route path=":organisationId" element={<OrganisationRoute />} />
+                </Route>
                 <Route path="/needs" element={<Needs />} />
-                <Route path="/locations" element={<LocationsRoute />} />
-                <Route path="/locations/:locationId" element={<LocationRoute />} />
+                <Route path="/locations">
+                  <Route index element={<LocationsRoute />} />
+                  <Route path=":locationId" element={<LocationRoute />} />
+                </Route>
                 <Route path="/login" element={<EditRouteLogin />} />
                 <Route path="/edit/:code" element={<EditRouteProtected/>} />
               </Routes>

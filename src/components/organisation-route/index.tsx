@@ -1,13 +1,14 @@
-import React, {FC, useEffect, useState} from 'react';
-import {LatLngExpression} from "leaflet";
-import {Link, List, ListItemButton, ListItemIcon, ListItemText, Theme, Typography} from "@mui/material";
-import {createStyles, makeStyles} from '@mui/styles';
-import {Location, LocationsFilters} from "../../types";
+import React, {FC, useEffect, useState} from "react";
 import {ApiClient} from "../../utils";
-import {Link as RLink} from "react-router-dom";
-import {FormattedMessage} from "react-intl";
+import {Organisation} from "../../types";
+import {Link as RLink, useParams} from "react-router-dom";
+import {createStyles, makeStyles} from "@mui/styles";
+import {Link, List, ListItemButton, ListItemIcon, ListItemText, Theme, Typography} from "@mui/material";
 import MapBlock from "../map-block";
+import {LatLngExpression} from "leaflet";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+
+const api = new ApiClient<Organisation>('organisations');
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -18,31 +19,27 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }));
 
-// @ts-ignore
-const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
-
-const byName = (a: Location, b: Location) => a.name.localeCompare(b.name);
-
-const LocationsRoute: FC = () => {
+const OrganisationRoute: FC = () => {
+  const params = useParams();
   const styles = useStyles();
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [organisation, setOrganisation] = useState<Organisation>();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
   });
 
   useEffect(() => {
-    api.all().then((l) => setLocations(l.sort(byName))).catch(console.error);
-  }, []);
+    api.one(params.organisationId).then(setOrganisation).catch(console.error);
+  }, [params]);
 
-  if (!locations.length) return null;
+  if (!organisation) return null;
 
-  const locationsWithGeo = locations.filter((l) => l.location);
+  const locationsWithGeo = organisation.locations.filter((l) => l.location);
 
   return (
     <>
       <Typography variant="h2" sx={{ my: 2 }}>
-        <FormattedMessage id="page.locations" />
+        {organisation.name}
       </Typography>
       <MapBlock
         center={center}
@@ -74,7 +71,7 @@ const LocationsRoute: FC = () => {
         }))}
       />
       <List>
-        {locations.map((loc) => (
+        {organisation.locations.map((loc) => (
           <ListItemButton component="a" href={`#/locations/${loc.id}`}>
             <ListItemIcon>
               <LocationOnIcon />
@@ -84,7 +81,7 @@ const LocationsRoute: FC = () => {
         ))}
       </List>
     </>
-  )
-};
+  );
+}
 
-export default LocationsRoute;
+export default OrganisationRoute;

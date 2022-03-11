@@ -44,6 +44,7 @@ const en: Translations = {
   'page.home.edit.intro.organisations': 'If you have access to edit one (or more) organisations, you can maintain the name and locations of the organisation(s), and needed donations at all locations of the organisation(s).',
   'page.home.edit.title.translations': 'Translations access',
   'page.home.edit.intro.translations': 'If you have access to edit translations, you can add new or edit existing localisations of the site',
+  'page.organisations.locations.count': '{count} locations',
 };
 
 export default en;
