@@ -103,7 +103,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                       <NavLink to="/needs">
                         <FormattedMessage id="page.needs" />
                       </NavLink>
-                      <NavLink to="/login">
+                      <NavLink to="/edit">
                         <FormattedMessage id="page.edit" />
                       </NavLink>
                     </Box>
@@ -128,8 +128,10 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                   <Route index element={<LocationsRoute />} />
                   <Route path=":locationId" element={<LocationRoute />} />
                 </Route>
-                <Route path="/login" element={<EditRouteLogin />} />
-                <Route path="/edit/:code" element={<EditRouteProtected/>} />
+                <Route path="/edit">
+                  <Route index element={<EditRouteLogin />} />
+                  <Route path=":code" element={<EditRouteProtected/>} />
+                </Route>
               </Routes>
             </Container>
           </Box>

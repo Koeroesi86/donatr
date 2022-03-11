@@ -68,7 +68,7 @@ const SidebarContents: FC<SidebarContentsProps> = ({ onClose }) => {
       </List>
       <Divider />
       <List component="nav" aria-label="secondary protected">
-        <RouteLink to="/login" translation="page.edit" onClick={onClose}>
+        <RouteLink to="/edit" translation="page.edit" onClick={onClose}>
           <EditIcon />
         </RouteLink>
       </List>
