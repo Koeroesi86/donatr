@@ -4,7 +4,7 @@ import Home from "../home";
 import {Link as RLink, Route, Routes, useMatch, useResolvedPath} from "react-router-dom";
 import {
   AppBar,
-  Box, Button,
+  Box,
   Container,
   createTheme,
   CssBaseline,
@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import {FormattedMessage, IntlProvider} from "react-intl";
 import MenuIcon from '@mui/icons-material/Menu';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import {Translations, TranslationsResource} from "../../types";
 import Needs from "../needs";
 import LocationRoute from "../location-route";
@@ -125,6 +126,13 @@ const App: FC<AppProps> = ({ initialLocale })  => {
             </Routes>
           </Container>
         </Box>
+        <AppBar position="static" sx={{ mt: 2, py: 1 }}>
+          <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Link href="https://github.com/Koeroesi86/help.koro.si" target="_blank" title="Github" color="inherit">
+              <GitHubIcon />
+            </Link>
+          </Container>
+        </AppBar>
         <Drawer open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
           <SidebarContents onClose={() => setIsSidebarOpen(false)} />
         </Drawer>

@@ -28,9 +28,7 @@ const DebouncedTextField: FC<DebouncedTextFieldProps> = ({ defaultValue, helperT
       helperText={helperText}
       fullWidth
       sx={{ my: 2 }}
-      onChange={(e) => {
-        debouncedOnChange(e.target.value);
-      }}
+      onChange={(e) => debouncedOnChange(e.target.value)}
     />
   );
 }
