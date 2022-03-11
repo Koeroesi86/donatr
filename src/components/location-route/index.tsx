@@ -1,7 +1,8 @@
 import React, {FC, useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {Link as RLink, useParams} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
 import {
+  Breadcrumbs,
   Card,
   CardContent,
   Link,
@@ -14,7 +15,7 @@ import {
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import {ApiClient} from "../../utils";
-import {Location, LocationsFilters} from "../../types";
+import {Location, LocationsFilters, Organisation} from "../../types";
 import MapBlock from "../map-block";
 import {createStyles, makeStyles} from "@mui/styles";
 
@@ -29,6 +30,29 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 // @ts-ignore
 const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
+const apiOrganisation = new ApiClient<Organisation>('organisations');
+
+const LocationRouteBreadCrumb: FC<{ location: Location }> = ({ location }) => {
+  const [organisation, setOrganisation] = useState<Organisation>();
+  useEffect(() => {
+    apiOrganisation.one(location.organisationId).then(setOrganisation).catch(console.error);
+  }, [location]);
+
+  if (!organisation) {
+    return null;
+  }
+
+  return (
+    <Breadcrumbs aria-label="breadcrumb" sx={{ mt: 2 }}>
+      <Link to={`/organisations/${organisation.id}`} component={RLink} color="inherit">
+        {organisation.name}
+      </Link>
+      <Link to={`/locations/${location.id}`} component={RLink} color="inherit">
+        {location.name}
+      </Link>
+    </Breadcrumbs>
+  );
+}
 
 const LocationRoute: FC = () => {
   const params = useParams();
@@ -43,6 +67,7 @@ const LocationRoute: FC = () => {
 
   return (
     <>
+      <LocationRouteBreadCrumb location={location} />
       <Typography variant="h2" sx={{ my: 2 }}>
         {location.name}
       </Typography>
