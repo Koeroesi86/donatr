@@ -56,12 +56,6 @@ const Home: FC = () => {
       <Typography variant="body2" align={align}>
         <FormattedMessage id="page.home.edit.intro.translations" />
       </Typography>
-      <Typography variant="h4" sx={{ my: 2 }} align={align}>
-        <FormattedMessage id="page.home.edit.title.translations" />
-      </Typography>
-      <Typography variant="body2" align={align}>
-        <FormattedMessage id="page.home.edit.intro.translations" />
-      </Typography>
     </>
   )
 };
