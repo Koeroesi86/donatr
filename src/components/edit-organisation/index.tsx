@@ -2,11 +2,11 @@ import React, {FC, useEffect, useState} from "react";
 import {Organisation, OrganisationResource} from "../../types";
 import {Accordion, AccordionDetails, AccordionSummary, Box, Button, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditLocations from "../edit-locations";
 import {useIntl} from "react-intl";
 import debounce from "lodash.debounce";
-import {ApiClient} from "../../utils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {ApiClient} from "../../utils";
+import EditLocations from "../edit-locations";
 
 const api = new ApiClient<Organisation, 'locations'>('organisations');
 

@@ -48,11 +48,11 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
     2000
   ), [update]);
   const create = useCallback(() => {
-    api.create({name: enteredText, locationId}).then((o) => {
+    api.create({name: enteredText, locationId}).then(() => {
       setEnteredText('');
-      setNeeds(o);
+      refresh();
     });
-  }, [enteredText, locationId]);
+  }, [enteredText, locationId, refresh]);
 
   useEffect(() => {
     refresh();

@@ -22,6 +22,7 @@ export type Worker = (event: RequestEvent, callback: (response: ResponseEvent) =
 export interface Organisation {
   id: string;
   name: string;
+  description?: string;
   locations: Location[];
 }
 

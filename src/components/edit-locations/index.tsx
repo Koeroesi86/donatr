@@ -60,16 +60,16 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpe
               variant="contained"
               disabled={!enteredText}
               onClick={() => {
-                api.create({name: enteredText, organisationId}).then((o) => {
+                api.create({name: enteredText, organisationId}).then(() => {
                   setEnteredText('');
-                  setLocations(o);
+                  refresh();
                 });
               }}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
-                  api.create({name: enteredText, organisationId}).then((o) => {
+                  api.create({name: enteredText, organisationId}).then(() => {
                     setEnteredText('');
-                    setLocations(o);
+                    refresh();
                   });
                 }
               }}
