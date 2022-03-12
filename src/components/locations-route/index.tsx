@@ -8,6 +8,7 @@ import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
 import MapBlock from "../map-block";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import LocationListItem from "../location-list-item";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -75,12 +76,7 @@ const LocationsRoute: FC = () => {
       />
       <List>
         {locations.map((loc) => (
-          <ListItemButton component={RLink} to={`/locations/${loc.id}`}>
-            <ListItemIcon>
-              <LocationOnIcon />
-            </ListItemIcon>
-            <ListItemText primary={loc.name} />
-          </ListItemButton>
+          <LocationListItem key={`location-list-item-${loc.id}`} location={loc} />
         ))}
       </List>
     </>

@@ -10,6 +10,7 @@ import RemarkGfm from "remark-gfm";
 import {ApiClient} from "../../utils";
 import {Organisation} from "../../types";
 import MapBlock from "../map-block";
+import LocationListItem from "../location-list-item";
 
 const api = new ApiClient<Organisation>('organisations');
 
@@ -84,12 +85,7 @@ const OrganisationRoute: FC = () => {
       )}
       <List>
         {organisation.locations.map((loc) => (
-          <ListItemButton component={RLink} to={`/locations/${loc.id}`}>
-            <ListItemIcon>
-              <LocationOnIcon />
-            </ListItemIcon>
-            <ListItemText primary={loc.name} />
-          </ListItemButton>
+          <LocationListItem key={`location-list-item-${loc.id}`} location={loc} />
         ))}
       </List>
     </>
