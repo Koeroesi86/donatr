@@ -33,7 +33,7 @@ const Needs: FC = () => {
         fullWidth
         sx={{ my: 2 }}
       />
-      <List sx={{ maxHeight: 400 }}>
+      <List sx={{ maxHeight: 400, overflow: 'auto' }}>
         {listing.map(need => (
           <ListItem key={`need-${need.id}`}>
             <ListItemIcon>
