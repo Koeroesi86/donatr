@@ -1,13 +1,12 @@
 import React, {FC, useEffect, useState} from "react";
 import {Link as RLink, useParams} from "react-router-dom";
 import {createStyles, makeStyles} from "@mui/styles";
-import {Link, List, ListItemButton, ListItemIcon, ListItemText, Theme, Typography} from "@mui/material";
+import {Link, List, Theme, Typography} from "@mui/material";
 import {LatLngExpression} from "leaflet";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ReactMarkdown from "react-markdown";
 import RemarkBreaks from "remark-breaks";
 import RemarkGfm from "remark-gfm";
-import {ApiClient} from "../../utils";
+import {ApiClient, sortByNames} from "../../utils";
 import {Organisation} from "../../types";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
@@ -84,7 +83,7 @@ const OrganisationRoute: FC = () => {
         />
       )}
       <List>
-        {organisation.locations.map((loc) => (
+        {organisation.locations.sort(sortByNames).map((loc) => (
           <LocationListItem key={`location-list-item-${loc.id}`} location={loc} />
         ))}
       </List>

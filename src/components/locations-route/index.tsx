@@ -1,13 +1,12 @@
 import React, {FC, useEffect, useState} from 'react';
 import {LatLngExpression} from "leaflet";
-import {Link, List, ListItemButton, ListItemIcon, ListItemText, Theme, Typography} from "@mui/material";
+import {Link, List, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
 import {Location, LocationsFilters} from "../../types";
-import {ApiClient} from "../../utils";
+import {ApiClient, sortByNames} from "../../utils";
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
 import MapBlock from "../map-block";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LocationListItem from "../location-list-item";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -22,8 +21,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 // @ts-ignore
 const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
 
-const byName = (a: Location, b: Location) => a.name.localeCompare(b.name);
-
 const LocationsRoute: FC = () => {
   const styles = useStyles();
   const [locations, setLocations] = useState<Location[]>([]);
@@ -33,7 +30,7 @@ const LocationsRoute: FC = () => {
   });
 
   useEffect(() => {
-    api.all().then((l) => setLocations(l.sort(byName))).catch(console.error);
+    api.all().then((l) => setLocations(l.sort(sortByNames))).catch(console.error);
   }, []);
 
   if (!locations.length) return null;

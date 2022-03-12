@@ -4,7 +4,7 @@ import {Box, Button, Card, CardContent, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {useIntl} from "react-intl";
 import EditLocation from "../edit-location";
-import {ApiClient} from "../../utils";
+import {ApiClient, sortByNames} from "../../utils";
 
 // @ts-ignore
 const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
@@ -18,7 +18,7 @@ interface EditLocationsProps {
 
 const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpen = true, initialState = [] }) => {
   const intl = useIntl();
-  const [locations, setLocations] = useState<LocationResource[]>(initialState.sort((a, b) => a.name.localeCompare(b.name)));
+  const [locations, setLocations] = useState<LocationResource[]>(initialState.sort(sortByNames));
   const [enteredText, setEnteredText] = useState('');
 
   const refresh = useCallback(() => {
@@ -26,7 +26,7 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpe
         ? Promise.all(ids.map((id: string) => api.one(id)))
         : api.all({ organisationId })
     )
-      .then((l) => l.sort((a, b) => a.name.localeCompare(b.name)))
+      .then((l) => l.sort(sortByNames))
       .then(o => setLocations(o));
   }, [ids, organisationId]);
 

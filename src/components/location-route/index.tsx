@@ -15,7 +15,7 @@ import {
   Typography
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import {ApiClient} from "../../utils";
+import {ApiClient, sortByNames} from "../../utils";
 import {Location, LocationsFilters, Organisation} from "../../types";
 import MapBlock from "../map-block";
 import {createStyles, makeStyles} from "@mui/styles";
@@ -102,7 +102,7 @@ const LocationRoute: FC = () => {
               <FormattedMessage id="page.needs" />
             </Typography>
             <List>
-              {location.needs.map((need) => (
+              {location.needs.sort(sortByNames).map((need) => (
                 <ListItem key={`location-${location.id}-need-${need.id}`}>
                   <ListItemIcon>
                     <ShoppingBagIcon />

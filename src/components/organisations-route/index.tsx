@@ -10,7 +10,7 @@ import {
 import {FormattedMessage, useIntl} from "react-intl";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import {Link} from "react-router-dom";
-import {ApiClient} from "../../utils";
+import {ApiClient, sortByNames} from "../../utils";
 
 const api = new ApiClient<Organisation, 'locations'>('organisations');
 
@@ -19,7 +19,7 @@ const OrganisationsRoute: FC = () => {
   const [organisations, setOrganisations] = useState<Organisation[]>([])
   useEffect(() => {
     api.all()
-      .then((data) => data.sort((a, b) => a.name.localeCompare(b.name)))
+      .then((data) => data.sort(sortByNames))
       .then((data) => setOrganisations(data))
       .catch(console.error);
   }, [])

@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import debounce from "lodash.debounce";
 import {useIntl} from "react-intl";
+import {sortByNames} from "../../utils";
 
 const api = {
   all: (locationId?: string): Promise<NeedResource[]> => {
@@ -33,11 +34,11 @@ interface EditNeedsProps {
 
 const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
   const intl = useIntl();
-  const [needs, setNeeds] = useState<NeedResource[]>(initialState.sort((a, b) => a.name.localeCompare(b.name)));
+  const [needs, setNeeds] = useState<NeedResource[]>(initialState.sort(sortByNames));
   const [enteredText, setEnteredText] = useState('');
   const refresh = useCallback(() => {
     api.all(locationId)
-      .then((l) => l.sort((a, b) => a.name.localeCompare(b.name)))
+      .then((l) => l.sort(sortByNames))
       .then(o => setNeeds(o));
   }, [locationId]);
   const update = useCallback((data: NeedResource) => {

@@ -4,7 +4,7 @@ import {Box, Button, Card, CardContent, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {useIntl} from "react-intl";
 import EditOrganisation from "../edit-organisation";
-import {ApiClient} from "../../utils";
+import {ApiClient, sortByNames} from "../../utils";
 
 const api = new ApiClient<Organisation, 'locations'>('organisations');
 
@@ -13,9 +13,7 @@ const EditOrganisations: FC = () => {
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [enteredText, setEnteredText] = useState('');
   const refresh = useCallback(() => {
-    api.all().then(o => setOrganisations(
-      o.sort((a, b) => a.name.localeCompare(b.name)
-      )));
+    api.all().then(o => setOrganisations(o.sort(sortByNames)));
   }, []);
   useEffect(() => {
     refresh();

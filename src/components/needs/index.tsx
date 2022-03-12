@@ -5,7 +5,7 @@ import {Link, List, ListItem, ListItemIcon, ListItemText, TextField} from "@mui/
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage, useIntl} from "react-intl";
-import {ApiClient} from "../../utils";
+import {ApiClient, sortByNames} from "../../utils";
 
 const api = new ApiClient<Need, undefined, { s: string }>('needs');
 
@@ -19,7 +19,7 @@ const Needs: FC = () => {
 
   useEffect(() => {
     api.all({ s: term })
-      .then((data) => data.sort((a, b) => a.name.localeCompare(b.name)))
+      .then((data) => data.sort(sortByNames))
       .then((data) => setListing(data))
       .catch(console.error);
   }, [term]);
