@@ -1,6 +1,7 @@
 import path from 'path';
 import {
-  Access, AccessFilters,
+  Access,
+  AccessFilters,
   Location,
   LocationResource,
   LocationsFilters,
@@ -10,7 +11,6 @@ import {
   Organisation,
   OrganisationResource,
   Provider,
-  Translations,
   TranslationsResource,
 } from "../types";
 import * as translations from "./translations";
