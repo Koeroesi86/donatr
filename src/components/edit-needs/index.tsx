@@ -10,7 +10,7 @@ import {sortByNames} from "../../utils";
 
 const api = {
   all: (locationId?: string): Promise<NeedResource[]> => {
-    const url = new URL(window.location.origin);
+    const url = new URL(typeof window !== 'undefined' && window.location.origin);
     url.pathname = '/api/needs';
     if (locationId) {
       url.searchParams.set('locationId', locationId);
@@ -91,7 +91,7 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
               <Button
                 variant="contained"
                 onClick={() => {
-                  if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
+                  if (typeof window !== 'undefined' && !window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
 
                   api.remove(need).then(() => refresh());
                 }}

@@ -59,16 +59,16 @@ module.exports = [
         name: "bundle"
       }),
       new webpack.EnvironmentPlugin(['PUBLIC_URL']),
-      new HtmlWebpackPlugin({
-        inject: true,
-        xhtml: true,
-        template: './src/pages/default/index.tsx',
-        chunks: ['bundle'],
-        publicPath: process.env.PUBLIC_URL,
-        templateParameters: {
-          PUBLIC_URL: process.env.PUBLIC_URL,
-        }
-      }),
+      // new HtmlWebpackPlugin({
+      //   inject: true,
+      //   xhtml: true,
+      //   template: './src/pages/default/index.tsx',
+      //   chunks: ['bundle'],
+      //   publicPath: process.env.PUBLIC_URL,
+      //   templateParameters: {
+      //     PUBLIC_URL: process.env.PUBLIC_URL,
+      //   }
+      // }),
       new CopyPlugin({
         patterns: [
           {
@@ -103,12 +103,13 @@ module.exports = [
     devtool: false,
     mode: isProd ? 'production' : 'development',
     entry: {
-      index: './src/api.ts',
+      'api/index': './src/api.ts',
+      'index': './src/ssr.tsx',
     },
     target: 'node',
     output: {
       pathinfo: true,
-      filename: 'api/[name].js',
+      filename: '[name].js',
       publicPath: process.env.PUBLIC_URL,
       path: path.resolve('./build/public'),
       library: {
@@ -131,6 +132,9 @@ module.exports = [
     plugins: [
       new WebpackBar({
         name: "index"
+      }),
+      new WebpackBar({
+        name: "api/index"
       }),
     ],
   }

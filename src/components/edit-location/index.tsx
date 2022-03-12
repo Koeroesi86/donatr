@@ -76,7 +76,7 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
             <Button
               variant="contained"
               onClick={() => {
-                if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
+                if (typeof window !== 'undefined' && !window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
 
                 api.remove(location).then(() => onRemove && onRemove());
               }}

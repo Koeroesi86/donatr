@@ -12,7 +12,7 @@ export default class ApiClient<T extends BaseResource, OmitFields extends keyof 
   }
 
   all = (filters?: F): Promise<T[]> => {
-    const url = new URL(window.location.origin);
+    const url = new URL(typeof window !== 'undefined' ? window.location.origin : '');
     url.pathname = `/api/${this.resource}`;
     if (filters) {
       Object.keys(filters).forEach(key => {

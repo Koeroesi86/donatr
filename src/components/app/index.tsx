@@ -61,7 +61,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
   useEffect(() => {
     api.one(locale).then((t) => {
       setMessages(t.translations);
-      sessionStorage.setItem('language', locale);
+      if (typeof window !== 'undefined') sessionStorage.setItem('language', locale);
     });
   }, [locale]);
 

@@ -1,12 +1,19 @@
 import React from 'react';
-import {render} from 'react-dom';
-import {HashRouter} from "react-router-dom";
+import {hydrate, render} from 'react-dom';
+import {BrowserRouter} from "react-router-dom";
 import App from './components/app';
 
-if (window) {
+if (typeof window !== 'undefined') {
+  if (window.location.hash.indexOf('#/') === 0) {
+    const target = new URL(window.location.href);
+    target.hash = '';
+    target.pathname = window.location.hash.replace('#/', '/');
+    window.location.replace(target);
+  }
   render(
-    <HashRouter>
+    <BrowserRouter>
       <App initialLocale={sessionStorage.getItem('language') || navigator.language} />
-    </HashRouter>,
-    document.getElementById('root'));
+    </BrowserRouter>,
+    document.getElementById('root')
+  );
 }

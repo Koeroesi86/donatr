@@ -80,7 +80,7 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
             <Button
               variant="contained"
               onClick={() => {
-                if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
+                if (typeof window !== 'undefined' && !window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
 
                 api.remove(organisation).then(() => onRemove && onRemove());
               }}
