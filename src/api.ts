@@ -5,7 +5,7 @@ import {JsonProvider} from "./providers";
 import {AccessFilters, Provider, ResponseEvent, Worker} from "./types";
 import debounce from "lodash.debounce";
 
-const keepAliveTimeout = 30 * 1000;
+const keepAliveTimeout = 30 * 60 * 1000;
 const keepAliveCallback = debounce(() => {
   console.log('Shutting down API due to inactivity.');
   process.exit(0);
