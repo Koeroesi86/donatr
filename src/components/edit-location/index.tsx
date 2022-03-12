@@ -1,8 +1,8 @@
-import React, {FC, useCallback, useEffect, useRef, useState} from "react";
+import React, {FC, useCallback, useEffect, useState} from "react";
 import {Accordion, AccordionDetails, AccordionSummary, Box, Button, Modal, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditNeeds from "../edit-needs";
-import {Location, LocationResource, LocationsFilters, PickedLocation} from "../../types";
+import {Location, LocationResource, LocationsFilters} from "../../types";
 import {FormattedMessage, useIntl} from "react-intl";
 import debounce from "lodash.debounce";
 import {ApiClient} from "../../utils";
@@ -13,12 +13,13 @@ interface EditLocationProps {
   id: string;
   initialState?: LocationResource;
   initialOpen?: boolean;
+  onRemove?: () => void | Promise<void>;
 }
 
 // @ts-ignore
 const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
 
-const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = true }) => {
+const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = true, onRemove }) => {
   const intl = useIntl();
   const [isExpanded, setIsExpanded] = useState(initialOpen);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
@@ -77,7 +78,7 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
               onClick={() => {
                 if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
 
-                api.remove(location).then(() => refresh());
+                api.remove(location).then(() => onRemove && onRemove());
               }}
             >
               <DeleteIcon />

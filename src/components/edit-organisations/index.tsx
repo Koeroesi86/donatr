@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useCallback, useEffect, useState} from "react";
 import {Organisation} from "../../types";
 import {Box, Button, Card, CardContent, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -12,11 +12,14 @@ const EditOrganisations: FC = () => {
   const intl = useIntl();
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [enteredText, setEnteredText] = useState('');
-  useEffect(() => {
+  const refresh = useCallback(() => {
     api.all().then(o => setOrganisations(
       o.sort((a, b) => a.name.localeCompare(b.name)
-    )));
+      )));
   }, []);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
   return (
     <Card>
       <CardContent>
@@ -26,6 +29,7 @@ const EditOrganisations: FC = () => {
             id={organisation.id}
             initialOpen={false}
             initialState={organisation}
+            onRemove={refresh}
           />
         ))}
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>

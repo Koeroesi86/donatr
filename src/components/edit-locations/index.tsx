@@ -43,6 +43,7 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpe
             id={location.id}
             initialOpen={initialOpen}
             initialState={location}
+            onRemove={refresh}
           />
         ))}
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>

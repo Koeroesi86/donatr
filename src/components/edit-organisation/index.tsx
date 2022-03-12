@@ -14,9 +14,10 @@ interface EditOrganisationProps {
   id: string;
   initialState?: Organisation;
   initialOpen?: boolean;
+  onRemove?: () => void | Promise<void>;
 }
 
-const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initialOpen = true }) => {
+const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initialOpen = true, onRemove }) => {
   const intl = useIntl();
   const [isExpanded, setIsExpanded] = useState(initialOpen);
   const [organisation, setOrganisation] = useState<Organisation>(initialState);
@@ -81,7 +82,7 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
               onClick={() => {
                 if (!window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
 
-                api.remove(organisation).then(() => api.one(id)).then(setOrganisation);
+                api.remove(organisation).then(() => onRemove && onRemove());
               }}
             >
               <DeleteIcon />
