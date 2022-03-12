@@ -1,5 +1,5 @@
 import path from "path";
-import fs from "fs";
+import fs from "graceful-fs";
 import chokidar, {FSWatcher} from "chokidar";
 
 interface BaseResource {
@@ -8,7 +8,7 @@ interface BaseResource {
 
 export default class JsonResource<T extends BaseResource> {
   private readonly basePath: string;
-  private readonly cache: { [k: string]: T } = {};
+  private readonly cache: { [k: string]: string } = {};
   private watcher: FSWatcher;
   private isCacheReady: boolean = false;
 
@@ -35,7 +35,7 @@ export default class JsonResource<T extends BaseResource> {
         const id = path.basename(filePath, path.extname(filePath))
 
         if (event === 'add' || event === 'change') {
-          this.cache[id] = await this.one(id);
+          await this.one(id);
 
           if (!this.isCacheReady && Object.keys(this.cache).length === (await this.getResourceIds()).length) {
             this.isCacheReady = true;
@@ -43,7 +43,6 @@ export default class JsonResource<T extends BaseResource> {
         }
 
         if (event === 'unlink') {
-          this.cache[id] = null;
           delete this.cache[id];
         }
       });
@@ -63,19 +62,16 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   all = async (): Promise<T[]> => {
-    if (this.isCacheReady) {
-      return Object.keys(this.cache).map(k => this.cache[k]);
-    }
-
-    const ids = await this.getResourceIds();
+    const ids = this.isCacheReady ? Object.keys(this.cache) : await this.getResourceIds();
     const all = await Promise.all(ids.map(async (id) => this.one(id)));
+    this.isCacheReady = true;
 
     return all.filter(Boolean);
   };
 
   one = async (id: string): Promise<T | undefined> => {
-    if(this.cache[id]) {
-      return this.cache[id];
+    if(this.isCacheReady && this.cache[id]) {
+      return JSON.parse(this.cache[id]) as T;
     }
 
     const fileName = path.resolve(this.basePath, `./${id}.json`);
@@ -84,7 +80,7 @@ export default class JsonResource<T extends BaseResource> {
 
     const content = await fs.promises.readFile(fileName, 'utf8');
     const data: T = JSON.parse(content);
-    this.cache[id] = data;
+    this.cache[id] = content;
 
     return data;
   };
@@ -100,7 +96,8 @@ export default class JsonResource<T extends BaseResource> {
 
   set = async (data: T): Promise<void> => {
     const fileName = path.resolve(this.basePath, `./${data.id}.json`);
-    await fs.promises.writeFile(fileName, JSON.stringify(data, null, 2), 'utf8');
-    this.cache[data.id] = data;
+    const content = JSON.stringify(data, null, 2)
+    await fs.promises.writeFile(fileName, content, 'utf8');
+    this.cache[data.id] = content;
   }
 }

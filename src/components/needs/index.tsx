@@ -1,9 +1,8 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
 import debounce from "lodash.debounce";
 import {Need} from "../../types";
-import {InputAdornment, Link, List, ListItem, ListItemIcon, ListItemText, TextField} from "@mui/material";
+import {Link, List, ListItem, ListItemIcon, ListItemText, TextField} from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import SearchIcon from '@mui/icons-material/Search';
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage, useIntl} from "react-intl";
 import {ApiClient} from "../../utils";
@@ -29,19 +28,12 @@ const Needs: FC = () => {
     <>
       <TextField
         label={intl.formatMessage({ id: 'input.needs.search.label' })}
-        // InputProps={{
-        //   startAdornment: (
-        //     <InputAdornment position="start">
-        //       <SearchIcon />
-        //     </InputAdornment>
-        //   ),
-        // }}
         variant="standard"
         onChange={(e) => search(e.target.value)}
         fullWidth
         sx={{ my: 2 }}
       />
-      <List>
+      <List sx={{ maxHeight: 400 }}>
         {listing.map(need => (
           <ListItem key={`need-${need.id}`}>
             <ListItemIcon>
