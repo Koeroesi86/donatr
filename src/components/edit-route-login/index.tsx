@@ -15,7 +15,7 @@ const EditRouteLogin: FC = () => {
 
   return (
     <>
-      <Typography variant="h2" sx={{ py: 2 }}>
+      <Typography variant="h3" sx={{ py: 2 }}>
         <FormattedMessage id="page.edit" />
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>

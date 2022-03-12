@@ -5,6 +5,7 @@ import {
   Breadcrumbs,
   Card,
   CardContent,
+  CircularProgress,
   Link,
   List,
   ListItem,
@@ -39,7 +40,7 @@ const LocationRouteBreadCrumb: FC<{ location: Location }> = ({ location }) => {
   }, [location]);
 
   if (!organisation) {
-    return null;
+    return <CircularProgress />;
   }
 
   return (
@@ -63,12 +64,14 @@ const LocationRoute: FC = () => {
     api.one(params.locationId).then(setLocation).catch(console.error);
   }, [params]);
 
-  if (!location) return null;
+  if (!location) {
+    return <CircularProgress />;
+  }
 
   return (
     <>
       <LocationRouteBreadCrumb location={location} />
-      <Typography variant="h2" sx={{ my: 2 }}>
+      <Typography variant="h3" sx={{ my: 2 }}>
         {location.name}
       </Typography>
       {location.location && (
@@ -92,23 +95,25 @@ const LocationRoute: FC = () => {
           }]}
         />
       )}
-      <Card sx={{ my: 2 }}>
-        <CardContent>
-          <Typography variant="h5">
-            <FormattedMessage id="page.needs" />
-          </Typography>
-          <List>
-            {location.needs.map((need) => (
-              <ListItem key={`location-${location.id}-need-${need.id}`}>
-                <ListItemIcon>
-                  <ShoppingBagIcon />
-                </ListItemIcon>
-                <ListItemText primary={need.name} />
-              </ListItem>
-            ))}
-          </List>
-        </CardContent>
-      </Card>
+      {location.needs.length > 0 && (
+        <Card sx={{ my: 2 }}>
+          <CardContent>
+            <Typography variant="h5">
+              <FormattedMessage id="page.needs" />
+            </Typography>
+            <List>
+              {location.needs.map((need) => (
+                <ListItem key={`location-${location.id}-need-${need.id}`}>
+                  <ListItemIcon>
+                    <ShoppingBagIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={need.name} />
+                </ListItem>
+              ))}
+            </List>
+          </CardContent>
+        </Card>
+      )}
     </>
   )
 }

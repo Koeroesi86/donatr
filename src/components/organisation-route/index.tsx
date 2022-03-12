@@ -42,7 +42,7 @@ const OrganisationRoute: FC = () => {
 
   return (
     <>
-      <Typography variant="h2" sx={{ my: 2 }}>
+      <Typography variant="h3" sx={{ my: 2 }}>
         {organisation.name}
       </Typography>
       <MapBlock

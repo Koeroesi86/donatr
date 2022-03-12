@@ -6,7 +6,7 @@ import {Outlet} from "@mui/icons-material";
 const EditRoute: FC = () => {
   return (
     <>
-      <Typography variant="h2" sx={{ py: 2 }}>
+      <Typography variant="h3" sx={{ py: 2 }}>
         <FormattedMessage id="page.edit" />
       </Typography>
       <Outlet />
