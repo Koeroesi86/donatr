@@ -1,8 +1,8 @@
-import {TranslationsResource} from "../../types";
-import React, {FC} from "react";
-import {MenuItem, Select} from "@mui/material";
-import CountryFlag from "../country-flag";
+import React, {FC, useCallback, useState} from "react";
+import {IconButton, Menu, MenuItem, Tooltip} from "@mui/material";
 import {useIntl} from "react-intl";
+import {TranslationsResource} from "../../types";
+import CountryFlag from "../country-flag";
 
 interface LocaleDropdownProps {
   locale: string;
@@ -12,19 +12,48 @@ interface LocaleDropdownProps {
 
 const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale, translations }) => {
   const intl = useIntl();
+  const [anchorElement, setAnchorElement] = useState(null);
+  const open = Boolean(anchorElement);
+  const handleClick = useCallback((event: React.SyntheticEvent) => {
+    setAnchorElement(event.currentTarget);
+  }, []);
+  const handleClose = useCallback(() => {
+    setAnchorElement(null);
+  }, []);
   return (
-    <Select
-      label={intl.formatMessage({ id: 'language.dropdown.label' })}
-      variant="outlined"
-      value={locale}
-      onChange={(e) => setLocale(e.target.value)}
-    >
-      {translations.map((t) => (
-        <MenuItem key={`locale-${t.id}`} value={t.id} sx={{ py: 2 }}>
-          <CountryFlag code={t.id.split('-').pop().toLowerCase()} width="30" />
-        </MenuItem>
-      ))}
-    </Select>
+    <>
+      <Tooltip title={intl.formatMessage({ id: 'language.dropdown.label' })}>
+        <IconButton
+          onClick={handleClick}
+          size="small"
+          sx={{ ml: 2 }}
+          aria-controls={open ? 'locales-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+        >
+          <CountryFlag code={locale.split('-').pop().toLowerCase()} width="30" />
+        </IconButton>
+      </Tooltip>
+      <Menu
+        anchorEl={anchorElement}
+        open={open}
+        onClose={handleClose}
+      >
+        {translations.sort((a, b) => a.id.localeCompare(b.id)).map((t) => (
+          <MenuItem
+            key={`locale-${t.id}`}
+            value={t.id}
+            sx={{ py: 2 }}
+            onClick={() => {
+              setLocale(t.id);
+              handleClose();
+            }}
+          >
+            <CountryFlag code={t.id.split('-').pop().toLowerCase()} width="30" />
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   );
 };
 
