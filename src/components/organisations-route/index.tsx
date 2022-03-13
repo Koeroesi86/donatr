@@ -1,6 +1,7 @@
 import React, {FC, useEffect, useState} from "react";
 import {Organisation} from "../../types";
 import {
+  CircularProgress,
   List,
   ListItemButton,
   ListItemIcon,
@@ -22,13 +23,16 @@ const OrganisationsRoute: FC = () => {
       .then((data) => data.sort(sortByNames))
       .then((data) => setOrganisations(data))
       .catch(console.error);
-  }, [])
+  }, []);
   return (
     <>
       <Typography variant="h3" sx={{ my: 2 }}>
         <FormattedMessage id="page.organisations" />
       </Typography>
       <List>
+        {organisations.length === 0 && (
+          <CircularProgress />
+        )}
         {organisations.map(organisation => (
           <ListItemButton
             key={`organisation-${organisation.id}`}
