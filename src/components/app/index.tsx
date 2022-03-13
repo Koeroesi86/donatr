@@ -28,6 +28,7 @@ import LocaleDropdown from "../locale-dropdown";
 import SidebarContents from "../sidebar-contents";
 import LocationsRoute from "../locations-route";
 import OrganisationRoute from "../organisation-route";
+import NotFoundRoute from "../not-found-route";
 
 const mdTheme = createTheme();
 
@@ -132,6 +133,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
                   <Route index element={<EditRouteLogin />} />
                   <Route path=":code" element={<EditRouteProtected/>} />
                 </Route>
+                <Route path="*" element={<NotFoundRoute />} />
               </Routes>
             </Container>
           </Box>
