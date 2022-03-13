@@ -1,14 +1,25 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
 import debounce from "lodash.debounce";
-import {Location, Need} from "../../types";
-import {Link, List, ListItem, ListItemIcon, ListItemText, TextField, Theme} from "@mui/material";
+import {
+  IconButton,
+  InputAdornment,
+  Link,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+  Theme
+} from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import {Link as RLink} from "react-router-dom";
+import {Link as RLink, useSearchParams} from "react-router-dom";
 import {FormattedMessage, useIntl} from "react-intl";
-import {ApiClient, sortByNames} from "../../utils";
-import MapBlock from "../map-block";
 import {createStyles, makeStyles} from "@mui/styles";
 import {LatLngExpression} from "leaflet";
+import ClearIcon from '@mui/icons-material/Clear';
+import {Location, Need} from "../../types";
+import {ApiClient, sortByNames} from "../../utils";
+import MapBlock from "../map-block";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -24,9 +35,31 @@ const apiLocations = new ApiClient<Location>('locations');
 
 const Needs: FC = () => {
   const intl = useIntl();
-  const [term, setTerm] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [term, setTerm] = useState<string>(
+    searchParams.has('s')
+      ? searchParams.get('s')
+      : ''
+  );
   const search = useCallback(debounce((s: string) => {
-    setTerm(s);
+    if (searchParams.get('s') !== s) {
+      setSearchParams(s ? { s } : {});
+    }
+    api.all({ s })
+      .then((data) => data.sort(sortByNames))
+      .then((data) => {
+        setListing(data);
+        if (s) {
+          const locationIds = Array.from(new Set(data.map((n) => n.locationId)));
+          Promise.all(locationIds.map((id) => apiLocations.one(id)))
+            .then((locations) => locations.filter((l) => l.location))
+            .then(setLocations)
+            .catch(console.error);
+        } else {
+          setLocations([]);
+        }
+      })
+      .catch(console.error);
   }, 200), []);
   const [listing, setListing] = useState<Need[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -37,32 +70,32 @@ const Needs: FC = () => {
   });
 
   useEffect(() => {
-    api.all({ s: term })
-      .then((data) => data.sort(sortByNames))
-      .then((data) => setListing(data))
-      .catch(console.error);
-  }, [term]);
-
-  useEffect(() => {
-    if (term) {
-      const locationIds = Array.from(new Set(listing.map((n) => n.locationId)));
-      Promise.all(locationIds.map((id) => apiLocations.one(id)))
-        .then((locations) => locations.filter((l) => l.location))
-        .then(setLocations)
-        .catch(console.error);
-    } else {
-      setLocations([]);
-    }
-  }, [listing, term])
+    search(term);
+  }, [term, search]);
 
   return (
     <>
       <TextField
         label={intl.formatMessage({ id: 'input.needs.search.label' })}
+        value={term}
         variant="standard"
-        onChange={(e) => search(e.target.value)}
-        fullWidth
+        onChange={(e) => setTerm(e.target.value)}
         sx={{ my: 2 }}
+        fullWidth
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+              aria-label="toggle password visibility"
+              onClick={() => setTerm('')}
+              onMouseDown={() => setTerm('')}
+              edge="end"
+              >
+                <ClearIcon />
+              </IconButton>
+            </InputAdornment>
+          )
+        }}
       />
       <List sx={{ maxHeight: 400, overflow: 'auto', mb: 2 }}>
         {listing.map(need => (
