@@ -1,6 +1,6 @@
 import React, {FC, useEffect, useState} from "react";
 import {Organisation, OrganisationResource} from "../../types";
-import {Accordion, AccordionDetails, AccordionSummary, Box, Button, TextField} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {useIntl} from "react-intl";
 import debounce from "lodash.debounce";
@@ -32,7 +32,7 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
     }
   }, [id, initialState]);
 
-  if (!organisation) return null;
+  if (!organisation) return <CircularProgress />;
 
   return (
     <Accordion expanded={isExpanded} onChange={(_, ex) => setIsExpanded(ex)}>

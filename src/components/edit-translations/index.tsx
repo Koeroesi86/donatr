@@ -1,7 +1,7 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
 import {TranslationsResource} from "../../types";
 import {ApiClient} from "../../utils";
-import {Accordion, AccordionDetails, AccordionSummary, TextField} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, CircularProgress, TextField} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {FormattedMessage} from "react-intl";
 import CountryFlag from "../country-flag";
@@ -46,7 +46,7 @@ const EditTranslations: FC = () => {
   }, [refresh]);
 
   if (!fallback) {
-    return null;
+    return <CircularProgress />;
   }
 
   return (

@@ -3,7 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {ApiClient} from "../../utils";
 import {Access, AccessFilters} from "../../types";
 import EditOrganisations from "../edit-organisations";
-import {Box, Tab, Tabs, Typography} from "@mui/material";
+import {Box, CircularProgress, Tab, Tabs, Typography} from "@mui/material";
 import {FormattedMessage, useIntl} from "react-intl";
 import EditOrganisation from "../edit-organisation";
 import EditLocation from "../edit-location";
@@ -76,7 +76,7 @@ const EditRouteProtected: FC = () => {
   }, [tabs]);
   
   if (!access) {
-    return null;
+    return <CircularProgress />;
   }
 
   return <>

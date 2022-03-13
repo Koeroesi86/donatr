@@ -1,6 +1,6 @@
 import React, {FC, useEffect, useState} from 'react';
 import {LatLngExpression} from "leaflet";
-import {Link, List, Theme, Typography} from "@mui/material";
+import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
 import {Location, LocationsFilters} from "../../types";
 import {ApiClient, sortByNames} from "../../utils";
@@ -33,7 +33,7 @@ const LocationsRoute: FC = () => {
     api.all().then((l) => setLocations(l.sort(sortByNames))).catch(console.error);
   }, []);
 
-  if (!locations.length) return null;
+  if (!locations.length) return <CircularProgress />;
 
   const locationsWithGeo = locations.filter((l) => l.location);
 

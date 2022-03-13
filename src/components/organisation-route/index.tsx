@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from "react";
 import {Link as RLink, useParams} from "react-router-dom";
 import {createStyles, makeStyles} from "@mui/styles";
-import {Link, List, Theme, Typography} from "@mui/material";
+import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
 import {LatLngExpression} from "leaflet";
 import ReactMarkdown from "react-markdown";
 import RemarkBreaks from "remark-breaks";
@@ -35,7 +35,7 @@ const OrganisationRoute: FC = () => {
     api.one(params.organisationId).then(setOrganisation).catch(console.error);
   }, [params]);
 
-  if (!organisation) return null;
+  if (!organisation) return <CircularProgress />;
 
   const locationsWithGeo = organisation.locations.filter((l) => l.location);
 

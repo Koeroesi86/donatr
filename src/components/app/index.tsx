@@ -5,6 +5,7 @@ import {Link as RLink, RouteObject, useMatch, useResolvedPath, useRoutes} from "
 import {
   AppBar,
   Box,
+  CircularProgress,
   Container,
   createTheme,
   CssBaseline,
@@ -94,7 +95,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
     });
   }, [locale]);
 
-  if (Object.keys(messages).length === 0) return null;
+  if (Object.keys(messages).length === 0) return <CircularProgress />;
 
   return (
     <ThemeProvider theme={mdTheme}>

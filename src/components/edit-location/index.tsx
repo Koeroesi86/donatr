@@ -1,5 +1,14 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
-import {Accordion, AccordionDetails, AccordionSummary, Box, Button, Modal, TextField} from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  CircularProgress,
+  Modal,
+  TextField
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditNeeds from "../edit-needs";
 import {Location, LocationResource, LocationsFilters} from "../../types";
@@ -37,7 +46,7 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
   }, [refresh, initialState]);
 
   if (!location) {
-    return null;
+    return <CircularProgress />;
   }
 
   return (

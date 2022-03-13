@@ -1,5 +1,5 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
-import {Accordion, AccordionDetails, AccordionSummary, Box, Button} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {FormattedMessage} from "react-intl";
 import {ApiClient} from "../../utils";
@@ -34,7 +34,7 @@ const EditAccesses: FC<EditAccessesProps> = ({ currentCode }) => {
   }, [refresh]);
 
   if (!organisations) {
-    return null;
+    return <CircularProgress />;
   }
 
   return (
