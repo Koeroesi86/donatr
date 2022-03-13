@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from "react";
 import OrganisationsRoute from "../organisations-route";
 import Home from "../home";
-import {Link as RLink, Route, Routes, useMatch, useResolvedPath} from "react-router-dom";
+import {Link as RLink, RouteObject, useMatch, useResolvedPath, useRoutes} from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -40,10 +40,37 @@ const NavLink: FC<{ to: string }> = ({ to, children }) => {
     <Link to={to} component={RLink} color="inherit" sx={{ padding: '0 12px' }} underline={match ? 'always' : 'hover'}>
       {children}
     </Link>
-  )
-}
+  );
+};
 
 const api = new ApiClient<TranslationsResource, undefined>('translations');
+
+const routes: RouteObject[] = [
+  { path: "/", element: <Home /> },
+  {
+    path: "/organisations",
+    children: [
+      { index: true, element: <OrganisationsRoute /> },
+      { path: ":organisationId", element: <OrganisationRoute /> },
+    ],
+  },
+  {
+    path: "/locations",
+    children: [
+      { index: true, element: <LocationsRoute /> },
+      { path: ":locationId", element: <LocationRoute /> },
+    ],
+  },
+  { path: "/needs", element: <Needs /> },
+  {
+    path: "/edit",
+    children: [
+      { index: true, element: <EditRouteLogin /> },
+      { path: ":code", element: <EditRouteProtected /> },
+    ],
+  },
+  { path: "*", element: <NotFoundRoute /> }
+];
 
 interface AppProps {
   initialLocale: string;
@@ -54,6 +81,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
   const [messages, setMessages] = useState<Translations>({});
   const [locale, setLocale] = useState(initialLocale);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const routesElement = useRoutes(routes);
 
   useEffect(() => {
     api.all().then(setTranslations)
@@ -118,23 +146,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
               </Container>
             </AppBar>
             <Container maxWidth="lg">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/organisations">
-                  <Route index element={<OrganisationsRoute />} />
-                  <Route path=":organisationId" element={<OrganisationRoute />} />
-                </Route>
-                <Route path="/needs" element={<Needs />} />
-                <Route path="/locations">
-                  <Route index element={<LocationsRoute />} />
-                  <Route path=":locationId" element={<LocationRoute />} />
-                </Route>
-                <Route path="/edit">
-                  <Route index element={<EditRouteLogin />} />
-                  <Route path=":code" element={<EditRouteProtected/>} />
-                </Route>
-                <Route path="*" element={<NotFoundRoute />} />
-              </Routes>
+              {routesElement}
             </Container>
           </Box>
           <AppBar position="static" sx={{ mt: 2, py: 1 }}>
