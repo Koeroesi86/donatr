@@ -50,53 +50,48 @@ const EditTranslations: FC = () => {
   }
 
   return (
-    <Accordion defaultExpanded={false}>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <FormattedMessage id="edit.translations.title" />
-      </AccordionSummary>
-      <AccordionDetails>
-        {translations.map((translation) => (
-          <Accordion key={`edit-translation-${translation.id}`}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <CountryFlag code={translation.id.split('-').pop().toLowerCase()} width="30" />
-            </AccordionSummary>
-            <AccordionDetails>
-              {Object.keys(fallback.translations).sort().map((key) => (
-                <DebouncedTextField
-                  key={`edit-translation-${translation.id}-input-${key}`}
-                  label={key}
-                  defaultValue={translation.translations[key]}
-                  helperText={fallback.translations[key]}
-                  onChange={(text) => {
-                    api.update({
-                      id: translation.id,
-                      translations: {
-                        ...translation.translations,
-                        [key]: text,
-                      }
-                    }).then(() => refresh());
-                  }}
-                />
-              ))}
-            </AccordionDetails>
-          </Accordion>
-        ))}
-        <Accordion>
+    <>
+      {translations.map((translation) => (
+        <Accordion key={`edit-translation-${translation.id}`}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <FormattedMessage id="edit.translations.new.title" />
+            <CountryFlag code={translation.id.split('-').pop().toLowerCase()} width="30" />
           </AccordionSummary>
           <AccordionDetails>
-            <CreateTranslationForm
-              fallback={fallback.translations}
-              existingIds={translations.map(t => t.id)}
-              onSubmit={(t) => {
-                api.update(t).then(() => refresh()).catch(console.error)
-              }}
-            />
+            {Object.keys(fallback.translations).sort().map((key) => (
+              <DebouncedTextField
+                key={`edit-translation-${translation.id}-input-${key}`}
+                label={key}
+                defaultValue={translation.translations[key]}
+                helperText={fallback.translations[key]}
+                onChange={(text) => {
+                  api.update({
+                    id: translation.id,
+                    translations: {
+                      ...translation.translations,
+                      [key]: text,
+                    }
+                  }).then(() => refresh());
+                }}
+              />
+            ))}
           </AccordionDetails>
         </Accordion>
-      </AccordionDetails>
-    </Accordion>
+      ))}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <FormattedMessage id="edit.translations.new.title" />
+        </AccordionSummary>
+        <AccordionDetails>
+          <CreateTranslationForm
+            fallback={fallback.translations}
+            existingIds={translations.map(t => t.id)}
+            onSubmit={(t) => {
+              api.update(t).then(() => refresh()).catch(console.error)
+            }}
+          />
+        </AccordionDetails>
+      </Accordion>
+    </>
   );
 }
 
