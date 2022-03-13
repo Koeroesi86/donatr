@@ -1,9 +1,10 @@
 import path from "path";
 import fs from "fs";
 import { v4 as uuid } from "uuid";
-import {JsonProvider} from "./providers";
-import {AccessFilters, Provider, ResponseEvent, Worker} from "./types";
 import debounce from "lodash.debounce";
+import crypto from "crypto";
+import {AccessFilters, Provider, ResponseEvent, Worker} from "./types";
+import {JsonProvider} from "./providers";
 
 const keepAliveTimeout = 30 * 60 * 1000;
 const keepAliveCallback = debounce(() => {
@@ -28,12 +29,47 @@ const getResponseHeaders = (headers: ResponseEvent["headers"] = {}) => ({
   ...headers,
 });
 
-const createResponse = (statusCode: number, data: any, headers: ResponseEvent["headers"] = {}): ResponseEvent => ({
-  statusCode,
-  headers: getResponseHeaders(headers),
-  body: JSON.stringify(data, null, 2),
-  isBase64Encoded: false,
-})
+const etag = (body: string, byteLength: number) => {
+  if (body.length === 0) {
+    // fast-path empty
+    return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
+  }
+
+  // compute hash of entity
+  const hash = crypto
+    .createHash('sha1')
+    .update(body, 'utf8')
+    .digest('base64')
+    .substring(0, 27);
+
+  return `"${byteLength.toString(16)}-${hash}"`
+};
+
+const createResponse = (statusCode: number, data: any, headers: ResponseEvent["headers"] = {}): ResponseEvent => {
+  return ({
+    statusCode,
+    headers: getResponseHeaders(headers),
+    body: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
+    isBase64Encoded: false,
+  });
+};
+
+const createCacheableResponse = (statusCode: number, data: any, headers: ResponseEvent["headers"] = {}): ResponseEvent => {
+  const body = [201, 304].includes(statusCode) ? '' : JSON.stringify(data, null, 2);
+  const byteLength = Buffer.byteLength(body, 'utf8');
+  return createResponse(statusCode, body, {
+    ...headers,
+    'Cache-Control': 'public, max-age=0',
+    'Content-Length': byteLength.toString(),
+    'ETag': etag(body, byteLength),
+  });
+}
+
+const ensureId = (id: string, resource: { id: string }) => {
+  if (id !== resource.id) {
+    throw new Error('Invalid ID');
+  }
+};
 
 const worker: Worker = async (event, callback) => {
   keepAliveCallback();
@@ -48,12 +84,14 @@ const worker: Worker = async (event, callback) => {
           });
         }
         const organisations = await provider.getOrganisations();
-        callback(createResponse(200, organisations));
+        callback(createCacheableResponse(200, organisations));
         return;
       }
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
-          await provider.setOrganisation(JSON.parse(event.body));
+          const content = JSON.parse(event.body);
+          ensureId(event.pathFragments[2], content);
+          await provider.setOrganisation(content);
         }
         if (event.httpMethod === 'DELETE') {
           await provider.removeOrganisation(event.pathFragments[2])
@@ -61,10 +99,10 @@ const worker: Worker = async (event, callback) => {
           return;
         }
         const organisation = await provider.getOrganisation(event.pathFragments[2]);
-        callback(createResponse(200, organisation));
+        callback(createCacheableResponse(200, organisation));
         return;
       }
-      callback(createResponse(404, { message: 'no endpoint like this.' }));
+      callback(createCacheableResponse(404, { message: 'no endpoint like this.' }));
       return;
     }
 
@@ -79,12 +117,14 @@ const worker: Worker = async (event, callback) => {
         const locations = await provider.getLocations({
           organisationId: event.queryStringParameters.organisationId,
         });
-        callback(createResponse(200, locations));
+        callback(createCacheableResponse(200, locations));
         return;
       }
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
-          await provider.setLocation(JSON.parse(event.body));
+          const content = JSON.parse(event.body);
+          ensureId(event.pathFragments[2], content);
+          await provider.setLocation(content);
         }
         if (event.httpMethod === 'DELETE') {
           await provider.removeLocation(event.pathFragments[2]);
@@ -93,11 +133,11 @@ const worker: Worker = async (event, callback) => {
         }
         const location = await provider.getLocation(event.pathFragments[2]);
         if (location) {
-          callback(createResponse(200, location));
+          callback(createCacheableResponse(200, location));
+          return;
         }
-        return;
       }
-      callback(createResponse(404, { message: 'no endpoint like this.' }));
+      callback(createCacheableResponse(404, { message: 'no endpoint like this.' }));
       return;
     }
 
@@ -113,12 +153,14 @@ const worker: Worker = async (event, callback) => {
           search: event.queryStringParameters.s,
           locationId: event.queryStringParameters.locationId,
         });
-        callback(createResponse(200, needs));
+        callback(createCacheableResponse(200, needs));
         return;
       }
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
-          await provider.setNeed(JSON.parse(event.body));
+          const content = JSON.parse(event.body);
+          ensureId(event.pathFragments[2], content);
+          await provider.setNeed(content);
         }
         if (event.httpMethod === 'DELETE') {
           await provider.removeNeed(event.pathFragments[2]);
@@ -127,31 +169,33 @@ const worker: Worker = async (event, callback) => {
         }
         const need = await provider.getNeed(event.pathFragments[2]);
         if (need) {
-          callback(createResponse(200, need));
+          callback(createCacheableResponse(200, need));
+          return;
         }
-        return;
       }
-      callback(createResponse(404, { message: 'no endpoint like this.' }));
+      callback(createCacheableResponse(404, { message: 'no endpoint like this.' }));
       return;
     }
 
     if (event.pathFragments[1] === 'translations') {
       if (event.pathFragments.length === 2) {
         const translations = await provider.getTranslations();
-        callback(createResponse(200, translations));
+        callback(createCacheableResponse(200, translations));
         return;
       }
 
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
-          await provider.setTranslations(JSON.parse(event.body));
+          const content = JSON.parse(event.body);
+          ensureId(event.pathFragments[2], content);
+          await provider.setTranslations(content);
         }
         const translation = await provider.getTranslation(event.pathFragments[2]);
-        callback(createResponse(200, translation));
+        callback(createCacheableResponse(200, translation));
         return;
       }
 
-      callback(createResponse(404, { message: 'no endpoint like this.' }));
+      callback(createCacheableResponse(404, { message: 'no endpoint like this.' }));
       return;
     }
 
@@ -171,7 +215,9 @@ const worker: Worker = async (event, callback) => {
 
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
-          await provider.setAccess(JSON.parse(event.body));
+          const content = JSON.parse(event.body);
+          ensureId(event.pathFragments[2], content);
+          await provider.setAccess(content);
         }
         if (event.httpMethod === 'DELETE') {
           await provider.removeAccess(event.pathFragments[2]);
@@ -191,7 +237,7 @@ const worker: Worker = async (event, callback) => {
     return;
   }
 
-  callback(createResponse(404, { message: 'no endpoint like this.' }));
+  callback(createCacheableResponse(404, { message: 'no endpoint like this.' }));
 };
 
 export default worker;

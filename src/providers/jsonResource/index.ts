@@ -37,7 +37,7 @@ export default class JsonResource<T extends BaseResource> {
         if (event === 'add' || event === 'change') {
           await this.one(id);
 
-          if (!this.isCacheReady && Object.keys(this.cache).length === (await this.getResourceIds()).length) {
+          if (!this.isCacheReady && Object.keys(this.cache).length === (await this.getIds()).length) {
             this.isCacheReady = true;
           }
         }
@@ -48,9 +48,13 @@ export default class JsonResource<T extends BaseResource> {
       });
   }
 
-  private getResourceIds = async (): Promise<string[]> => {
+  getIds = async (): Promise<string[]> => {
     if (!fs.existsSync(this.basePath)) {
       return [];
+    }
+
+    if (this.isCacheReady) {
+      return Object.keys(this.cache);
     }
 
     const fileNames = await fs.promises.readdir(this.basePath);
@@ -62,7 +66,7 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   all = async (): Promise<T[]> => {
-    const ids = this.isCacheReady ? Object.keys(this.cache) : await this.getResourceIds();
+    const ids = await this.getIds();
     const all = await Promise.all(ids.map(async (id) => this.one(id)));
     this.isCacheReady = true;
 

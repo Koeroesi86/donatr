@@ -54,12 +54,13 @@ export default class JsonProvider implements Provider {
   };
 
   getLocations = async (filters?: LocationsFilters): Promise<Location[]> => {
+    const ids = await this.locationResources.getIds();
     const allLocations = await Promise.all(
-      (await this.locationResources.all())
-        .map(async (loc) => ({ ...loc, ...await this.getLocation(loc.id) }))
+      ids.map(async (id) => this.getLocation(id))
     );
 
     return allLocations
+      .filter(Boolean)
       .filter(l => filters && filters.organisationId ? l.organisationId === filters.organisationId : true);
   };
 
@@ -89,11 +90,11 @@ export default class JsonProvider implements Provider {
   };
 
   getOrganisations = async (): Promise<Organisation[]> => {
-    const organisations = await this.organisationResources.all();
-    return Promise.all(organisations.map(async (organisation) => ({
-      ...organisation,
-      ...await this.getOrganisation(organisation.id)
-    })));
+    const ids = await this.organisationResources.getIds();
+    const result = await Promise.all(
+      ids.map(async (id) => this.getOrganisation(id))
+    );
+    return result.filter(Boolean)
   };
 
   getTranslation = async (code: string): Promise<TranslationsResource> => {
