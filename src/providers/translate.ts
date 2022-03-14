@@ -40,6 +40,7 @@ const tryLibretranslate = async (text: string, targetLocale: string): Promise<st
     'https://translate.argosopentech.com/translate', // 20 per min
     'https://libretranslate.de/translate', // 20 per min
     'https://trans.zillyhuhn.com/translate', // 5 per 1 minute
+    'https://libretranslate.pussthecat.org/translate',
   ];
 
   for (let url of urls) {
