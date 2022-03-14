@@ -1,15 +1,29 @@
-import React, {FC} from "react";
+import React, {FC, useEffect} from "react";
 import {FormattedMessage} from "react-intl";
-import {Typography} from "@mui/material";
-import {Outlet} from "@mui/icons-material";
+import {CircularProgress, Typography} from "@mui/material";
+import {useNavigate, useOutlet, useParams} from "react-router-dom";
+import useApiToken from "../../hooks/useApiToken";
+import useResolveAccess from "../../hooks/useResolveAccess";
 
 const EditRoute: FC = () => {
+  const outlet = useOutlet();
+  const {code} = useParams();
+  const navigate = useNavigate();
+  const {getToken} = useApiToken();
+  const resolveAccess = useResolveAccess();
+  
+  useEffect(() => {
+    if (code && !getToken()) {
+      resolveAccess(code).catch(() => navigate('/edit'));
+    }
+  }, [code, getToken, navigate, resolveAccess]);
+
   return (
     <>
       <Typography variant="h3" sx={{ py: 2 }}>
         <FormattedMessage id="page.edit" />
       </Typography>
-      <Outlet />
+      {code && !getToken() ? <CircularProgress /> : outlet}
     </>
   )
 };

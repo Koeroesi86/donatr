@@ -2,14 +2,11 @@ import React, {FC, useCallback, useEffect, useState} from "react";
 import {Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {FormattedMessage} from "react-intl";
-import {ApiClient} from "../../utils";
-import {Access, AccessFilters, Organisation} from "../../types";
+import {Access, Organisation} from "../../types";
 import EditAccess from "../edit-access";
 import EditAccessForm from "../edit-access-form";
 import AddIcon from "@mui/icons-material/Add";
-
-const api = new ApiClient<Access, undefined, AccessFilters>('access');
-const apiOrganisation = new ApiClient<Organisation, 'locations'>('organisations');
+import useApiClient from "../../hooks/useApiClient";
 
 interface EditAccessesProps {
   currentCode: string;
@@ -19,15 +16,17 @@ const EditAccesses: FC<EditAccessesProps> = ({ currentCode }) => {
   const [accesses, setAccesses] = useState<Access[]>([]);
   const [newAccess, setNewAccess] = useState<Access>({ id: 'new', all: true, code: '' });
   const [organisations, setOrganisations] = useState<Organisation[]>();
+  const accessApi = useApiClient<'access'>('access');
+  const organisationsApi = useApiClient<'organisations'>('organisations');
 
   const refresh = useCallback(() => {
-    api.all().then((a) => setAccesses(a.sort((a, b) => a.code.localeCompare(b.code))));
-    apiOrganisation.all().then(setOrganisations);
-  }, []);
+    accessApi.all().then((a) => setAccesses(a.sort((a, b) => a.code.localeCompare(b.code))));
+    organisationsApi.all().then(setOrganisations);
+  }, [accessApi, organisationsApi]);
 
   const update = useCallback((data: Access) => {
-    api.update(data).then(() => refresh());
-  }, [refresh]);
+    accessApi.update(data).then(() => refresh());
+  }, [accessApi, refresh]);
 
   useEffect(() => {
     refresh();
@@ -63,7 +62,7 @@ const EditAccesses: FC<EditAccessesProps> = ({ currentCode }) => {
               onClick={() => {
                 const a = { ...newAccess };
                 delete a.id;
-                api.create(a).then(() => {
+                accessApi.create(a).then(() => {
                   refresh();
                   setNewAccess({ id: 'new', all: true, code: '' });
                 });

@@ -1,13 +1,11 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
-import {Location, LocationResource, LocationsFilters} from "../../types";
 import {Box, Button, Card, CardContent, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {useIntl} from "react-intl";
+import {Location, LocationResource} from "../../types";
 import EditLocation from "../edit-location";
-import {ApiClient, sortByNames} from "../../utils";
-
-// @ts-ignore
-const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
+import {sortByNames} from "../../utils";
+import useApiClient from "../../hooks/useApiClient";
 
 interface EditLocationsProps {
   ids?: string[];
@@ -20,6 +18,7 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpe
   const intl = useIntl();
   const [locations, setLocations] = useState<LocationResource[]>(initialState.sort(sortByNames));
   const [enteredText, setEnteredText] = useState('');
+  const api = useApiClient<'locations'>('locations');
 
   const refresh = useCallback(() => {
     (ids

@@ -2,12 +2,13 @@ import React, {FC, useEffect, useState} from 'react';
 import {LatLngExpression} from "leaflet";
 import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
-import {Location, LocationsFilters} from "../../types";
-import {ApiClient, sortByNames} from "../../utils";
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
+import {Location} from "../../types";
+import {sortByNames} from "../../utils";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
+import useApiClient from "../../hooks/useApiClient";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -18,10 +19,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }));
 
-// @ts-ignore
-const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
-
 const LocationsRoute: FC = () => {
+  const api = useApiClient<'locations'>('locations');
   const styles = useStyles();
   const [locations, setLocations] = useState<Location[]>([]);
   const [center] = useState<LatLngExpression>({

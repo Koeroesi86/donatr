@@ -96,6 +96,32 @@ export type CreateNeedResource = Omit<NeedResource, 'id'>;
 export type CreateLocationResource = Omit<LocationResource, 'id'>;
 export type CreateOrganisationResource = Omit<OrganisationResource, 'id'>;
 
+export type Resources = 'locations' | 'organisations' | 'needs' | 'access' | 'translations';
+
+export interface PathToType {
+  organisations: Organisation;
+  locations: Location;
+  needs: Need;
+  translations: TranslationsResource;
+  access: Access;
+}
+
+export interface PathToResource {
+  organisations: Omit<Organisation, 'locations'>;
+  locations: Omit<Location, 'needs'>;
+  needs: Need;
+  translations: TranslationsResource;
+  access: Access;
+}
+
+export interface PathToFilters {
+  organisations: {};
+  locations: LocationsFilters;
+  needs: NeedsFilters;
+  translations: {};
+  access: AccessFilters;
+}
+
 export interface Provider {
   getOrganisations: () => Promise<Organisation[]>;
   getOrganisation: (id: string) => Promise<Organisation | undefined>;

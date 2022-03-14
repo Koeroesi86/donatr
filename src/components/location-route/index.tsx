@@ -15,10 +15,11 @@ import {
   Typography
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import {ApiClient, sortByNames} from "../../utils";
-import {Location, LocationsFilters, Organisation} from "../../types";
+import {sortByNames} from "../../utils";
+import {Location, Organisation} from "../../types";
 import MapBlock from "../map-block";
 import {createStyles, makeStyles} from "@mui/styles";
+import useApiClient from "../../hooks/useApiClient";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -29,15 +30,13 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }));
 
-// @ts-ignore
-const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
-const apiOrganisation = new ApiClient<Organisation>('organisations');
-
 const LocationRouteBreadCrumb: FC<{ location: Location }> = ({ location }) => {
+  const apiOrganisation = useApiClient<'organisations'>('organisations');
   const [organisation, setOrganisation] = useState<Organisation>();
+
   useEffect(() => {
     apiOrganisation.one(location.organisationId).then(setOrganisation).catch(console.error);
-  }, [location]);
+  }, [apiOrganisation, location]);
 
   if (!organisation) {
     return <CircularProgress />;
@@ -58,11 +57,12 @@ const LocationRouteBreadCrumb: FC<{ location: Location }> = ({ location }) => {
 const LocationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
+  const api = useApiClient<'locations'>('locations')
   const [location, setLocation] = useState<Location>();
 
   useEffect(() => {
     api.one(params.locationId).then(setLocation).catch(console.error);
-  }, [params]);
+  }, [api, params]);
 
   if (!location) {
     return <CircularProgress />;

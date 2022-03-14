@@ -18,8 +18,9 @@ import {createStyles, makeStyles} from "@mui/styles";
 import {LatLngExpression} from "leaflet";
 import ClearIcon from '@mui/icons-material/Clear';
 import {Location, Need} from "../../types";
-import {ApiClient, sortByNames} from "../../utils";
+import {sortByNames} from "../../utils";
 import MapBlock from "../map-block";
+import useApiClient from "../../hooks/useApiClient";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -30,26 +31,25 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }));
 
-const api = new ApiClient<Need, undefined, { s: string }>('needs');
-const apiLocations = new ApiClient<Location>('locations');
-
 const Needs: FC = () => {
   const intl = useIntl();
+  const api = useApiClient<'needs'>('needs');
+  const apiLocations = useApiClient<'locations'>('locations');
   const [searchParams, setSearchParams] = useSearchParams();
   const [term, setTerm] = useState<string>(
     searchParams.has('s')
       ? searchParams.get('s')
       : ''
   );
-  const search = useCallback(debounce((s: string) => {
-    if (searchParams.get('s') !== s) {
-      setSearchParams(s ? { s } : {});
+  const search = useCallback(debounce((search: string) => {
+    if (searchParams.get('s') !== search) {
+      setSearchParams(search ? { s: search } : {});
     }
-    api.all({ s })
+    api.all({ search })
       .then((data) => data.sort(sortByNames))
       .then((data) => {
         setListing(data);
-        if (s) {
+        if (search) {
           const locationIds = Array.from(new Set(data.map((n) => n.locationId)));
           Promise.all(locationIds.map((id) => apiLocations.one(id)))
             .then((locations) => locations.filter((l) => l.location))

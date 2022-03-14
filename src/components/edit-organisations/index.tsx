@@ -4,12 +4,12 @@ import {Box, Button, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {useIntl} from "react-intl";
 import EditOrganisation from "../edit-organisation";
-import {ApiClient, sortByNames} from "../../utils";
-
-const api = new ApiClient<Organisation, 'locations'>('organisations');
+import {sortByNames} from "../../utils";
+import useApiClient from "../../hooks/useApiClient";
 
 const EditOrganisations: FC = () => {
   const intl = useIntl();
+  const api = useApiClient<'organisations'>('organisations')
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [enteredText, setEnteredText] = useState('');
   const refresh = useCallback(() => {

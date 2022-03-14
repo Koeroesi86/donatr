@@ -6,12 +6,11 @@ import {LatLngExpression} from "leaflet";
 import ReactMarkdown from "react-markdown";
 import RemarkBreaks from "remark-breaks";
 import RemarkGfm from "remark-gfm";
-import {ApiClient, sortByNames} from "../../utils";
+import {sortByNames} from "../../utils";
 import {Organisation} from "../../types";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
-
-const api = new ApiClient<Organisation>('organisations');
+import useApiClient from "../../hooks/useApiClient";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -25,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 const OrganisationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
+  const api = useApiClient<'organisations'>('organisations');
   const [organisation, setOrganisation] = useState<Organisation>();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
@@ -33,7 +33,7 @@ const OrganisationRoute: FC = () => {
 
   useEffect(() => {
     api.one(params.organisationId).then(setOrganisation).catch(console.error);
-  }, [params]);
+  }, [api, params]);
 
   if (!organisation) return <CircularProgress />;
 

@@ -3,8 +3,10 @@ import fs from "fs";
 import { v4 as uuid } from "uuid";
 import debounce from "lodash.debounce";
 import crypto from "crypto";
-import {AccessFilters, Provider, ResponseEvent, Worker} from "./types";
+import {AccessFilters, LocationResource, NeedResource, Provider, ResponseEvent, Worker} from "./types";
 import {JsonProvider} from "./providers";
+import * as token from "./utils/token";
+import { hasAccess } from "./utils";
 
 const keepAliveTimeout = 30 * 60 * 1000;
 const keepAliveCallback = debounce(() => {
@@ -78,6 +80,11 @@ const worker: Worker = async (event, callback) => {
     if (event.pathFragments[1] === 'organisations') {
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          if (!("all" in tokenAccess) || !tokenAccess.all) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
           await provider.setOrganisation({
             ...JSON.parse(event.body),
             id: uuid(),
@@ -89,11 +96,24 @@ const worker: Worker = async (event, callback) => {
       }
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          if (!hasAccess({ organisationId: event.pathFragments[2] }, tokenAccess)) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
           const content = JSON.parse(event.body);
           ensureId(event.pathFragments[2], content);
           await provider.setOrganisation(content);
         }
         if (event.httpMethod === 'DELETE') {
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          if (
+            (!("all" in tokenAccess) || !tokenAccess.all)
+            && (!("organisationIds" in tokenAccess) || !tokenAccess.organisationIds.includes(event.pathFragments[2]))
+          ) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
           await provider.removeOrganisation(event.pathFragments[2])
           callback(createResponse(200, ''));
           return;
@@ -109,8 +129,14 @@ const worker: Worker = async (event, callback) => {
     if (event.pathFragments[1] === 'locations') {
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
+          const content = JSON.parse(event.body) as LocationResource;
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          if (!hasAccess({ organisationId: content.organisationId }, tokenAccess)) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
           await provider.setLocation({
-            ...JSON.parse(event.body),
+            ...content,
             id: uuid(),
           });
         }
@@ -121,6 +147,17 @@ const worker: Worker = async (event, callback) => {
         return;
       }
       if (event.pathFragments.length === 3) {
+        if (['PUT', 'DELETE'].includes(event.httpMethod)) {
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          const loc = await provider.getLocation(event.pathFragments[2]);
+          if (
+            !hasAccess({ locationId: event.pathFragments[2] }, tokenAccess)
+            && !hasAccess({ organisationId: loc.organisationId }, tokenAccess)
+          ) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
+        }
         if (event.httpMethod === 'PUT') {
           const content = JSON.parse(event.body);
           ensureId(event.pathFragments[2], content);
@@ -144,6 +181,16 @@ const worker: Worker = async (event, callback) => {
     if (event.pathFragments[1] === 'needs') {
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
+          const content = JSON.parse(event.body) as NeedResource;
+          const location = await provider.getLocation(content.locationId);
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          if (
+            !hasAccess({ organisationId: location.organisationId }, tokenAccess)
+            && !hasAccess({ locationId: content.locationId }, tokenAccess)
+          ) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
           await provider.setNeed({
             ...JSON.parse(event.body),
             id: uuid(),
@@ -157,6 +204,18 @@ const worker: Worker = async (event, callback) => {
         return;
       }
       if (event.pathFragments.length === 3) {
+        if (['PUT', 'DELETE'].includes(event.httpMethod)) {
+          const need = await provider.getNeed(event.pathFragments[2]);
+          const location = await provider.getLocation(need.locationId);
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          if (
+            !hasAccess({ locationId: need.locationId }, tokenAccess)
+            && !hasAccess({ organisationId: location.organisationId }, tokenAccess)
+          ) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
+        }
         if (event.httpMethod === 'PUT') {
           const content = JSON.parse(event.body);
           ensureId(event.pathFragments[2], content);
@@ -186,6 +245,11 @@ const worker: Worker = async (event, callback) => {
 
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
+          const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+          if (!hasAccess({ translations: true }, tokenAccess)) {
+            callback(createResponse(401, { message: "Nope." }));
+            return;
+          }
           const content = JSON.parse(event.body);
           ensureId(event.pathFragments[2], content);
           await provider.setTranslations(content);
@@ -200,6 +264,12 @@ const worker: Worker = async (event, callback) => {
     }
 
     if (event.pathFragments[1] === 'access') {
+      const tokenAccess = await token.deserialize(event.headers['x-access-token']);
+      if (!hasAccess({ accesses: true }, tokenAccess)) {
+        callback(createResponse(401, { message: "Nope." }));
+        return;
+      }
+
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
           await provider.setAccess({
@@ -230,6 +300,14 @@ const worker: Worker = async (event, callback) => {
           return;
         }
       }
+    }
+
+    if (event.pathFragments[1] === 'resolve-access' && event.pathFragments.length === 3) {
+      const [access] = await provider.getAccesses({ code: event.pathFragments[2] });
+      if (access) {
+        callback(createResponse(200, access, { 'x-access-token': await token.serialize(access) }));
+      }
+      return;
     }
   } catch (e) {
     console.error(e);

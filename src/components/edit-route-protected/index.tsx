@@ -1,16 +1,15 @@
 import React, {FC, useEffect, useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {ApiClient} from "../../utils";
-import {Access, AccessFilters} from "../../types";
+import {Box, CircularProgress, Tab, Tabs} from "@mui/material";
+import {useIntl} from "react-intl";
+import {Access} from "../../types";
 import EditOrganisations from "../edit-organisations";
-import {Box, CircularProgress, Tab, Tabs, Typography} from "@mui/material";
-import {FormattedMessage, useIntl} from "react-intl";
 import EditOrganisation from "../edit-organisation";
 import EditLocation from "../edit-location";
 import EditAccesses from "../edit-accesses";
 import EditTranslations from "../edit-translations";
-
-const api = new ApiClient<Access, undefined, AccessFilters>('access');
+import useApiClient from "../../hooks/useApiClient";
+import useResolveAccess from "../../hooks/useResolveAccess";
 
 interface TabPanelProps {
   current?: string;
@@ -29,6 +28,8 @@ const TabPanel: FC<TabPanelProps> = ({ value, current, children }) => {
 const EditRouteProtected: FC = () => {
   const {code} = useParams();
   const intl = useIntl();
+  const apiClient = useApiClient<'access'>('access');
+  const resolveAccess = useResolveAccess();
   const [access, setAccess] = useState<Access>();
   const navigate = useNavigate();
   const tabs = useMemo(() => {
@@ -60,16 +61,10 @@ const EditRouteProtected: FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>();
   
   useEffect(() => {
-    api.all({ code })
-      .then(([access]) => {
-        if (access) {
-          setAccess(access);
-        } else {
-          navigate('/login')
-        }
-      })
-      .catch(console.error);
-  }, [code, navigate]);
+    resolveAccess(code)
+      .then(setAccess)
+      .catch(() => navigate('/edit'));
+  }, [apiClient, code, navigate, resolveAccess]);
 
   useEffect(() => {
     if (tabs.length > 0) setSelectedTab(tabs[0].key);
@@ -79,37 +74,36 @@ const EditRouteProtected: FC = () => {
     return <CircularProgress />;
   }
 
-  return <>
-    <Typography variant="h3" sx={{ py: 2 }}>
-      <FormattedMessage id="page.edit" />
-    </Typography>
-    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-      <Tabs value={selectedTab} onChange={(e, t) => setSelectedTab(t)} aria-label="tabs">
-        {tabs.map((tab) => (
-          <Tab label={tab.label} value={tab.key} key={`tab-control-${tab.key}`} />
+  return (
+    <>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={selectedTab} onChange={(e, t) => setSelectedTab(t)} aria-label="tabs">
+          {tabs.map((tab) => (
+            <Tab label={tab.label} value={tab.key} key={`tab-control-${tab.key}`} />
+          ))}
+        </Tabs>
+      </Box>
+      <TabPanel value="edit-all-organisations" current={selectedTab}>
+        <EditOrganisations />
+      </TabPanel>
+      <TabPanel value="edit-organisations" current={selectedTab}>
+        {"organisationIds" in access && access.organisationIds.map((id) => (
+          <EditOrganisation key={`edit-organisaion-${id}`} id={id} />
         ))}
-      </Tabs>
-    </Box>
-    <TabPanel value="edit-all-organisations" current={selectedTab}>
-      <EditOrganisations />
-    </TabPanel>
-    <TabPanel value="edit-organisations" current={selectedTab}>
-      {"organisationIds" in access && access.organisationIds.map((id) => (
-        <EditOrganisation key={`edit-organisaion-${id}`} id={id} />
-      ))}
-    </TabPanel>
-    <TabPanel value="edit-locations" current={selectedTab}>
-      {"locationIds" in access && access.locationIds.map((id) => (
-        <EditLocation key={`edit-location-${id}`} id={id} />
-      ))}
-    </TabPanel>
-    <TabPanel value="edit-accesses" current={selectedTab}>
-      <EditAccesses currentCode={code} />
-    </TabPanel>
-    <TabPanel value="edit-translations" current={selectedTab}>
-      <EditTranslations />
-    </TabPanel>
-  </>
+      </TabPanel>
+      <TabPanel value="edit-locations" current={selectedTab}>
+        {"locationIds" in access && access.locationIds.map((id) => (
+          <EditLocation key={`edit-location-${id}`} id={id} />
+        ))}
+      </TabPanel>
+      <TabPanel value="edit-accesses" current={selectedTab}>
+        <EditAccesses currentCode={code} />
+      </TabPanel>
+      <TabPanel value="edit-translations" current={selectedTab}>
+        <EditTranslations />
+      </TabPanel>
+    </>
+  );
 };
 
 export default EditRouteProtected;

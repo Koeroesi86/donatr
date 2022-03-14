@@ -11,12 +11,12 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditNeeds from "../edit-needs";
-import {Location, LocationResource, LocationsFilters} from "../../types";
 import {FormattedMessage, useIntl} from "react-intl";
 import debounce from "lodash.debounce";
-import {ApiClient} from "../../utils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {LocationResource} from "../../types";
 import LocationPicker from "../location-picker";
+import useApiClient from "../../hooks/useApiClient";
 
 interface EditLocationProps {
   id: string;
@@ -25,21 +25,19 @@ interface EditLocationProps {
   onRemove?: () => void | Promise<void>;
 }
 
-// @ts-ignore
-const api = new ApiClient<Location, 'needs', LocationsFilters>('locations');
-
 const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = true, onRemove }) => {
   const intl = useIntl();
   const [isExpanded, setIsExpanded] = useState(initialOpen);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [location, setLocation] = useState<LocationResource>(initialState);
+  const api = useApiClient<'locations'>('locations');
   const debouncedUpdate = debounce((data: LocationResource) => {
     api.update(data).then(() => refresh());
   }, 2000);
 
   const refresh = useCallback(() => {
     api.one(id).then((l) => setLocation(l));
-  }, [id]);
+  }, [api, id]);
 
   useEffect(() => {
     if (!initialState) refresh();

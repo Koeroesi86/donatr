@@ -1,14 +1,12 @@
 import React, {FC, useEffect, useState} from "react";
-import {Organisation, OrganisationResource} from "../../types";
 import {Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {useIntl} from "react-intl";
 import debounce from "lodash.debounce";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {ApiClient} from "../../utils";
+import {Organisation, OrganisationResource} from "../../types";
 import EditLocations from "../edit-locations";
-
-const api = new ApiClient<Organisation, 'locations'>('organisations');
+import useApiClient from "../../hooks/useApiClient";
 
 interface EditOrganisationProps {
   id: string;
@@ -19,6 +17,7 @@ interface EditOrganisationProps {
 
 const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initialOpen = true, onRemove }) => {
   const intl = useIntl();
+  const api = useApiClient<'organisations'>('organisations');
   const [isExpanded, setIsExpanded] = useState(initialOpen);
   const [organisation, setOrganisation] = useState<Organisation>(initialState);
 

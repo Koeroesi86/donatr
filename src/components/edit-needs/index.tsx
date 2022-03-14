@@ -1,31 +1,12 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
-import {CreateNeedResource, NeedResource} from "../../types";
-import axios from "axios";
+import {NeedResource} from "../../types";
 import {Box, Button, Card, CardContent, TextField} from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import debounce from "lodash.debounce";
 import {useIntl} from "react-intl";
 import {sortByNames} from "../../utils";
-
-const api = {
-  all: (locationId?: string): Promise<NeedResource[]> => {
-    const url = new URL(typeof window !== 'undefined' && window.location.origin);
-    url.pathname = '/api/needs';
-    if (locationId) {
-      url.searchParams.set('locationId', locationId);
-    }
-    return axios.get<NeedResource[]>(url.toJSON()).then(r => r.data);
-  },
-  one: (id: string): Promise<NeedResource> =>
-    axios.get<NeedResource>(`/api/needs/${id}`).then(r => r.data),
-  create: (data: CreateNeedResource): Promise<NeedResource[]> =>
-    axios.post<NeedResource[]>('/api/needs', data).then(r => r.data),
-  update: (data: NeedResource): Promise<NeedResource[]> =>
-    axios.put<NeedResource[]>(`/api/needs/${data.id}`, data).then(r => r.data),
-  remove: (data: NeedResource): Promise<void> =>
-    axios.delete(`/api/needs/${data.id}`),
-}
+import useApiClient from "../../hooks/useApiClient";
 
 interface EditNeedsProps {
   locationId: string;
@@ -36,14 +17,15 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
   const intl = useIntl();
   const [needs, setNeeds] = useState<NeedResource[]>(initialState.sort(sortByNames));
   const [enteredText, setEnteredText] = useState('');
+  const api = useApiClient<'needs'>('needs');
   const refresh = useCallback(() => {
-    api.all(locationId)
+    api.all({ locationId })
       .then((l) => l.sort(sortByNames))
       .then(o => setNeeds(o));
-  }, [locationId]);
+  }, [api, locationId]);
   const update = useCallback((data: NeedResource) => {
     api.update(data).then(() => refresh());
-  }, [refresh]);
+  }, [api, refresh]);
   const debouncedUpdate = useCallback(debounce(
     (data: NeedResource) => update(data),
     2000
@@ -53,7 +35,7 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
       setEnteredText('');
       refresh();
     });
-  }, [enteredText, locationId, refresh]);
+  }, [api, enteredText, locationId, refresh]);
 
   useEffect(() => {
     refresh();

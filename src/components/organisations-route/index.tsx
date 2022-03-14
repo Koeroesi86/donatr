@@ -11,19 +11,19 @@ import {
 import {FormattedMessage, useIntl} from "react-intl";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import {Link} from "react-router-dom";
-import {ApiClient, sortByNames} from "../../utils";
-
-const api = new ApiClient<Organisation, 'locations'>('organisations');
+import {sortByNames} from "../../utils";
+import useApiClient from "../../hooks/useApiClient";
 
 const OrganisationsRoute: FC = () => {
   const intl = useIntl();
+  const api = useApiClient<'organisations'>('organisations');
   const [organisations, setOrganisations] = useState<Organisation[]>([])
   useEffect(() => {
     api.all()
       .then((data) => data.sort(sortByNames))
       .then((data) => setOrganisations(data))
       .catch(console.error);
-  }, []);
+  }, [api]);
   return (
     <>
       <Typography variant="h3" sx={{ my: 2 }}>

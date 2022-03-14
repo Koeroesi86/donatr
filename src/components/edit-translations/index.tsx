@@ -1,14 +1,12 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
-import {TranslationsResource} from "../../types";
-import {ApiClient} from "../../utils";
 import {Accordion, AccordionDetails, AccordionSummary, CircularProgress, TextField} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {FormattedMessage} from "react-intl";
+import {TranslationsResource} from "../../types";
 import CountryFlag from "../country-flag";
 import debounce from "lodash.debounce";
 import CreateTranslationForm from "../create-translation-form";
-
-const api = new ApiClient<TranslationsResource>('translations');
+import useApiClient from "../../hooks/useApiClient";
 
 interface DebouncedTextFieldProps {
   onChange: (value: string) => void | Promise<void>;
@@ -34,16 +32,17 @@ const DebouncedTextField: FC<DebouncedTextFieldProps> = ({ defaultValue, helperT
 }
 
 const EditTranslations: FC = () => {
+  const api = useApiClient<'translations'>('translations');
   const [fallback, setFallback] = useState<TranslationsResource>();
   const [translations, setTranslations] = useState<TranslationsResource[]>([]);
   const refresh = useCallback(() => {
     api.all().then(setTranslations)
-  }, []);
+  }, [api]);
 
   useEffect(() => {
     api.one('en').then(setFallback);
     refresh();
-  }, [refresh]);
+  }, [api, refresh]);
 
   if (!fallback) {
     return <CircularProgress />;
