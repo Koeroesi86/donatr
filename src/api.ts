@@ -308,7 +308,6 @@ const worker: Worker = async (event, callback) => {
         callback(createResponse(200, access, { 'x-access-token': await token.serialize(access) }));
         return;
       }
-      console.log('access not found', event.pathFragments[2])
     }
   } catch (e) {
     console.error(e);
