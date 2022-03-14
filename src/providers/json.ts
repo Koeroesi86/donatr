@@ -15,6 +15,7 @@ import {
 } from "../types";
 import * as translations from "./translations";
 import JsonResource from "./jsonResource";
+import translate from "./translate";
 
 export default class JsonProvider implements Provider {
   private readonly basePath: string;
@@ -40,7 +41,7 @@ export default class JsonProvider implements Provider {
     this.translationResources = new JsonResource<TranslationsResource>(translationResourcesPath);
   }
 
-  getLocation = async (id: string): Promise<Location | undefined> => {
+  getLocation = async (id: string, language?: string): Promise<Location | undefined> => {
     const location = await this.locationResources.one(id);
 
     if (!location) {
@@ -49,7 +50,7 @@ export default class JsonProvider implements Provider {
 
     return {
       ...location,
-      needs: await this.getNeeds({ locationId: location.id })
+      needs: await this.getNeeds({ locationId: location.id }, language)
     };
   };
 
@@ -68,8 +69,15 @@ export default class JsonProvider implements Provider {
     return this.needResources.one(id);
   };
 
-  getNeeds = async (filters?: NeedsFilters): Promise<Need[]> => {
-    const allNeeds = await this.needResources.all();
+  getNeeds = async (filters?: NeedsFilters, language?: string): Promise<Need[]> => {
+    let allNeeds: Need[] = await this.needResources.all();
+
+    if (language) {
+      allNeeds = await Promise.all(allNeeds.map(async (need) => ({
+        ...need,
+        name: await translate(need.name, language),
+      })));
+    }
 
     return allNeeds
       .filter(n => filters && filters.search ? n.name.includes(filters.search) : true)

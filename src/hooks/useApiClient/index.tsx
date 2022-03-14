@@ -2,16 +2,20 @@ import {useMemo} from "react";
 import axios from "axios";
 import {PathToFilters, PathToResource, PathToType, Resources} from "../../types";
 import useApiToken from "../useApiToken";
+import {useIntl} from "react-intl";
 
 const useApiClient = <P extends Resources>(resource: Resources) => {
   const {getToken} = useApiToken();
+  const intl = useIntl();
   const instance = useMemo(() =>
     axios.create({
       baseURL: `/api/${resource}`,
       headers: {
         'x-access-token': getToken(),
+        'x-target-locale': intl.locale.split('-')[0],
       },
-    }), [getToken, resource]);
+    }), [getToken, intl.locale, resource]);
+  
   return useMemo(() => ({
     all: (params?: PathToFilters[P]) =>
       instance.get<PathToType[P][]>('/', {params}).then((r) => r.data),

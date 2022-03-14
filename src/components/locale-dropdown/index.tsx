@@ -1,17 +1,18 @@
-import React, {FC, useCallback, useState} from "react";
+import React, {FC, useCallback, useContext, useEffect, useState} from "react";
 import {IconButton, Menu, MenuItem, Tooltip} from "@mui/material";
 import {useIntl} from "react-intl";
-import {TranslationsResource} from "../../types";
 import CountryFlag from "../country-flag";
+import {TranslationsContext} from "../translations-provider";
+import {TranslationsResource} from "../../types";
 
 interface LocaleDropdownProps {
   locale: string;
-  setLocale: (l: string) => void;
-  translations: TranslationsResource[];
+  setLocale: (translation: TranslationsResource) => void;
 }
 
-const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale, translations }) => {
+const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale }) => {
   const intl = useIntl();
+  const translations = useContext(TranslationsContext);
   const [anchorElement, setAnchorElement] = useState(null);
   const open = Boolean(anchorElement);
   const handleClick = useCallback((event: React.SyntheticEvent) => {
@@ -20,6 +21,12 @@ const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale, translatio
   const handleClose = useCallback(() => {
     setAnchorElement(null);
   }, []);
+  useEffect(() => {
+    const current = translations.find((t) => t.id === locale);
+    if (current) {
+      setLocale(current);
+    }
+  }, [locale, translations]);
   return (
     <>
       <Tooltip title={intl.formatMessage({ id: 'language.dropdown.label' })}>
@@ -45,7 +52,7 @@ const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale, translatio
             value={t.id}
             sx={{ py: 2 }}
             onClick={() => {
-              setLocale(t.id);
+              setLocale(t);
               handleClose();
             }}
           >

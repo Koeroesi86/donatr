@@ -126,8 +126,8 @@ export interface Provider {
   getOrganisations: () => Promise<Organisation[]>;
   getOrganisation: (id: string) => Promise<Organisation | undefined>;
   getLocations: (p?: LocationsFilters) => Promise<Location[]>;
-  getLocation: (id: string) => Promise<Location | undefined>;
-  getNeeds: (p?: NeedsFilters) => Promise<Need[]>;
+  getLocation: (id: string, language?: string) => Promise<Location | undefined>;
+  getNeeds: (p?: NeedsFilters, language?: string) => Promise<Need[]>;
   getNeed: (id: string) => Promise<Need | undefined>;
   getTranslations: () => Promise<TranslationsResource[]>;
   getTranslation: (code: string) => Promise<TranslationsResource>;

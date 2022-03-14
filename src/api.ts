@@ -8,6 +8,7 @@ import {JsonProvider} from "./providers";
 import * as token from "./utils/token";
 import { hasAccess } from "./utils";
 
+
 const keepAliveTimeout = 30 * 60 * 1000;
 const keepAliveCallback = debounce(() => {
   console.log('Shutting down API due to inactivity.');
@@ -168,7 +169,7 @@ const worker: Worker = async (event, callback) => {
           callback(createResponse(200, ''));
           return;
         }
-        const location = await provider.getLocation(event.pathFragments[2]);
+        const location = await provider.getLocation(event.pathFragments[2], event.headers['x-target-locale']);
         if (location) {
           callback(createCacheableResponse(200, location));
           return;
@@ -199,7 +200,8 @@ const worker: Worker = async (event, callback) => {
         const needs = await provider.getNeeds({
           search: event.queryStringParameters.s,
           locationId: event.queryStringParameters.locationId,
-        });
+        }, event.headers['x-target-locale']);
+
         callback(createCacheableResponse(200, needs));
         return;
       }
