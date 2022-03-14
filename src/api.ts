@@ -303,11 +303,12 @@ const worker: Worker = async (event, callback) => {
     }
 
     if (event.pathFragments[1] === 'resolve-access' && event.pathFragments.length === 3) {
-      const [access] = await provider.getAccesses({ code: event.pathFragments[2] });
+      const [access] = await provider.getAccesses({ code: decodeURIComponent(event.pathFragments[2]) });
       if (access) {
         callback(createResponse(200, access, { 'x-access-token': await token.serialize(access) }));
+        return;
       }
-      return;
+      console.log('access not found', event.pathFragments[2])
     }
   } catch (e) {
     console.error(e);
