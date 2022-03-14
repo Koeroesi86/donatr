@@ -44,6 +44,7 @@ export interface Need {
   id: string;
   locationId: string;
   name: string;
+  originalName: string;
 }
 
 export interface Translations {
@@ -84,7 +85,7 @@ export type Access = FullAccess | OrganisationsAccess | LocationsAccess;
 
 export type AccessFilters = { code?: string; };
 
-export type NeedResource = Need;
+export type NeedResource = Omit<Need, 'originalName'>;
 export type LocationResource = Omit<Location, 'needs'>;
 export type OrganisationResource = Omit<Organisation, 'locations'>;
 export interface TranslationsResource {
@@ -109,7 +110,7 @@ export interface PathToType {
 export interface PathToResource {
   organisations: Omit<Organisation, 'locations'>;
   locations: Omit<Location, 'needs'>;
-  needs: Need;
+  needs: NeedResource;
   translations: TranslationsResource;
   access: Access;
 }
@@ -128,7 +129,7 @@ export interface Provider {
   getLocations: (p?: LocationsFilters) => Promise<Location[]>;
   getLocation: (id: string, language?: string) => Promise<Location | undefined>;
   getNeeds: (p?: NeedsFilters, language?: string) => Promise<Need[]>;
-  getNeed: (id: string) => Promise<Need | undefined>;
+  getNeed: (id: string, language?: string) => Promise<Need | undefined>;
   getTranslations: () => Promise<TranslationsResource[]>;
   getTranslation: (code: string) => Promise<TranslationsResource>;
   setTranslations: (translation: TranslationsResource) => Promise<void>;

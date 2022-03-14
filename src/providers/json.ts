@@ -65,12 +65,16 @@ export default class JsonProvider implements Provider {
       .filter(l => filters && filters.organisationId ? l.organisationId === filters.organisationId : true);
   };
 
-  getNeed = async (id: string): Promise<Need | undefined> => {
-    return this.needResources.one(id);
+  getNeed = async (id: string, language?: string): Promise<Need | undefined> => {
+    return this.needResources.one(id).then(async (n) => ({
+      ...n,
+      name: language ? await translate(n.name, language) : n.name,
+      originalName: n.name,
+    }));
   };
 
   getNeeds = async (filters?: NeedsFilters, language?: string): Promise<Need[]> => {
-    let allNeeds: Need[] = await this.needResources.all();
+    let allNeeds: Need[] = (await this.needResources.all()).map((n) => ({ ...n, originalName: n.name }));
 
     if (language) {
       allNeeds = await Promise.all(allNeeds.map(async (need) => ({

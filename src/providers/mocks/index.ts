@@ -4,6 +4,7 @@ export const needs: Need[] = [
   {
     id: 'f32dbd74-5cce-4036-a1f4-e1fbb8770910',
     name: '1 loaf of bread',
+    originalName: '1 loaf of bread',
     locationId: '576143b0-e316-4b16-84c4-53b15eecadec',
   }
 ];

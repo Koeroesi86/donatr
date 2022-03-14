@@ -228,7 +228,7 @@ const worker: Worker = async (event, callback) => {
           callback(createResponse(200, ''));
           return;
         }
-        const need = await provider.getNeed(event.pathFragments[2]);
+        const need = await provider.getNeed(event.pathFragments[2], event.headers['x-target-locale']);
         if (need) {
           callback(createCacheableResponse(200, need));
           return;
