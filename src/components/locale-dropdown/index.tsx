@@ -22,11 +22,24 @@ const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale }) => {
     setAnchorElement(null);
   }, []);
   useEffect(() => {
-    const current = translations.find((t) => t.id === locale);
+    if (translations.length === 0) {
+      return;
+    }
+
+    let current = translations.find((t) => t.id === locale);
     if (current) {
       setLocale(current);
+      return;
     }
-  }, [locale, translations]);
+    
+    current = translations.find((t) => t.id.startsWith(locale));
+    if (current) {
+      setLocale(current);
+      return;
+    }
+
+    setLocale(translations[0]);
+  }, [locale, setLocale, translations]);
   return (
     <>
       <Tooltip title={intl.formatMessage({ id: 'language.dropdown.label' })}>

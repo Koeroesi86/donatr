@@ -11,7 +11,7 @@ const TranslationsProvider: FC<TranslationsProviderProps> = ({ children }) => {
   const [translations, setTranslations] = useState<TranslationsResource[]>([]);
   
   useEffect(() => {
-    api.all().then(setTranslations);
+    api.all().then((t) => setTranslations(t.sort((a, b) => a.id.localeCompare(b.id))));
   }, [api]);
 
   return (
