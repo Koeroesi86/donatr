@@ -9,6 +9,7 @@ interface BaseResource {
 export default class JsonResource<T extends BaseResource> {
   private readonly basePath: string;
   private readonly cache: { [k: string]: string } = {};
+  private allCache: string = '';
   private watcher: FSWatcher;
   private isCacheReady: boolean = false;
 
@@ -35,7 +36,8 @@ export default class JsonResource<T extends BaseResource> {
         const id = path.basename(filePath, path.extname(filePath))
 
         if (event === 'add' || event === 'change') {
-          await this.one(id);
+          this.cache[id] = null;
+          this.allCache = '';
 
           if (!this.isCacheReady && Object.keys(this.cache).length === (await this.getIds()).length) {
             this.isCacheReady = true;
@@ -44,6 +46,7 @@ export default class JsonResource<T extends BaseResource> {
 
         if (event === 'unlink') {
           delete this.cache[id];
+          this.allCache = '';
         }
       });
   }
@@ -66,11 +69,16 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   all = async (): Promise<T[]> => {
+    if (this.allCache) {
+      return JSON.parse(this.allCache)
+    }
+
     const ids = await this.getIds();
-    const all = await Promise.all(ids.map(async (id) => this.one(id)));
+    const all = (await Promise.all(ids.map(async (id) => this.one(id)))).filter(Boolean);
+    this.allCache = JSON.stringify(all);
     this.isCacheReady = true;
 
-    return all.filter(Boolean);
+    return all;
   };
 
   one = async (id: string): Promise<T | undefined> => {
@@ -96,6 +104,7 @@ export default class JsonResource<T extends BaseResource> {
 
     await fs.promises.unlink(fileName);
     delete this.cache[id];
+    this.allCache = '';
   };
 
   set = async (data: T): Promise<void> => {
@@ -103,5 +112,6 @@ export default class JsonResource<T extends BaseResource> {
     const content = JSON.stringify(data, null, 2)
     await fs.promises.writeFile(fileName, content, 'utf8');
     this.cache[data.id] = content;
+    this.allCache = '';
   }
 }
