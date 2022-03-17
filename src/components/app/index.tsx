@@ -85,7 +85,7 @@ const getInitialMode = (prefersDarkMode: boolean): 'dark'|'light' => {
 };
 
 const App: FC<AppProps> = ({ initialLocale })  => {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: typeof window !== 'undefined' });
   const [mode, setMode] = useState<'dark'|'light'>(getInitialMode(prefersDarkMode));
   const theme = useMemo(() => createTheme({
     palette: { mode },
