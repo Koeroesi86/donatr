@@ -104,6 +104,7 @@ export default class JsonResource<T extends BaseResource> {
 
     await fs.promises.unlink(fileName);
     delete this.cache[id];
+    this.allCache = '';
   };
 
   set = async (data: T): Promise<void> => {
@@ -111,5 +112,6 @@ export default class JsonResource<T extends BaseResource> {
     const content = JSON.stringify(data, null, 2)
     await fs.promises.writeFile(fileName, content, 'utf8');
     this.cache[data.id] = content;
+    this.allCache = '';
   }
 }
