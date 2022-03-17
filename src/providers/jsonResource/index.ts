@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "graceful-fs";
 import chokidar, {FSWatcher} from "chokidar";
+import {Promise as Bluebird} from "bluebird";
 
 interface BaseResource {
   id: string;
@@ -38,16 +39,16 @@ export default class JsonResource<T extends BaseResource> {
         if (event === 'add' || event === 'change') {
           this.cache[id] = null;
           this.allCache = '';
-
-          if (!this.isCacheReady && Object.keys(this.cache).length === (await this.getIds()).length) {
-            this.isCacheReady = true;
-          }
         }
 
         if (event === 'unlink') {
           delete this.cache[id];
           this.allCache = '';
         }
+      })
+      .once('ready', async () => {
+        await this.all();
+        this.isCacheReady = true;
       });
   }
 
@@ -69,12 +70,12 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   all = async (): Promise<T[]> => {
-    if (this.allCache) {
-      return JSON.parse(this.allCache)
+    if (this.allCache.length > 0) {
+      return JSON.parse(this.allCache);
     }
 
     const ids = await this.getIds();
-    const all = (await Promise.all(ids.map(async (id) => this.one(id)))).filter(Boolean);
+    const all = (await Bluebird.map(ids, async (id) => this.one(id), { concurrency: 1 })).filter(Boolean);
     this.allCache = JSON.stringify(all);
     this.isCacheReady = true;
 

@@ -198,7 +198,7 @@ const worker: Worker = async (event, callback) => {
           })
         }
         const needs = await provider.getNeeds({
-          search: event.queryStringParameters.s,
+          search: event.queryStringParameters.search,
           locationId: event.queryStringParameters.locationId,
         }, event.headers['x-target-locale']);
 
