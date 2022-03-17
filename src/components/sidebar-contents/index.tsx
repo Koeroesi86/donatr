@@ -9,6 +9,8 @@ import ListIcon from '@mui/icons-material/List';
 import EditIcon from '@mui/icons-material/Edit';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
 
 interface RouteLinkProps {
   to: string;
@@ -32,9 +34,10 @@ const RouteLink: FC<RouteLinkProps> = ({ children, onClick, to, translation }) =
 
 interface SidebarContentsProps {
   onClose: () => void;
+  toggleThemeMode: () => void;
 }
 
-const SidebarContents: FC<SidebarContentsProps> = ({ onClose }) => {
+const SidebarContents: FC<SidebarContentsProps> = ({ onClose, toggleThemeMode }) => {
   const theme = useTheme();
   return (
     <Box>
@@ -44,9 +47,15 @@ const SidebarContents: FC<SidebarContentsProps> = ({ onClose }) => {
           alignItems: 'center',
           padding: theme.spacing(0, 1),
           ...theme.mixins.toolbar,
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
         }}
       >
+        <IconButton
+          onClick={toggleThemeMode}
+          color="inherit"
+        >
+          {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
         <IconButton onClick={onClose}>
           {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </IconButton>

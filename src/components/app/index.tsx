@@ -1,11 +1,10 @@
-import React, {FC, useCallback, useEffect, useState} from "react";
+import React, {FC, useCallback, useEffect, useMemo, useState} from "react";
 import OrganisationsRoute from "../organisations-route";
 import Home from "../home";
 import {Link as RLink, RouteObject, useMatch, useResolvedPath, useRoutes} from "react-router-dom";
 import {
   AppBar,
   Box,
-  CircularProgress,
   Container,
   createTheme,
   CssBaseline,
@@ -14,7 +13,8 @@ import {
   Link,
   ThemeProvider,
   Toolbar,
-  Typography
+  Typography,
+  useMediaQuery
 } from "@mui/material";
 import {FormattedMessage, IntlProvider} from "react-intl";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -31,10 +31,7 @@ import OrganisationRoute from "../organisation-route";
 import NotFoundRoute from "../not-found-route";
 import ApiTokenProvider from "../api-token-provider";
 import EditRoute from "../edit-route";
-import useApiClient from "../../hooks/useApiClient";
 import TranslationsProvider from "../translations-provider";
-
-const mdTheme = createTheme();
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
   const resolved = useResolvedPath(to);
@@ -79,7 +76,20 @@ interface AppProps {
   initialLocale: string;
 }
 
+const getInitialMode = (prefersDarkMode: boolean): 'dark'|'light' => {
+  const storedMode: string|null = typeof window !== 'undefined' ? sessionStorage.getItem('mode') : null;
+  if (storedMode === 'dark' || storedMode === 'light') {
+    return storedMode;
+  }
+  return prefersDarkMode ? 'dark' : 'light';
+};
+
 const App: FC<AppProps> = ({ initialLocale })  => {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [mode, setMode] = useState<'dark'|'light'>(getInitialMode(prefersDarkMode));
+  const theme = useMemo(() => createTheme({
+    palette: { mode },
+  }), [mode]);
   const [messages, setMessages] = useState<Translations>({});
   const [locale, setLocale] = useState(initialLocale);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -91,8 +101,12 @@ const App: FC<AppProps> = ({ initialLocale })  => {
     if (typeof window !== 'undefined') sessionStorage.setItem('language', translation.id);
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') sessionStorage.setItem('mode', mode)
+  }, [mode]);
+
   return (
-    <ThemeProvider theme={mdTheme}>
+    <ThemeProvider theme={theme}>
       <IntlProvider messages={messages} locale={locale} defaultLocale="en">
         <ApiTokenProvider>
           <TranslationsProvider>
@@ -154,7 +168,10 @@ const App: FC<AppProps> = ({ initialLocale })  => {
               </AppBar>
             </Box>
             <Drawer open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
-              <SidebarContents onClose={() => setIsSidebarOpen(false)} />
+              <SidebarContents
+                onClose={() => setIsSidebarOpen(false)}
+                toggleThemeMode={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+              />
             </Drawer>
           </TranslationsProvider>
         </ApiTokenProvider>
