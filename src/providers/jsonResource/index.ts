@@ -38,25 +38,27 @@ export default class JsonResource<T extends BaseResource> {
 
         if (event === 'add' || event === 'change') {
           this.cache[id] = null;
-          this.allCache = '';
         }
 
         if (event === 'unlink') {
           delete this.cache[id];
+        }
+
+        if (this.isCacheReady) {
           this.allCache = '';
+          this.scheduleUpdate();
         }
       })
-      .once('ready', async () => {
-        await this.all();
+      .once('ready', () => {
         this.isCacheReady = true;
       });
   }
 
-  getIds = async (): Promise<string[]> => {
-    if (!fs.existsSync(this.basePath)) {
-      return [];
-    }
+  private scheduleUpdate = () => {
+    this.all().catch(console.error);
+  }
 
+  getIds = async (): Promise<string[]> => {
     if (this.isCacheReady) {
       return Object.keys(this.cache);
     }
@@ -105,7 +107,6 @@ export default class JsonResource<T extends BaseResource> {
 
     await fs.promises.unlink(fileName);
     delete this.cache[id];
-    this.allCache = '';
   };
 
   set = async (data: T): Promise<void> => {
@@ -113,6 +114,5 @@ export default class JsonResource<T extends BaseResource> {
     const content = JSON.stringify(data, null, 2)
     await fs.promises.writeFile(fileName, content, 'utf8');
     this.cache[data.id] = content;
-    this.allCache = '';
   }
 }
