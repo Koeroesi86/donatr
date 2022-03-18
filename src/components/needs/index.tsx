@@ -17,7 +17,7 @@ import {FormattedMessage, useIntl} from "react-intl";
 import {createStyles, makeStyles} from "@mui/styles";
 import {LatLngExpression} from "leaflet";
 import ClearIcon from '@mui/icons-material/Clear';
-import {Location, Need} from "../../types";
+import {Location, LocationResource, Need, NeedResource} from "../../types";
 import {sortByNames} from "../../utils";
 import MapBlock from "../map-block";
 import useApiClient from "../../hooks/useApiClient";
@@ -61,8 +61,8 @@ const Needs: FC = () => {
       })
       .catch(console.error);
   }, 200), []);
-  const [listing, setListing] = useState<Need[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [listing, setListing] = useState<NeedResource[]>([]);
+  const [locations, setLocations] = useState<LocationResource[]>([]);
   const styles = useStyles();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,

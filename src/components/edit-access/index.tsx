@@ -1,22 +1,20 @@
 import React, {FC} from "react";
-import {Access, Organisation} from "../../types";
+import {Access, OrganisationResource} from "../../types";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
 } from "@mui/material";
-import {useIntl} from "react-intl";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import EditAccessForm from "../edit-access-form";
 
 interface EditAccessProps {
   access: Access;
-  organisations: Organisation[];
+  organisations: OrganisationResource[];
   onChange: (access: Access) => void | Promise<void>;
 }
 
 const EditAccess: FC<EditAccessProps> = ({ access, onChange, organisations }) => {
-  const intl = useIntl();
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>

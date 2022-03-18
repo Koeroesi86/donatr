@@ -4,13 +4,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {useIntl} from "react-intl";
 import debounce from "lodash.debounce";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {Organisation, OrganisationResource} from "../../types";
+import {OrganisationResource} from "../../types";
 import EditLocations from "../edit-locations";
 import useApiClient from "../../hooks/useApiClient";
+import useLocations from "../../hooks/useLocations";
 
 interface EditOrganisationProps {
   id: string;
-  initialState?: Organisation;
+  initialState?: OrganisationResource;
   initialOpen?: boolean;
   onRemove?: () => void | Promise<void>;
 }
@@ -19,7 +20,8 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
   const intl = useIntl();
   const api = useApiClient<'organisations'>('organisations');
   const [isExpanded, setIsExpanded] = useState(initialOpen);
-  const [organisation, setOrganisation] = useState<Organisation>(initialState);
+  const [organisation, setOrganisation] = useState<OrganisationResource>(initialState);
+  const locations = useLocations({ organisationId: id });
 
   const debouncedUpdate = debounce((data: OrganisationResource) => {
     api.update(data).then(() => api.one(data.id)).then(d => setOrganisation(d));
@@ -29,7 +31,7 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
     if (!initialState) {
       api.one(id).then(o => setOrganisation(o))
     }
-  }, [id, initialState]);
+  }, [api, id, initialState]);
 
   if (!organisation) return <CircularProgress />;
 
@@ -92,7 +94,7 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
           <EditLocations
             organisationId={organisation.id}
             initialOpen={false}
-            initialState={organisation.locations}
+            initialState={locations}
           />
         )}
       </AccordionDetails>

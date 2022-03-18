@@ -41,20 +41,17 @@ export default class JsonProvider implements Provider {
     this.translationResources = new JsonResource<TranslationsResource>(translationResourcesPath);
   }
 
-  getLocation = async (id: string, language?: string): Promise<Location | undefined> => {
+  getLocation = async (id: string, language?: string): Promise<LocationResource | undefined> => {
     const location = await this.locationResources.one(id);
 
     if (!location) {
       return undefined;
     }
 
-    return {
-      ...location,
-      needs: await this.getNeeds({ locationId: location.id }, language)
-    };
+    return location;
   };
 
-  getLocations = async (filters?: LocationsFilters): Promise<Location[]> => {
+  getLocations = async (filters?: LocationsFilters): Promise<LocationResource[]> => {
     const ids = await this.locationResources.getIds();
     const allLocations = await Promise.all(
       ids.map(async (id) => this.getLocation(id))
@@ -80,6 +77,7 @@ export default class JsonProvider implements Provider {
       allNeeds = await Promise.all(allNeeds.map(async (need) => ({
         ...need,
         name: await translate(need.name, language),
+        originalName: need.name,
       })));
     }
 
@@ -88,25 +86,22 @@ export default class JsonProvider implements Provider {
       .filter(n => filters && filters.locationId ? n.locationId === filters.locationId : true);
   };
 
-  getOrganisation = async (id: string): Promise<Organisation | undefined> => {
+  getOrganisation = async (id: string): Promise<OrganisationResource | undefined> => {
     const organisation = await this.organisationResources.one(id);
 
     if (!organisation) {
       return undefined;
     }
 
-    return {
-      ...organisation,
-      locations: await this.getLocations({ organisationId: organisation.id })
-    };
+    return organisation;
   };
 
-  getOrganisations = async (): Promise<Organisation[]> => {
+  getOrganisations = async (): Promise<OrganisationResource[]> => {
     const ids = await this.organisationResources.getIds();
     const result = await Promise.all(
       ids.map(async (id) => this.getOrganisation(id))
     );
-    return result.filter(Boolean)
+    return result.filter(Boolean);
   };
 
   getTranslation = async (code: string): Promise<TranslationsResource> => {
@@ -143,7 +138,8 @@ export default class JsonProvider implements Provider {
       return;
     }
 
-    await Promise.all(location.needs.map((async (need) => this.removeNeed(need.id))));
+    const needs = await this.getNeeds({ locationId: id });
+    await Promise.all(needs.map((async (need) => this.removeNeed(need.id))));
     await this.locationResources.remove(id);
   };
 
@@ -158,7 +154,8 @@ export default class JsonProvider implements Provider {
       return;
     }
 
-    await Promise.all(organisation.locations.map((async (location) => this.removeLocation(location.id))));
+    const locations = await this.getLocations({ organisationId: id });
+    await Promise.all(locations.map((async (location) => this.removeLocation(location.id))));
     await this.organisationResources.remove(id);
   };
 

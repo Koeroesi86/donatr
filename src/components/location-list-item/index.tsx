@@ -2,18 +2,20 @@ import React, {FC} from "react";
 import {Link as RLink} from "react-router-dom";
 import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import {Location} from "../../types";
+import {LocationResource} from "../../types";
+import useNeeds from "../../hooks/useNeeds";
 
 interface LocationListItemProps {
-  location: Location;
+  location: LocationResource;
 }
 
 const LocationListItem: FC<LocationListItemProps> = ({ location }) => {
+  const needs = useNeeds({ locationId: location.id });
   return (
     <ListItemButton component={RLink} to={`/locations/${location.id}`}>
       <ListItemIcon>
-        {location.needs.length ? (
-          <Badge badgeContent={location.needs.length} color="primary">
+        {needs.length ? (
+          <Badge badgeContent={needs.length} color="primary">
             <LocationOnIcon />
           </Badge>
         ) : (

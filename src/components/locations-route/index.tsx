@@ -4,11 +4,9 @@ import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
-import {Location} from "../../types";
-import {sortByNames} from "../../utils";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
-import useApiClient from "../../hooks/useApiClient";
+import useLocations from "../../hooks/useLocations";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -20,17 +18,12 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 }));
 
 const LocationsRoute: FC = () => {
-  const api = useApiClient<'locations'>('locations');
   const styles = useStyles();
-  const [locations, setLocations] = useState<Location[]>([]);
+  const locations = useLocations();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
   });
-
-  useEffect(() => {
-    api.all().then((l) => setLocations(l.sort(sortByNames))).catch(console.error);
-  }, []);
 
   if (!locations.length) return <CircularProgress />;
 
