@@ -2,6 +2,7 @@ import path from "path";
 import fs from "graceful-fs";
 import chokidar, {FSWatcher} from "chokidar";
 import {Promise as Bluebird} from "bluebird";
+import clone from "lodash.clonedeep";
 
 interface BaseResource {
   id: string;
@@ -9,8 +10,7 @@ interface BaseResource {
 
 export default class JsonResource<T extends BaseResource> {
   private readonly basePath: string;
-  private readonly cache: { [k: string]: string } = {};
-  private allCache: string = '';
+  private readonly cache: { [k: string]: T } = {};
   private watcher: FSWatcher;
   private isCacheReady: boolean = false;
 
@@ -40,22 +40,14 @@ export default class JsonResource<T extends BaseResource> {
           this.cache[id] = null;
         }
 
-        if (event === 'unlink') {
+        if (event === 'unlink' && id in this.cache) {
           delete this.cache[id];
-        }
-
-        if (this.isCacheReady) {
-          this.allCache = '';
-          this.scheduleUpdate();
         }
       })
       .once('ready', () => {
         this.isCacheReady = true;
+        this.all().catch(console.error);
       });
-  }
-
-  private scheduleUpdate = () => {
-    this.all().catch(console.error);
   }
 
   getIds = async (): Promise<string[]> => {
@@ -72,13 +64,8 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   all = async (): Promise<T[]> => {
-    if (this.allCache.length > 0) {
-      return JSON.parse(this.allCache);
-    }
-
     const ids = await this.getIds();
     const all = (await Bluebird.map(ids, async (id) => this.one(id), { concurrency: 1 })).filter(Boolean);
-    this.allCache = JSON.stringify(all);
     this.isCacheReady = true;
 
     return all;
@@ -86,16 +73,18 @@ export default class JsonResource<T extends BaseResource> {
 
   one = async (id: string): Promise<T | undefined> => {
     if(this.isCacheReady && this.cache[id]) {
-      return JSON.parse(this.cache[id]) as T;
+      return clone(this.cache[id]);
     }
 
     const fileName = path.resolve(this.basePath, `./${id}.json`);
 
-    if (!fs.existsSync(fileName)) return undefined;
+    if (!fs.existsSync(fileName)) {
+      return undefined;
+    }
 
     const content = await fs.promises.readFile(fileName, 'utf8');
     const data: T = JSON.parse(content);
-    this.cache[id] = content;
+    this.cache[id] = clone(data);
 
     return data;
   };
@@ -113,6 +102,6 @@ export default class JsonResource<T extends BaseResource> {
     const fileName = path.resolve(this.basePath, `./${data.id}.json`);
     const content = JSON.stringify(data, null, 2)
     await fs.promises.writeFile(fileName, content, 'utf8');
-    this.cache[data.id] = content;
+    this.cache[data.id] = clone(data);
   }
 }
