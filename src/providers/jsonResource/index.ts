@@ -72,7 +72,7 @@ export default class JsonResource<T extends BaseResource> {
   };
 
   one = async (id: string): Promise<T | undefined> => {
-    if(this.isCacheReady && this.cache[id]) {
+    if(this.cache[id]) {
       return clone(this.cache[id]);
     }
 
@@ -84,9 +84,9 @@ export default class JsonResource<T extends BaseResource> {
 
     const content = await fs.promises.readFile(fileName, 'utf8');
     const data: T = JSON.parse(content);
-    this.cache[id] = clone(data);
+    this.cache[id] = data;
 
-    return data;
+    return this.one(id);
   };
 
   remove = async (id: string): Promise<void> => {
