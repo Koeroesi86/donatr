@@ -3,14 +3,14 @@ import {en} from "./translations";
 import {Access, Provider} from "../types";
 
 export default class MockProvider implements Provider {
-  getLocations = () => Promise.resolve(locations);
-  getLocation = () => Promise.resolve(locations[0]);
-  getNeeds = () => Promise.resolve(needs);
-  getNeed = () => Promise.resolve(needs[0]);
-  getOrganisations = () => Promise.resolve(organisations);
-  getOrganisation = () => Promise.resolve(organisations[0]);
-  getTranslations = () => Promise.resolve([{ id: 'en', translations: en }]);
-  getTranslation = () => Promise.resolve({ id: 'en', translations: en });
+  getLocations = () => Promise.resolve({ result: locations });
+  getLocation = () => Promise.resolve({ result: locations[0] });
+  getNeeds = () => Promise.resolve({ result: needs });
+  getNeed = () => Promise.resolve({ result: needs[0] });
+  getOrganisations = () => Promise.resolve({ result: organisations });
+  getOrganisation = () => Promise.resolve({ result: organisations[0] });
+  getTranslations = () => Promise.resolve({ result: [{ id: 'en', translations: en }] });
+  getTranslation = () => Promise.resolve({ result: { id: 'en', translations: en } });
   setTranslations = () => Promise.resolve();
   removeLocation = () => Promise.resolve();
   removeNeed = () => Promise.resolve();
@@ -18,8 +18,8 @@ export default class MockProvider implements Provider {
   setLocation = () => Promise.resolve();
   setNeed = () => Promise.resolve();
   setOrganisation = () => Promise.resolve();
-  getAccess = (code: string): Promise<Access | undefined> => Promise.resolve(undefined);
-  getAccesses = (): Promise<Access[]> => Promise.resolve([]);
-  removeAccess = (code: string): Promise<void> => Promise.resolve();
-  setAccess = (access: Access): Promise<void> => Promise.resolve();
+  getAccess = (code: string) => Promise.resolve({ result: undefined });
+  getAccesses = () => Promise.resolve({ result: [] });
+  removeAccess = (code: string) => Promise.resolve();
+  setAccess = (access: Access) => Promise.resolve();
 }

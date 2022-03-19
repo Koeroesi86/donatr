@@ -7,10 +7,11 @@ import ReactMarkdown from "react-markdown";
 import RemarkBreaks from "remark-breaks";
 import RemarkGfm from "remark-gfm";
 import {sortByNames} from "../../utils";
-import {Organisation} from "../../types";
+import {Organisation, OrganisationResource} from "../../types";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
 import useApiClient from "../../hooks/useApiClient";
+import useLocations from "../../hooks/useLocations";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -25,11 +26,12 @@ const OrganisationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
   const api = useApiClient<'organisations'>('organisations');
-  const [organisation, setOrganisation] = useState<Organisation>();
+  const [organisation, setOrganisation] = useState<OrganisationResource>();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
   });
+  const locations = useLocations({ organisationId: params.organisationId });
 
   useEffect(() => {
     api.one(params.organisationId).then(setOrganisation).catch(console.error);
@@ -37,7 +39,7 @@ const OrganisationRoute: FC = () => {
 
   if (!organisation) return <CircularProgress />;
 
-  const locationsWithGeo = organisation.locations.filter((l) => l.location);
+  const locationsWithGeo = locations.filter((l) => l.location);
 
   return (
     <>
@@ -83,7 +85,7 @@ const OrganisationRoute: FC = () => {
         />
       )}
       <List>
-        {organisation.locations.sort(sortByNames).map((loc) => (
+        {locations.map((loc) => (
           <LocationListItem key={`location-list-item-${loc.id}`} location={loc} />
         ))}
       </List>

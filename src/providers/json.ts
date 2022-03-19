@@ -2,15 +2,14 @@ import path from 'path';
 import {
   Access,
   AccessFilters,
-  Location,
   LocationResource,
   LocationsFilters,
   Need,
   NeedResource,
   NeedsFilters,
-  Organisation,
   OrganisationResource,
   Provider,
+  ProviderResult,
   TranslationsResource,
 } from "../types";
 import * as translations from "./translations";
@@ -41,95 +40,97 @@ export default class JsonProvider implements Provider {
     this.translationResources = new JsonResource<TranslationsResource>(translationResourcesPath);
   }
 
-  getLocation = async (id: string, language?: string): Promise<Location | undefined> => {
+  getLocation = async (id: string, language?: string): Promise<ProviderResult<LocationResource | undefined>> => {
     const location = await this.locationResources.one(id);
 
-    if (!location) {
-      return undefined;
-    }
+    return { result: location };
+  };
+
+  getLocations = async (filters?: LocationsFilters): Promise<ProviderResult<LocationResource[]>> => {
+    const ids = await this.locationResources.getIds();
+    const allLocations = await Promise.all(
+      ids.map(async (id) => await this.getLocation(id))
+    );
 
     return {
-      ...location,
-      needs: await this.getNeeds({ locationId: location.id }, language)
+      result: allLocations
+        .map((l) => l.result)
+        .filter(Boolean)
+        .filter(l => filters && filters.organisationId ? l.organisationId === filters.organisationId : true),
     };
   };
 
-  getLocations = async (filters?: LocationsFilters): Promise<Location[]> => {
-    const ids = await this.locationResources.getIds();
-    const allLocations = await Promise.all(
-      ids.map(async (id) => this.getLocation(id))
-    );
-
-    return allLocations
-      .filter(Boolean)
-      .filter(l => filters && filters.organisationId ? l.organisationId === filters.organisationId : true);
+  getNeed = async (id: string, language?: string): Promise<ProviderResult<Need | undefined>> => {
+    const need = await this.needResources.one(id);
+    return {
+      result: !need ? undefined : {
+        ...need,
+        name: language ? await translate(need.name, language) : need.name,
+        originalName: need.name,
+      },
+    };
   };
 
-  getNeed = async (id: string, language?: string): Promise<Need | undefined> => {
-    return this.needResources.one(id).then(async (n) => ({
-      ...n,
-      name: language ? await translate(n.name, language) : n.name,
-      originalName: n.name,
-    }));
-  };
-
-  getNeeds = async (filters?: NeedsFilters, language?: string): Promise<Need[]> => {
+  getNeeds = async (filters?: NeedsFilters, language?: string): Promise<ProviderResult<Need[]>> => {
     let allNeeds: Need[] = (await this.needResources.all()).map((n) => ({ ...n, originalName: n.name }));
 
     if (language) {
       allNeeds = await Promise.all(allNeeds.map(async (need) => ({
         ...need,
         name: await translate(need.name, language),
+        originalName: need.name,
       })));
     }
 
-    return allNeeds
-      .filter(n => filters && filters.search ? n.name.includes(filters.search) : true)
-      .filter(n => filters && filters.locationId ? n.locationId === filters.locationId : true);
-  };
-
-  getOrganisation = async (id: string): Promise<Organisation | undefined> => {
-    const organisation = await this.organisationResources.one(id);
-
-    if (!organisation) {
-      return undefined;
-    }
-
     return {
-      ...organisation,
-      locations: await this.getLocations({ organisationId: organisation.id })
+      result: allNeeds
+        .filter(n => filters && filters.search ? n.name.includes(filters.search) : true)
+        .filter(n => filters && filters.locationId ? n.locationId === filters.locationId : true),
     };
   };
 
-  getOrganisations = async (): Promise<Organisation[]> => {
+  getOrganisation = async (id: string): Promise<ProviderResult<OrganisationResource | undefined>> => {
+    const organisation = await this.organisationResources.one(id);
+
+    return { result: organisation };
+  };
+
+  getOrganisations = async (): Promise<ProviderResult<OrganisationResource[]>> => {
     const ids = await this.organisationResources.getIds();
     const result = await Promise.all(
       ids.map(async (id) => this.getOrganisation(id))
     );
-    return result.filter(Boolean)
+
+    return { result: result.map((r) => r.result).filter(Boolean) };
   };
 
-  getTranslation = async (code: string): Promise<TranslationsResource> => {
+  getTranslation = async (code: string): Promise<ProviderResult<TranslationsResource>> => {
     const translation = await this.translationResources.one(code);
 
     if (!translation) {
       return {
-        id: 'en',
-        translations: translations.en,
+        result: {
+          id: 'en',
+          translations: translations.en,
+        }
       };
     }
 
     return {
-      ...translation,
-      translations: {
-        ...translations.en,
-        ...translation.translations,
-      },
+      result: {
+        ...translation,
+        translations: {
+          ...translations.en,
+          ...translation.translations,
+        },
+      }
     };
   };
 
-  getTranslations = (): Promise<TranslationsResource[]> => {
-    return this.translationResources.all();
+  getTranslations = async (): Promise<ProviderResult<TranslationsResource[]>> => {
+    return {
+      result: await this.translationResources.all(),
+    };
   }
 
   setTranslations = async (translations: TranslationsResource): Promise<void> => {
@@ -143,7 +144,8 @@ export default class JsonProvider implements Provider {
       return;
     }
 
-    await Promise.all(location.needs.map((async (need) => this.removeNeed(need.id))));
+    const needs = await this.getNeeds({ locationId: id });
+    await Promise.all(needs.result.map((async (need) => this.removeNeed(need.id))));
     await this.locationResources.remove(id);
   };
 
@@ -158,7 +160,8 @@ export default class JsonProvider implements Provider {
       return;
     }
 
-    await Promise.all(organisation.locations.map((async (location) => this.removeLocation(location.id))));
+    const locations = await this.getLocations({ organisationId: id });
+    await Promise.all(locations.result.map((async (location) => this.removeLocation(location.id))));
     await this.organisationResources.remove(id);
   };
 
@@ -174,14 +177,16 @@ export default class JsonProvider implements Provider {
     await this.organisationResources.set(organisation);
   };
 
-  getAccesses = async (filters?: AccessFilters): Promise<Access[]> => {
+  getAccesses = async (filters?: AccessFilters): Promise<ProviderResult<Access[]>> => {
     const results = await this.accessResources.all();
-    return results
-      .filter((access) => filters && filters.code ? access.code === filters.code : true);
+    return {
+      result: results
+        .filter((access) => filters && filters.code ? access.code === filters.code : true)
+    };
   };
 
-  getAccess = async (id: string): Promise<Access | undefined> => {
-    return this.accessResources.one(id);
+  getAccess = async (id: string): Promise<ProviderResult<Access | undefined>> => {
+    return { result: await this.accessResources.one(id) };
   };
 
   setAccess = async (access: Access): Promise<void> => {

@@ -15,11 +15,11 @@ import {
   Typography
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import {sortByNames} from "../../utils";
-import {Location, Organisation} from "../../types";
+import {LocationResource, OrganisationResource} from "../../types";
 import MapBlock from "../map-block";
 import {createStyles, makeStyles} from "@mui/styles";
 import useApiClient from "../../hooks/useApiClient";
+import useNeeds from "../../hooks/useNeeds";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -30,9 +30,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }));
 
-const LocationRouteBreadCrumb: FC<{ location: Location }> = ({ location }) => {
+const LocationRouteBreadCrumb: FC<{ location: LocationResource }> = ({ location }) => {
   const apiOrganisation = useApiClient<'organisations'>('organisations');
-  const [organisation, setOrganisation] = useState<Organisation>();
+  const [organisation, setOrganisation] = useState<OrganisationResource>();
 
   useEffect(() => {
     apiOrganisation.one(location.organisationId).then(setOrganisation).catch(console.error);
@@ -58,7 +58,8 @@ const LocationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
   const api = useApiClient<'locations'>('locations')
-  const [location, setLocation] = useState<Location>();
+  const [location, setLocation] = useState<LocationResource>();
+  const needs = useNeeds(({ locationId: params.locationId }));
 
   useEffect(() => {
     api.one(params.locationId).then(setLocation).catch(console.error);
@@ -95,14 +96,14 @@ const LocationRoute: FC = () => {
           }]}
         />
       )}
-      {location.needs.length > 0 && (
+      {needs.length > 0 && (
         <Card sx={{ my: 2 }}>
           <CardContent>
             <Typography variant="h5">
               <FormattedMessage id="page.needs" />
             </Typography>
             <List>
-              {location.needs.sort(sortByNames).map((need) => (
+              {needs.map((need) => (
                 <ListItem key={`location-${location.id}-need-${need.id}`}>
                   <ListItemIcon>
                     <ShoppingBagIcon />

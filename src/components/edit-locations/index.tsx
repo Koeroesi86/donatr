@@ -2,7 +2,7 @@ import React, {FC, useCallback, useEffect, useState} from "react";
 import {Box, Button, Card, CardContent, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {useIntl} from "react-intl";
-import {Location, LocationResource} from "../../types";
+import {LocationResource} from "../../types";
 import EditLocation from "../edit-location";
 import {sortByNames} from "../../utils";
 import useApiClient from "../../hooks/useApiClient";
@@ -11,7 +11,7 @@ interface EditLocationsProps {
   ids?: string[];
   organisationId: string;
   initialOpen?: boolean;
-  initialState?: Location[];
+  initialState?: LocationResource[];
 }
 
 const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpen = true, initialState = [] }) => {
@@ -27,7 +27,7 @@ const EditLocations: FC<EditLocationsProps> = ({ ids, organisationId, initialOpe
     )
       .then((l) => l.sort(sortByNames))
       .then(o => setLocations(o));
-  }, [ids, organisationId]);
+  }, [api, ids, organisationId]);
 
   useEffect(() => {
     if (!initialState.length) refresh();

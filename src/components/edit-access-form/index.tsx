@@ -1,16 +1,18 @@
 import React, {FC} from "react";
 import {Box, Card, CardContent, Checkbox, FormControlLabel, TextField} from "@mui/material";
-import {Access, Organisation, OrganisationsAccess} from "../../types";
+import {Access, OrganisationResource, OrganisationsAccess} from "../../types";
 import {useIntl} from "react-intl";
+import useLocations from "../../hooks/useLocations";
 
 interface EditAccessFormProps {
   access: Access;
-  organisations: Organisation[];
+  organisations: OrganisationResource[];
   onChange: (access: Access) => void | Promise<void>;
 }
 
 const EditAccessForm: FC<EditAccessFormProps> = ({ access, onChange, organisations }) => {
   const intl = useIntl();
+  const locations = useLocations();
   return (
     <>
       <TextField
@@ -81,7 +83,7 @@ const EditAccessForm: FC<EditAccessFormProps> = ({ access, onChange, organisatio
                 }
               />
               <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-                {organisation.locations.map((loc) => (
+                {locations.filter((l) => l.organisationId === organisation.id).map((loc) => (
                   <FormControlLabel
                     key={`access-location-${access.id}-${organisation.id}-${loc.id}`}
                     label={loc.name}

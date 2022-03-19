@@ -2,11 +2,12 @@ import React, {FC, useCallback, useEffect, useState} from "react";
 import {Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {FormattedMessage} from "react-intl";
-import {Access, Organisation} from "../../types";
+import {Access} from "../../types";
 import EditAccess from "../edit-access";
 import EditAccessForm from "../edit-access-form";
 import AddIcon from "@mui/icons-material/Add";
 import useApiClient from "../../hooks/useApiClient";
+import useOrganisations from "../../hooks/useOrganisations";
 
 interface EditAccessesProps {
   currentCode: string;
@@ -15,14 +16,12 @@ interface EditAccessesProps {
 const EditAccesses: FC<EditAccessesProps> = ({ currentCode }) => {
   const [accesses, setAccesses] = useState<Access[]>([]);
   const [newAccess, setNewAccess] = useState<Access>({ id: 'new', all: true, code: '' });
-  const [organisations, setOrganisations] = useState<Organisation[]>();
+  const organisations = useOrganisations();
   const accessApi = useApiClient<'access'>('access');
-  const organisationsApi = useApiClient<'organisations'>('organisations');
 
   const refresh = useCallback(() => {
     accessApi.all().then((a) => setAccesses(a.sort((a, b) => a.code.localeCompare(b.code))));
-    organisationsApi.all().then(setOrganisations);
-  }, [accessApi, organisationsApi]);
+  }, [accessApi]);
 
   const update = useCallback((data: Access) => {
     accessApi.update(data).then(() => refresh());

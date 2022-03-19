@@ -100,16 +100,16 @@ export type CreateOrganisationResource = Omit<OrganisationResource, 'id'>;
 export type Resources = 'locations' | 'organisations' | 'needs' | 'access' | 'translations';
 
 export interface PathToType {
-  organisations: Organisation;
-  locations: Location;
-  needs: Need;
+  organisations: OrganisationResource;
+  locations: LocationResource;
+  needs: NeedResource;
   translations: TranslationsResource;
   access: Access;
 }
 
 export interface PathToResource {
-  organisations: Omit<Organisation, 'locations'>;
-  locations: Omit<Location, 'needs'>;
+  organisations: OrganisationResource;
+  locations: LocationResource;
   needs: NeedResource;
   translations: TranslationsResource;
   access: Access;
@@ -123,24 +123,28 @@ export interface PathToFilters {
   access: AccessFilters;
 }
 
+export interface ProviderResult<T> {
+  result: T;
+}
+
 export interface Provider {
-  getOrganisations: () => Promise<Organisation[]>;
-  getOrganisation: (id: string) => Promise<Organisation | undefined>;
-  getLocations: (p?: LocationsFilters) => Promise<Location[]>;
-  getLocation: (id: string, language?: string) => Promise<Location | undefined>;
-  getNeeds: (p?: NeedsFilters, language?: string) => Promise<Need[]>;
-  getNeed: (id: string, language?: string) => Promise<Need | undefined>;
-  getTranslations: () => Promise<TranslationsResource[]>;
-  getTranslation: (code: string) => Promise<TranslationsResource>;
+  getOrganisations: () => Promise<ProviderResult<OrganisationResource[]>>;
+  getOrganisation: (id: string) => Promise<ProviderResult<OrganisationResource | undefined>>;
+  getLocations: (p?: LocationsFilters) => Promise<ProviderResult<LocationResource[]>>;
+  getLocation: (id: string, language?: string) => Promise<ProviderResult<LocationResource | undefined>>;
+  getNeeds: (p?: NeedsFilters, language?: string) => Promise<ProviderResult<Need[]>>;
+  getNeed: (id: string, language?: string) => Promise<ProviderResult<Need | undefined>>;
+  getTranslations: () => Promise<ProviderResult<TranslationsResource[]>>;
+  getTranslation: (code: string) => Promise<ProviderResult<TranslationsResource>>;
   setTranslations: (translation: TranslationsResource) => Promise<void>;
-  setOrganisation: (organisation: Organisation) => Promise<void>;
+  setOrganisation: (organisation: OrganisationResource) => Promise<void>;
   removeOrganisation: (id: string) => Promise<void>;
   setLocation: (location: LocationResource) => Promise<void>;
   removeLocation: (id: string) => Promise<void>;
-  setNeed: (location: Need) => Promise<void>;
+  setNeed: (location: NeedResource) => Promise<void>;
   removeNeed: (id: string) => Promise<void>;
-  getAccesses: (filters?: AccessFilters) => Promise<Access[]>;
-  getAccess: (code: string) => Promise<Access | undefined>;
+  getAccesses: (filters?: AccessFilters) => Promise<ProviderResult<Access[]>>;
+  getAccess: (code: string) => Promise<ProviderResult<Access | undefined>>;
   setAccess: (access: Access) => Promise<void>;
   removeAccess: (code: string) => Promise<void>;
 }

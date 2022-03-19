@@ -92,7 +92,7 @@ const worker: Worker = async (event, callback) => {
           });
         }
         const organisations = await provider.getOrganisations();
-        callback(createCacheableResponse(200, organisations));
+        callback(createCacheableResponse(200, organisations.result));
         return;
       }
       if (event.pathFragments.length === 3) {
@@ -120,7 +120,7 @@ const worker: Worker = async (event, callback) => {
           return;
         }
         const organisation = await provider.getOrganisation(event.pathFragments[2]);
-        callback(createCacheableResponse(200, organisation));
+        callback(createCacheableResponse(200, organisation.result));
         return;
       }
       callback(createCacheableResponse(404, { message: 'no endpoint like this.' }));
@@ -144,7 +144,7 @@ const worker: Worker = async (event, callback) => {
         const locations = await provider.getLocations({
           organisationId: event.queryStringParameters.organisationId,
         });
-        callback(createCacheableResponse(200, locations));
+        callback(createCacheableResponse(200, locations.result));
         return;
       }
       if (event.pathFragments.length === 3) {
@@ -153,7 +153,7 @@ const worker: Worker = async (event, callback) => {
           const loc = await provider.getLocation(event.pathFragments[2]);
           if (
             !hasAccess({ locationId: event.pathFragments[2] }, tokenAccess)
-            && !hasAccess({ organisationId: loc.organisationId }, tokenAccess)
+            && !hasAccess({ organisationId: loc.result.organisationId }, tokenAccess)
           ) {
             callback(createResponse(401, { message: "Nope." }));
             return;
@@ -171,7 +171,7 @@ const worker: Worker = async (event, callback) => {
         }
         const location = await provider.getLocation(event.pathFragments[2], event.headers['x-target-locale']);
         if (location) {
-          callback(createCacheableResponse(200, location));
+          callback(createCacheableResponse(200, location.result));
           return;
         }
       }
@@ -186,7 +186,7 @@ const worker: Worker = async (event, callback) => {
           const location = await provider.getLocation(content.locationId);
           const tokenAccess = await token.deserialize(event.headers['x-access-token']);
           if (
-            !hasAccess({ organisationId: location.organisationId }, tokenAccess)
+            !hasAccess({ organisationId: location.result.organisationId }, tokenAccess)
             && !hasAccess({ locationId: content.locationId }, tokenAccess)
           ) {
             callback(createResponse(401, { message: "Nope." }));
@@ -202,17 +202,17 @@ const worker: Worker = async (event, callback) => {
           locationId: event.queryStringParameters.locationId,
         }, event.headers['x-target-locale']);
 
-        callback(createCacheableResponse(200, needs));
+        callback(createCacheableResponse(200, needs.result));
         return;
       }
       if (event.pathFragments.length === 3) {
         if (['PUT', 'DELETE'].includes(event.httpMethod)) {
           const need = await provider.getNeed(event.pathFragments[2]);
-          const location = await provider.getLocation(need.locationId);
+          const location = await provider.getLocation(need.result.locationId);
           const tokenAccess = await token.deserialize(event.headers['x-access-token']);
           if (
-            !hasAccess({ locationId: need.locationId }, tokenAccess)
-            && !hasAccess({ organisationId: location.organisationId }, tokenAccess)
+            !hasAccess({ locationId: need.result.locationId }, tokenAccess)
+            && !hasAccess({ organisationId: location.result.organisationId }, tokenAccess)
           ) {
             callback(createResponse(401, { message: "Nope." }));
             return;
@@ -230,7 +230,7 @@ const worker: Worker = async (event, callback) => {
         }
         const need = await provider.getNeed(event.pathFragments[2], event.headers['x-target-locale']);
         if (need) {
-          callback(createCacheableResponse(200, need));
+          callback(createCacheableResponse(200, need.result));
           return;
         }
       }
@@ -241,7 +241,7 @@ const worker: Worker = async (event, callback) => {
     if (event.pathFragments[1] === 'translations') {
       if (event.pathFragments.length === 2) {
         const translations = await provider.getTranslations();
-        callback(createCacheableResponse(200, translations));
+        callback(createCacheableResponse(200, translations.result));
         return;
       }
 
@@ -257,7 +257,7 @@ const worker: Worker = async (event, callback) => {
           await provider.setTranslations(content);
         }
         const translation = await provider.getTranslation(event.pathFragments[2]);
-        callback(createCacheableResponse(200, translation));
+        callback(createCacheableResponse(200, translation.result));
         return;
       }
 
@@ -281,7 +281,7 @@ const worker: Worker = async (event, callback) => {
         }
         const filters = event.queryStringParameters as AccessFilters;
         const accesses = await provider.getAccesses(filters);
-        callback(createResponse(200, accesses));
+        callback(createResponse(200, accesses.result));
         return;
       }
 
@@ -298,14 +298,14 @@ const worker: Worker = async (event, callback) => {
         }
         const access = await provider.getAccess(event.pathFragments[2]);
         if (access) {
-          callback(createResponse(200, access));
+          callback(createResponse(200, access.result));
           return;
         }
       }
     }
 
     if (event.pathFragments[1] === 'resolve-access' && event.pathFragments.length === 3) {
-      const [access] = await provider.getAccesses({ code: decodeURIComponent(event.pathFragments[2]) });
+      const { result: [access] } = await provider.getAccesses({ code: decodeURIComponent(event.pathFragments[2]) });
       if (access) {
         callback(createResponse(200, access, { 'x-access-token': await token.serialize(access) }));
         return;

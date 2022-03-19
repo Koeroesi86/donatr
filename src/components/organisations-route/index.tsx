@@ -11,19 +11,13 @@ import {
 import {FormattedMessage, useIntl} from "react-intl";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import {Link} from "react-router-dom";
-import {sortByNames} from "../../utils";
-import useApiClient from "../../hooks/useApiClient";
+import useOrganisations from "../../hooks/useOrganisations";
+import useLocations from "../../hooks/useLocations";
 
 const OrganisationsRoute: FC = () => {
   const intl = useIntl();
-  const api = useApiClient<'organisations'>('organisations');
-  const [organisations, setOrganisations] = useState<Organisation[]>([])
-  useEffect(() => {
-    api.all()
-      .then((data) => data.sort(sortByNames))
-      .then((data) => setOrganisations(data))
-      .catch(console.error);
-  }, [api]);
+  const organisations = useOrganisations();
+  const locations = useLocations();
   return (
     <>
       <Typography variant="h3" sx={{ my: 2 }}>
@@ -46,7 +40,7 @@ const OrganisationsRoute: FC = () => {
               primary={organisation.name}
               secondary={intl.formatMessage(
                 { id: 'page.organisations.locations.count' },
-                { count: organisation.locations.length }
+                { count: locations.filter((l) => l.organisationId === organisation.id).length }
               )}
             />
           </ListItemButton>
