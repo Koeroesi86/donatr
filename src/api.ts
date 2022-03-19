@@ -80,7 +80,7 @@ const createCacheableResponse = (
     }
   }
 
-  const actualStatusCode = ![201, 304].includes(statusCode) && isModified ? 304 : statusCode;
+  const actualStatusCode = 200 === statusCode && !isModified ? 304 : statusCode;
   const actualBody = actualStatusCode === 304 ? '' : body;
 
   return createResponse(actualStatusCode, actualBody, {
