@@ -21,11 +21,6 @@ const SsrPage: FC<SsrPageProps> = ({ locale, path, publicUrl }) => (
         href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
       />
       <link rel="stylesheet" href={`${publicUrl}static/leaflet.css`}/>
-      <script defer src={`${publicUrl}static/js/bundle.js`} />
-    </head>
-    <body>
-      <noscript>You need to enable JavaScript to run this app.</noscript>
-      <div id="root" />
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-207L6CE7EN" />
       <script dangerouslySetInnerHTML={{ __html: `
         window.dataLayer = window.dataLayer || [];
@@ -34,6 +29,11 @@ const SsrPage: FC<SsrPageProps> = ({ locale, path, publicUrl }) => (
 
         gtag('config', 'G-207L6CE7EN');
       `}} />
+      <script defer src={`${publicUrl}static/js/bundle.js`} />
+    </head>
+    <body>
+      <noscript>You need to enable JavaScript to run this app.</noscript>
+      <div id="root" />
     </body>
   </html>
 );
