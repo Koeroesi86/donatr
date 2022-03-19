@@ -9,7 +9,8 @@ const useLocations = (filter?: LocationsFilters) => {
 
   useEffect(() => {
     api.all(filter).then((l) => setLocations(l.sort(sortByNames))).catch(console.error);
-  }, [api, filter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
 
   return locations;
 }

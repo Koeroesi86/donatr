@@ -123,15 +123,19 @@ export interface PathToFilters {
   access: AccessFilters;
 }
 
+export interface ProviderResult<T> {
+  result: T;
+}
+
 export interface Provider {
-  getOrganisations: () => Promise<OrganisationResource[]>;
-  getOrganisation: (id: string) => Promise<OrganisationResource | undefined>;
-  getLocations: (p?: LocationsFilters) => Promise<LocationResource[]>;
-  getLocation: (id: string, language?: string) => Promise<LocationResource | undefined>;
-  getNeeds: (p?: NeedsFilters, language?: string) => Promise<NeedResource[]>;
-  getNeed: (id: string, language?: string) => Promise<NeedResource | undefined>;
-  getTranslations: () => Promise<TranslationsResource[]>;
-  getTranslation: (code: string) => Promise<TranslationsResource>;
+  getOrganisations: () => Promise<ProviderResult<OrganisationResource[]>>;
+  getOrganisation: (id: string) => Promise<ProviderResult<OrganisationResource | undefined>>;
+  getLocations: (p?: LocationsFilters) => Promise<ProviderResult<LocationResource[]>>;
+  getLocation: (id: string, language?: string) => Promise<ProviderResult<LocationResource | undefined>>;
+  getNeeds: (p?: NeedsFilters, language?: string) => Promise<ProviderResult<Need[]>>;
+  getNeed: (id: string, language?: string) => Promise<ProviderResult<Need | undefined>>;
+  getTranslations: () => Promise<ProviderResult<TranslationsResource[]>>;
+  getTranslation: (code: string) => Promise<ProviderResult<TranslationsResource>>;
   setTranslations: (translation: TranslationsResource) => Promise<void>;
   setOrganisation: (organisation: OrganisationResource) => Promise<void>;
   removeOrganisation: (id: string) => Promise<void>;
@@ -139,8 +143,8 @@ export interface Provider {
   removeLocation: (id: string) => Promise<void>;
   setNeed: (location: NeedResource) => Promise<void>;
   removeNeed: (id: string) => Promise<void>;
-  getAccesses: (filters?: AccessFilters) => Promise<Access[]>;
-  getAccess: (code: string) => Promise<Access | undefined>;
+  getAccesses: (filters?: AccessFilters) => Promise<ProviderResult<Access[]>>;
+  getAccess: (code: string) => Promise<ProviderResult<Access | undefined>>;
   setAccess: (access: Access) => Promise<void>;
   removeAccess: (code: string) => Promise<void>;
 }

@@ -9,7 +9,8 @@ const useOrganisations = () => {
   
   useEffect(() => {
     api.all().then((o) => setOrganisations(o.sort(sortByNames))).catch(console.error);
-  }, [api]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   return organisations;
 };

@@ -9,7 +9,8 @@ const useNeeds = (filter?: NeedsFilters) => {
 
   useEffect(() => {
     api.all(filter).then((n) => setNeeds(n.sort(sortByNames))).catch(console.error);
-  }, [api, filter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
 
   return needs;
 }
