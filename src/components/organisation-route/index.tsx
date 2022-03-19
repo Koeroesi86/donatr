@@ -6,12 +6,12 @@ import {LatLngExpression} from "leaflet";
 import ReactMarkdown from "react-markdown";
 import RemarkBreaks from "remark-breaks";
 import RemarkGfm from "remark-gfm";
-import {sortByNames} from "../../utils";
-import {Organisation, OrganisationResource} from "../../types";
+import {Organisation} from "../../types";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
 import useApiClient from "../../hooks/useApiClient";
 import useLocations from "../../hooks/useLocations";
+import useNeeds from "../../hooks/useNeeds";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -26,12 +26,13 @@ const OrganisationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
   const api = useApiClient<'organisations'>('organisations');
-  const [organisation, setOrganisation] = useState<OrganisationResource>();
+  const [organisation, setOrganisation] = useState<Organisation>();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
   });
   const locations = useLocations({ organisationId: params.organisationId });
+  const needs = useNeeds();
 
   useEffect(() => {
     api.one(params.organisationId).then(setOrganisation).catch(console.error);
@@ -86,11 +87,15 @@ const OrganisationRoute: FC = () => {
       )}
       <List>
         {locations.map((loc) => (
-          <LocationListItem key={`location-list-item-${loc.id}`} location={loc} />
+          <LocationListItem
+            key={`location-list-item-${loc.id}`}
+            location={loc}
+            needs={needs.filter((n) => n.locationId === loc.id)}
+          />
         ))}
       </List>
     </>
   );
-}
+};
 
 export default OrganisationRoute;

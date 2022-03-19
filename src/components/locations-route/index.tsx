@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useState} from 'react';
 import {LatLngExpression} from "leaflet";
 import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
@@ -7,6 +7,7 @@ import {FormattedMessage} from "react-intl";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
 import useLocations from "../../hooks/useLocations";
+import useNeeds from "../../hooks/useNeeds";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -20,6 +21,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 const LocationsRoute: FC = () => {
   const styles = useStyles();
   const locations = useLocations();
+  const needs = useNeeds();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
@@ -65,11 +67,15 @@ const LocationsRoute: FC = () => {
       />
       <List>
         {locations.map((loc) => (
-          <LocationListItem key={`location-list-item-${loc.id}`} location={loc} />
+          <LocationListItem
+            key={`location-list-item-${loc.id}`}
+            location={loc}
+            needs={needs.filter((n) => n.locationId === loc.id)}
+          />
         ))}
       </List>
     </>
-  )
+  );
 };
 
 export default LocationsRoute;
