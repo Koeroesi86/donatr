@@ -43,65 +43,62 @@ export default class JsonProvider implements Provider {
   getLocation = async (id: string, language?: string): Promise<ProviderResult<LocationResource | undefined>> => {
     const location = await this.locationResources.one(id);
 
-    return { result: location };
+    return { result: location.data, modified: location.modified };
   };
 
   getLocations = async (filters?: LocationsFilters): Promise<ProviderResult<LocationResource[]>> => {
-    const ids = await this.locationResources.getIds();
-    const allLocations = await Promise.all(
-      ids.map(async (id) => await this.getLocation(id))
-    );
+    const all = await this.locationResources.all();
 
     return {
-      result: allLocations
-        .map((l) => l.result)
+      result: all.data
         .filter(Boolean)
         .filter(l => filters && filters.organisationId ? l.organisationId === filters.organisationId : true),
+      modified: all.modified
     };
   };
 
   getNeed = async (id: string, language?: string): Promise<ProviderResult<Need | undefined>> => {
     const need = await this.needResources.one(id);
     return {
-      result: !need ? undefined : {
-        ...need,
-        name: language ? await translate(need.name, language) : need.name,
-        originalName: need.name,
+      result: !need.data ? undefined : {
+        ...need.data,
+        name: language ? await translate(need.data.name, language) : need.data.name,
+        originalName: need.data.name,
       },
+      modified: need.modified,
     };
   };
 
   getNeeds = async (filters?: NeedsFilters, language?: string): Promise<ProviderResult<Need[]>> => {
-    let allNeeds: Need[] = (await this.needResources.all()).map((n) => ({ ...n, originalName: n.name }));
+    const allNeeds = await this.needResources.all();
+
+    let data: Need[] = allNeeds.data.map((need) => ({ ...need, originalName: need.name }));
 
     if (language) {
-      allNeeds = await Promise.all(allNeeds.map(async (need) => ({
+      data = await Promise.all(data.map(async (need) => ({
         ...need,
         name: await translate(need.name, language),
-        originalName: need.name,
       })));
     }
 
     return {
-      result: allNeeds
+      result: data
         .filter(n => filters && filters.search ? n.name.includes(filters.search) : true)
         .filter(n => filters && filters.locationId ? n.locationId === filters.locationId : true),
+      modified: allNeeds.modified,
     };
   };
 
   getOrganisation = async (id: string): Promise<ProviderResult<OrganisationResource | undefined>> => {
     const organisation = await this.organisationResources.one(id);
 
-    return { result: organisation };
+    return { result: organisation.data, modified: organisation.modified };
   };
 
   getOrganisations = async (): Promise<ProviderResult<OrganisationResource[]>> => {
-    const ids = await this.organisationResources.getIds();
-    const result = await Promise.all(
-      ids.map(async (id) => this.getOrganisation(id))
-    );
+    const result = await this.organisationResources.all();
 
-    return { result: result.map((r) => r.result).filter(Boolean) };
+    return { result: result.data, modified: result.modified };
   };
 
   getTranslation = async (code: string): Promise<ProviderResult<TranslationsResource>> => {
@@ -112,25 +109,26 @@ export default class JsonProvider implements Provider {
         result: {
           id: 'en',
           translations: translations.en,
-        }
+        },
+        modified: 0,
       };
     }
 
     return {
       result: {
-        ...translation,
+        ...translation.data,
         translations: {
           ...translations.en,
-          ...translation.translations,
+          ...translation.data.translations,
         },
-      }
+      },
+      modified: translation.modified,
     };
   };
 
   getTranslations = async (): Promise<ProviderResult<TranslationsResource[]>> => {
-    return {
-      result: await this.translationResources.all(),
-    };
+    const { data, modified } = await this.translationResources.all();
+    return { result: data, modified };
   }
 
   setTranslations = async (translations: TranslationsResource): Promise<void> => {
@@ -180,13 +178,15 @@ export default class JsonProvider implements Provider {
   getAccesses = async (filters?: AccessFilters): Promise<ProviderResult<Access[]>> => {
     const results = await this.accessResources.all();
     return {
-      result: results
-        .filter((access) => filters && filters.code ? access.code === filters.code : true)
+      result: results.data
+        .filter((access) => filters && filters.code ? access.code === filters.code : true),
+      modified: results.modified,
     };
   };
 
   getAccess = async (id: string): Promise<ProviderResult<Access | undefined>> => {
-    return { result: await this.accessResources.one(id) };
+    const result = await this.accessResources.one(id);
+    return { result: result.data, modified: result.modified };
   };
 
   setAccess = async (access: Access): Promise<void> => {

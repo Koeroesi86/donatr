@@ -125,6 +125,7 @@ export interface PathToFilters {
 
 export interface ProviderResult<T> {
   result: T;
+  modified: number;
 }
 
 export interface Provider {
