@@ -19,32 +19,10 @@ export interface ResponseEvent {
 
 export type Worker = (event: RequestEvent, callback: (response: ResponseEvent) => void) => void | Promise<void>;
 
-export interface Organisation {
-  id: string;
-  name: string;
-  description?: string;
-  locations: Location[];
-}
-
 export interface PickedLocation {
   lat: number;
   lng: number;
   text: string;
-}
-
-export interface Location {
-  id: string;
-  organisationId: string;
-  name: string;
-  location?: PickedLocation,
-  needs: Need[];
-}
-
-export interface Need {
-  id: string;
-  locationId: string;
-  name: string;
-  originalName: string;
 }
 
 export interface Translations {
@@ -85,12 +63,41 @@ export type Access = FullAccess | OrganisationsAccess | LocationsAccess;
 
 export type AccessFilters = { code?: string; };
 
-export type NeedResource = Omit<Need, 'originalName'>;
-export type LocationResource = Omit<Location, 'needs'>;
-export type OrganisationResource = Omit<Organisation, 'locations'>;
+export interface NeedResource {
+  id: string;
+  locationId: string;
+  name: string;
+}
+
+export interface LocationResource {
+  id: string;
+  organisationId: string;
+  name: string;
+  location?: PickedLocation,
+}
+
+export interface OrganisationResource {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export interface TranslationsResource {
   id: string;
   translations: Translations;
+}
+
+export interface Organisation extends OrganisationResource{
+}
+
+export interface Location extends LocationResource {
+}
+
+export interface Need extends NeedResource {
+  originalName: string;
+}
+
+export interface Translation extends TranslationsResource {
 }
 
 export type CreateNeedResource = Omit<NeedResource, 'id'>;
@@ -100,10 +107,10 @@ export type CreateOrganisationResource = Omit<OrganisationResource, 'id'>;
 export type Resources = 'locations' | 'organisations' | 'needs' | 'access' | 'translations';
 
 export interface PathToType {
-  organisations: OrganisationResource;
-  locations: LocationResource;
-  needs: NeedResource;
-  translations: TranslationsResource;
+  organisations: Organisation;
+  locations: Location;
+  needs: Need;
+  translations: Translation;
   access: Access;
 }
 
