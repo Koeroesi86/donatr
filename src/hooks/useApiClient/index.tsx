@@ -14,6 +14,7 @@ const useApiClient = <P extends Resources>(resource: Resources) => {
         'x-access-token': getToken(),
         'x-target-locale': intl.locale.split('-')[0],
       },
+      validateStatus: (status) => status < 400,
     }), [getToken, intl.locale, resource]);
   
   return useMemo(() => ({

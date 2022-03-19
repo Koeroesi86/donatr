@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useMemo, useState} from "react";
 import {Link as RLink, useParams} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
 import {
@@ -15,7 +15,7 @@ import {
   Typography
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import {LocationResource, OrganisationResource} from "../../types";
+import {LocationResource, NeedsFilters, OrganisationResource} from "../../types";
 import MapBlock from "../map-block";
 import {createStyles, makeStyles} from "@mui/styles";
 import useApiClient from "../../hooks/useApiClient";
@@ -57,13 +57,17 @@ const LocationRouteBreadCrumb: FC<{ location: LocationResource }> = ({ location 
 const LocationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
-  const api = useApiClient<'locations'>('locations')
+  const api = useApiClient<'locations'>('locations');
   const [location, setLocation] = useState<LocationResource>();
-  const needs = useNeeds(({ locationId: params.locationId }));
+  const filter = useMemo<NeedsFilters>(() => ({
+    locationId: params.locationId,
+  }),[params.locationId]);
+  const needs = useNeeds(filter);
 
   useEffect(() => {
     api.one(params.locationId).then(setLocation).catch(console.error);
-  }, [api, params]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   if (!location) {
     return <CircularProgress />;
