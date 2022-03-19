@@ -10,7 +10,7 @@ interface BaseResource {
 
 export default class JsonResource<T extends BaseResource> {
   private readonly basePath: string;
-  private readonly cache: { [k: string]: T } = {};
+  private readonly cache: { [k: string]: { data: T; modified: number; } } = {};
   private watcher: FSWatcher;
   private isCacheReady: boolean = false;
 
@@ -63,15 +63,21 @@ export default class JsonResource<T extends BaseResource> {
     return ids;
   };
 
-  all = async (): Promise<T[]> => {
+  all = async (): Promise<{ data: T[]; modified: number }> => {
     const ids = await this.getIds();
     const all = (await Bluebird.map(ids, async (id) => this.one(id), { concurrency: 1 })).filter(Boolean);
     this.isCacheReady = true;
 
-    return all;
+    return {
+      data: all.map((one) => one.data),
+      modified: all.reduce(
+        (result, one) => one.modified > result ? one.modified : result,
+        0
+      ),
+    };
   };
 
-  one = async (id: string): Promise<T | undefined> => {
+  one = async (id: string): Promise<{ data: T | undefined; modified: number }> => {
     if(this.cache[id]) {
       return clone(this.cache[id]);
     }
@@ -84,7 +90,8 @@ export default class JsonResource<T extends BaseResource> {
 
     const content = await fs.promises.readFile(fileName, 'utf8');
     const data: T = JSON.parse(content);
-    this.cache[id] = data;
+    const stats = await fs.promises.stat(fileName)
+    this.cache[id] = { data, modified: stats.mtimeMs };
 
     return this.one(id);
   };
@@ -102,6 +109,6 @@ export default class JsonResource<T extends BaseResource> {
     const fileName = path.resolve(this.basePath, `./${data.id}.json`);
     const content = JSON.stringify(data, null, 2)
     await fs.promises.writeFile(fileName, content, 'utf8');
-    this.cache[data.id] = clone(data);
+    this.cache[data.id] = { data: clone(data), modified: Date.now() };
   }
 }
