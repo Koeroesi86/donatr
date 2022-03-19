@@ -26,6 +26,14 @@ const SsrPage: FC<SsrPageProps> = ({ locale, path, publicUrl }) => (
     <body>
       <noscript>You need to enable JavaScript to run this app.</noscript>
       <div id="root" />
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-207L6CE7EN" />
+      <script dangerouslySetInnerHTML={{ __html: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-207L6CE7EN');
+      `}} />
     </body>
   </html>
 );
