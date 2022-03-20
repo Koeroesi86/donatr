@@ -88,6 +88,7 @@ const createCacheableResponse = (
     'Cache-Control': 'public, max-age=0',
     'Content-Length': byteLength.toString(),
     'ETag': etag(body, byteLength),
+    'Last-Modified': ifModifiedSince.toUTCString(),
   });
 }
 
