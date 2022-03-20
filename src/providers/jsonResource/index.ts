@@ -2,7 +2,6 @@ import path from "path";
 import fs from "graceful-fs";
 import chokidar, {FSWatcher} from "chokidar";
 import {Promise as Bluebird} from "bluebird";
-import clone from "lodash.clonedeep";
 
 interface BaseResource {
   id: string;
@@ -10,7 +9,7 @@ interface BaseResource {
 
 export default class JsonResource<T extends BaseResource> {
   private readonly basePath: string;
-  private readonly cache: { [k: string]: { data: T; modified: number; } } = {};
+  private readonly cache: { [k: string]: { content: string; modified: number; } } = {};
   private watcher: FSWatcher;
   private isCacheReady: boolean = false;
 
@@ -34,9 +33,14 @@ export default class JsonResource<T extends BaseResource> {
       .on('all', async (event, filePath) => {
         if (path.extname(filePath) !== '.json') return;
 
-        const id = path.basename(filePath, path.extname(filePath))
+        const id = path.basename(filePath, path.extname(filePath));
 
-        if (event === 'add' || event === 'change') {
+
+        if (event === 'add' && !(id in this.cache)) {
+          this.cache[id] = null;
+        }
+
+        if (event === 'change') {
           this.cache[id] = null;
         }
 
@@ -45,7 +49,6 @@ export default class JsonResource<T extends BaseResource> {
         }
       })
       .once('ready', () => {
-        this.isCacheReady = true;
         this.all().catch(console.error);
       });
   }
@@ -65,7 +68,11 @@ export default class JsonResource<T extends BaseResource> {
 
   all = async (): Promise<{ data: T[]; modified: number }> => {
     const ids = await this.getIds();
-    const all = (await Bluebird.map(ids, async (id) => this.one(id), { concurrency: 1 })).filter(Boolean);
+    const all = (await Bluebird.map(
+      ids,
+      async (id) => this.one(id),
+      { concurrency: 1 }
+    )).filter(Boolean);
     this.isCacheReady = true;
 
     return {
@@ -79,19 +86,21 @@ export default class JsonResource<T extends BaseResource> {
 
   one = async (id: string): Promise<{ data: T | undefined; modified: number }> => {
     if(this.cache[id]) {
-      return clone(this.cache[id]);
+      return {
+        data: JSON.parse(this.cache[id].content),
+        modified: this.cache[id].modified,
+      };
     }
 
     const fileName = path.resolve(this.basePath, `./${id}.json`);
 
     if (!fs.existsSync(fileName)) {
-      return undefined;
+      return { data: undefined, modified: 0 };
     }
 
     const content = await fs.promises.readFile(fileName, 'utf8');
-    const data: T = JSON.parse(content);
     const stats = await fs.promises.stat(fileName)
-    this.cache[id] = { data, modified: stats.mtimeMs };
+    this.cache[id] = { content, modified: stats.mtimeMs };
 
     return this.one(id);
   };
@@ -109,6 +118,6 @@ export default class JsonResource<T extends BaseResource> {
     const fileName = path.resolve(this.basePath, `./${data.id}.json`);
     const content = JSON.stringify(data, null, 2)
     await fs.promises.writeFile(fileName, content, 'utf8');
-    this.cache[data.id] = { data: clone(data), modified: Date.now() };
+    this.cache[data.id] = { content, modified: Date.now() };
   }
 }
