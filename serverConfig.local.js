@@ -7,19 +7,13 @@ module.exports = {
   servers: [
     {
       ...serverConfig,
-      serverOptions: {
-        ...serverConfig.serverOptions,
-        hostname: 'localhost',
-      },
-      workerOptions: {
-        ...serverConfig.workerOptions,
+      hostname: 'localhost',
+      options: {
+        ...serverConfig.options,
         root: path.resolve(__dirname, './build/public'),
-        options:{
-          ...serverConfig.workerOptions.options,
-          env: {
-            ...serverConfig.workerOptions.options.env,
-            DATA_BASE_PATH: path.resolve(__dirname, './.data/')
-          }
+        env: {
+          ...serverConfig.options.env,
+          DATA_BASE_PATH: path.resolve(__dirname, './.data/')
         }
       }
     }

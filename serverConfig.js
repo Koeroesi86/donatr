@@ -1,11 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  serverOptions: {
-    hostname: 'help.koro.si', //defines what host to provide the instance for
-    protocol: 'http', //defines what protocol to use. http/https
-  },
-  workerOptions: {
+  hostname: 'help.koro.si', //defines what host to provide the instance for
+  protocol: 'http', //defines what protocol to use. http/https
+  type: 'worker',
+  options: {
     root: '/var/www/help.koro.si/build/public/',
     options: {
       cwd: path.resolve(__dirname),
