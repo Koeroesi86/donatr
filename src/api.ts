@@ -15,9 +15,6 @@ const keepAliveCallback = debounce(() => {
   process.exit(0);
 }, keepAliveTimeout);
 
-// TODO
-console.log('process.env.DATA_BASE_PATH', process.env.DATA_BASE_PATH)
-
 const provider: Provider = new JsonProvider({
   basePath: process.env.DATA_BASE_PATH || (
     fs.existsSync(path.resolve('/var/www/help.koro.si/data'))

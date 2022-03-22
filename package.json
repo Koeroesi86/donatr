@@ -65,6 +65,7 @@
     "webpackbar": "^5.0.2"
   },
   "dependencies": {
+    "accept-language": "^3.0.18",
     "chokidar": "^3.5.3",
     "cookie": "^0.4.2",
     "jsonwebtoken": "^8.5.1",
