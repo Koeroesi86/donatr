@@ -6,6 +6,8 @@ import acceptLanguage from "accept-language";
 import {Worker} from "./types";
 import SsrPage from "./components/ssr-page";
 import createApiClient from "./utils/createApiClient";
+import SsrOrganisationPage from "./components/ssr-organisation-page";
+import SsrLocationPage from "./components/ssr-location-page";
 
 const keepAliveTimeout = 10 * 60 * 1000;
 const keepAliveCallback = debounce(() => {
@@ -47,29 +49,78 @@ const worker: Worker = async (event, callback): Promise<void> => {
     }
 
     if (event.pathFragments[0] === 'organisations') {
-      callback({
-        statusCode: 200,
-        headers: {
-          'content-type': 'text/html; charset=utf-8'
-        },
-        body: '<!DOCTYPE html>' + renderToString(
-          <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
-        ),
-      });
-      return;
+      if (event.pathFragments.length === 1) {
+        callback({
+          statusCode: 200,
+          headers: {
+            'content-type': 'text/html; charset=utf-8'
+          },
+          body: '<!DOCTYPE html>' + renderToString(
+            <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
+          ),
+        });
+        return;
+      }
+      if (event.pathFragments.length === 2) {
+        const organisation = await apiClient.one<'organisations'>('organisations', event.pathFragments[1]);
+        if (organisation) {
+          callback({
+            statusCode: 200,
+            headers: {
+              'content-type': 'text/html; charset=utf-8'
+            },
+            body: '<!DOCTYPE html>' + renderToString(
+              <SsrOrganisationPage
+                publicUrl={publicUrl}
+                path={event.path}
+               locale={locale}
+               title={pageTitle}
+                organisation={organisation}
+              />
+            ),
+          });
+          return;
+        }
+      }
     }
 
     if (event.pathFragments[0] === 'locations') {
-      callback({
-        statusCode: 200,
-        headers: {
-          'content-type': 'text/html; charset=utf-8'
-        },
-        body: '<!DOCTYPE html>' + renderToString(
-          <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
-        ),
-      });
-      return;
+      if (event.pathFragments.length === 1) {
+        callback({
+          statusCode: 200,
+          headers: {
+            'content-type': 'text/html; charset=utf-8'
+          },
+          body: '<!DOCTYPE html>' + renderToString(
+            <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle}/>
+          ),
+        });
+        return;
+      }
+
+      if (event.pathFragments.length === 2) {
+        const location = await apiClient.one<'locations'>('locations', event.pathFragments[1]);
+        if (location) {
+          const organisation = await apiClient.one<'organisations'>('organisations', location.organisationId);
+          callback({
+            statusCode: 200,
+            headers: {
+              'content-type': 'text/html; charset=utf-8'
+            },
+            body: '<!DOCTYPE html>' + renderToString(
+              <SsrLocationPage
+                publicUrl={publicUrl}
+                path={event.path}
+                locale={locale}
+                title={pageTitle}
+                organisation={organisation}
+                location={location}
+              />
+            ),
+          });
+          return;
+        }
+      }
     }
 
     if (event.pathFragments[0] === 'needs') {

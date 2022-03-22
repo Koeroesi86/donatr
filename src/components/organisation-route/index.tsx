@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useMemo, useState} from "react";
 import {Link as RLink, useParams} from "react-router-dom";
 import {createStyles, makeStyles} from "@mui/styles";
 import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
@@ -31,12 +31,14 @@ const OrganisationRoute: FC = () => {
     lat: 47.497913,
     lng: 19.040236,
   });
-  const locations = useLocations({ organisationId: params.organisationId });
+  const filter = useMemo(() => ({ organisationId: params.organisationId }), [params.organisationId]);
+  const locations = useLocations(filter);
   const needs = useNeeds();
 
   useEffect(() => {
     api.one(params.organisationId).then(setOrganisation).catch(console.error);
-  }, [api, params]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   if (!organisation) return <CircularProgress />;
 

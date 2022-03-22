@@ -101,7 +101,6 @@ const App: FC<AppProps> = ({ initialLocale })  => {
     setMessages(translation.translations);
     if (typeof window !== 'undefined') {
       setCookie('language', translation.id, 7);
-      window.document.title = translation.translations['site.name'];
     }
   }, []);
 
