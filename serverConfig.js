@@ -6,12 +6,9 @@ module.exports = {
   type: 'worker',
   options: {
     root: '/var/www/help.koro.si/build/public/',
-    options: {
-      cwd: path.resolve(__dirname),
-      env: {
-        DATA_BASE_PATH: '/var/www/help.koro.si/data',
-        PUBLIC_URL: 'https://help.koro.si/',
-      }
+    env: {
+      DATA_BASE_PATH: '/var/www/help.koro.si/data',
+      PUBLIC_URL: 'https://help.koro.si/',
     },
     limit: 0,
     limitPerPath: 1,

@@ -28,8 +28,8 @@ const worker: Worker = async (event, callback): Promise<void> => {
     const localeIds = locales.map((l) => l.id);
     acceptLanguage.languages(localeIds);
 
-    const detectedLanguage = cookies.locale && localeIds.includes(cookies.locale)
-      ? cookies.locale
+    const detectedLanguage = cookies.language && localeIds.includes(cookies.language)
+      ? cookies.language
       : acceptLanguage.get(event.headers['accept-language']);
     const translation = locales.find((t) => t.id === detectedLanguage);
     let pageTitle = translation.translations['site.name'] || '';
