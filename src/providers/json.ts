@@ -101,10 +101,10 @@ export default class JsonProvider implements Provider {
     return { result: result.data, modified: result.modified };
   };
 
-  getTranslation = async (code: string): Promise<ProviderResult<TranslationsResource>> => {
-    const translation = await this.translationResources.one(code);
+  getTranslation = async (id: string): Promise<ProviderResult<TranslationsResource>> => {
+    const translation = await this.translationResources.one(id);
 
-    if (!translation) {
+    if (!translation.data) {
       return {
         result: {
           id: 'en',

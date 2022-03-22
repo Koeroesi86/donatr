@@ -10,12 +10,14 @@ module.exports = {
       cwd: path.resolve(__dirname),
       env: {
         DATA_BASE_PATH: '/var/www/help.koro.si/data',
+        PUBLIC_URL: 'https://help.koro.si/',
       }
     },
     limit: 0,
     limitPerPath: 1,
     index: [
       'index.js'
-    ]
+    ],
+    // staticWorker: path.resolve(__dirname, '../examples/staticWorker.js'),
   },
 };

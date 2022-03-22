@@ -1,22 +1,25 @@
 import React, {FC} from "react";
+import {Location, Organisation} from "../../types";
 // TODO: window is not defined
 // import {StaticRouter} from "react-router-dom/server";
 // import App from "../app";
 
-interface SsrPageProps {
+interface SsrLocationPagePageProps {
   publicUrl: string;
   path: string;
   locale: string;
   title: string;
+  organisation: Organisation;
+  location: Location;
 }
 
-const SsrPage: FC<SsrPageProps> = ({ locale, path, publicUrl, title }) => (
+const SsrLocationPage: FC<SsrLocationPagePageProps> = ({ location, organisation, path, publicUrl, title }) => (
   <html lang="en">
     <head>
       <meta charSet="utf-8"/>
       <meta name="viewport" content="width=device-width, initial-scale=1"/>
       <link rel="manifest" href={`${publicUrl}manifest.json`}/>
-      <title>{title}</title>
+      <title>{`${organisation.name} | ${location.name} | ${title}`}</title>
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
@@ -39,4 +42,4 @@ const SsrPage: FC<SsrPageProps> = ({ locale, path, publicUrl, title }) => (
   </html>
 );
 
-export default SsrPage;
+export default SsrLocationPage;

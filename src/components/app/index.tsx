@@ -32,6 +32,7 @@ import NotFoundRoute from "../not-found-route";
 import ApiTokenProvider from "../api-token-provider";
 import EditRoute from "../edit-route";
 import TranslationsProvider from "../translations-provider";
+import {setCookie} from "../../utils/cookies";
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
   const resolved = useResolvedPath(to);
@@ -98,7 +99,9 @@ const App: FC<AppProps> = ({ initialLocale })  => {
   const setTranslation = useCallback((translation: TranslationsResource) => {
     setLocale(translation.id);
     setMessages(translation.translations);
-    if (typeof window !== 'undefined') sessionStorage.setItem('language', translation.id);
+    if (typeof window !== 'undefined') {
+      setCookie('language', translation.id, 7);
+    }
   }, []);
 
   useEffect(() => {
