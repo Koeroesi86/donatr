@@ -13,7 +13,8 @@ module.exports = {
         root: path.resolve(__dirname, './build/public'),
         env: {
           ...serverConfig.options.env,
-          DATA_BASE_PATH: path.resolve(__dirname, './.data/')
+          DATA_BASE_PATH: path.resolve(__dirname, './.data/'),
+          PUBLIC_URL: 'http://localhost:3000/',
         }
       }
     }
