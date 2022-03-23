@@ -1,21 +1,20 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
-import {NeedResource} from "../../types";
+import {Need} from "../../types";
 import {Box, Button, Card, CardContent, TextField} from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import debounce from "lodash.debounce";
 import {useIntl} from "react-intl";
 import {sortByNames} from "../../utils";
 import useApiClient from "../../hooks/useApiClient";
+import EditNeed from "../edit-need";
 
 interface EditNeedsProps {
   locationId: string;
-  initialState?: NeedResource[];
+  initialState?: Need[];
 }
 
 const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
   const intl = useIntl();
-  const [needs, setNeeds] = useState<NeedResource[]>(initialState.sort(sortByNames));
+  const [needs, setNeeds] = useState<Need[]>(initialState.sort(sortByNames));
   const [enteredText, setEnteredText] = useState('');
   const api = useApiClient<'needs'>('needs');
   const refresh = useCallback(() => {
@@ -23,13 +22,6 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
       .then((l) => l.sort(sortByNames))
       .then(o => setNeeds(o));
   }, [api, locationId]);
-  const update = useCallback((data: NeedResource) => {
-    api.update(data).then(() => refresh());
-  }, [api, refresh]);
-  const debouncedUpdate = useCallback(debounce(
-    (data: NeedResource) => update(data),
-    2000
-  ), [update]);
   const create = useCallback(() => {
     api.create({name: enteredText, locationId}).then(() => {
       setEnteredText('');
@@ -44,44 +36,8 @@ const EditNeeds: FC<EditNeedsProps> = ({ locationId, initialState = [] }) => {
   return (
     <Card>
       <CardContent>
-        {needs.map(need => (
-          <Box key={need.id} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
-            <Box sx={{ flexGrow: 1, px: 1 }}>
-              <TextField
-                label={intl.formatMessage({ id: 'input.need.name' })}
-                variant="standard"
-                defaultValue={need.name}
-                fullWidth
-                onChange={(e) => debouncedUpdate({
-                  id: need.id,
-                  locationId: need.locationId,
-                  name: e.target.value,
-                })}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    update({
-                      id: need.id,
-                      locationId: need.locationId,
-                      // @ts-ignore
-                      name: e.target.value,
-                    });
-                  }
-                }}
-              />
-            </Box>
-            <Box>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  if (typeof window !== 'undefined' && !window.confirm(intl.formatMessage({ id: 'dialog.confirm.delete' }))) return;
-
-                  api.remove(need).then(() => refresh());
-                }}
-              >
-                <DeleteIcon />
-              </Button>
-            </Box>
-          </Box>
+        {needs.map((need) => (
+          <EditNeed key={need.id} need={need} onRemove={refresh} onUpdate={refresh} />
         ))}
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', py: 1 }}>
           <Box sx={{ flexGrow: 1, px: 1 }}>

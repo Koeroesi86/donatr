@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useMemo, useState} from "react";
 import {Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {useIntl} from "react-intl";
@@ -21,7 +21,8 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
   const api = useApiClient<'organisations'>('organisations');
   const [isExpanded, setIsExpanded] = useState(initialOpen);
   const [organisation, setOrganisation] = useState<OrganisationResource>(initialState);
-  const locations = useLocations({ organisationId: id });
+  const filters = useMemo(() => ({ organisationId: id }), [id]);
+  const locations = useLocations(filters);
 
   const debouncedUpdate = debounce((data: OrganisationResource) => {
     api.update(data).then(() => api.one(data.id)).then(d => setOrganisation(d));
