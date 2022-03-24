@@ -12,7 +12,8 @@
       "dom",
       "es5",
       "scripthost",
-      "es2015.promise"
+      "es2015.promise",
+      "webworker"
     ]
   },
   "include": [

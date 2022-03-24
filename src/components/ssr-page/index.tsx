@@ -30,7 +30,7 @@ const SsrPage: FC<SsrPageProps> = ({ locale, path, publicUrl, title }) => (
 
         gtag('config', 'G-207L6CE7EN');
       `}} />
-      <script defer src={`${publicUrl}static/js/bundle.js`} />
+      <script defer src={`${publicUrl}bundle.js`} />
     </head>
     <body>
       <noscript>You need to enable JavaScript to run this app.</noscript>
