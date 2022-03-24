@@ -34,6 +34,24 @@ const worker: Worker = async (event, callback): Promise<void> => {
     let pageTitle = translation.translations['site.name'] || '';
     let locale = translation.id;
 
+    if (event.path === '/manifest.json') {
+      callback({
+        statusCode: 200,
+        headers: {
+          'content-type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+          $schema: 'https://json.schemastore.org/web-manifest-combined.json',
+          short_name: pageTitle,
+          name: pageTitle,
+          start_url: '/',
+          display: 'standalone',
+          background_color: "#fff",
+        }, null, 2),
+      });
+      return;
+    }
+
     if (event.pathFragments.length === 0) {
       callback({
         statusCode: 200,
