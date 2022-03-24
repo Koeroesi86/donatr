@@ -17,4 +17,25 @@ if (typeof window !== 'undefined') {
     </BrowserRouter>,
     document.getElementById('root')
   );
+
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/serviceWorker.js')
+      .then((registration) => {
+        // Listen for updates:
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          // Listen for when the new worker is ready:
+          newWorker.addEventListener('statechange', () => {
+            switch (newWorker.state) {
+              case 'installed':
+                if (navigator.serviceWorker.controller) {
+                  console.log('Updated service worker.');
+                }
+                break;
+            }
+          });
+        });
+      })
+      .catch(console.error);
+  }
 }

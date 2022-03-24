@@ -13,12 +13,13 @@ module.exports = [
     mode: isProd ? 'production' : 'development',
     entry: {
       bundle: './src/client.tsx',
+      serviceWorker: './src/serviceWorker.tsx',
     },
     target: 'web',
     output: {
       pathinfo: true,
-      filename: 'static/js/[name].js',
-      chunkFilename: 'static/js/[name].chunk.js',
+      filename: '[name].js',
+      chunkFilename: '[name].chunk.js',
       publicPath: process.env.PUBLIC_URL,
       path: path.resolve('./build/public'),
     },
