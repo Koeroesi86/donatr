@@ -1,5 +1,4 @@
 import React from "react";
-import debounce from "lodash.debounce";
 import {renderToString} from "react-dom/server";
 import cookie from "cookie";
 import acceptLanguage from "accept-language";
@@ -8,12 +7,12 @@ import SsrPage from "./components/ssr-page";
 import createApiClient from "./utils/createApiClient";
 import SsrOrganisationPage from "./components/ssr-organisation-page";
 import SsrLocationPage from "./components/ssr-location-page";
+import createKeepAliveCallback from "./utils/createKeepAliveCallback";
+import createScheduleGC from "./utils/createScheduleGC";
 
-const keepAliveTimeout = 10 * 60 * 1000;
-const keepAliveCallback = debounce(() => {
-  console.log('Shutting down SSR due to inactivity.');
-  process.exit(0);
-}, keepAliveTimeout);
+const keepAliveCallback = createKeepAliveCallback(10 * 60 * 1000);
+
+const scheduleGC = createScheduleGC(30 * 1000);
 
 const publicUrl: string = process.env.PUBLIC_URL || '/';
 
@@ -169,6 +168,8 @@ const worker: Worker = async (event, callback): Promise<void> => {
         <SsrPage publicUrl={publicUrl} path={event.path} locale={'en'} title={''} />
       ),
     });
+  } finally {
+    scheduleGC();
   }
 };
 
