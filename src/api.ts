@@ -1,26 +1,17 @@
-import path from "path";
-import fs from "fs";
 import { v4 as uuid } from "uuid";
-import debounce from "lodash.debounce";
-import crypto from "crypto";
-import {AccessFilters, LocationResource, NeedResource, Provider, ResponseEvent, Worker} from "./types";
-import {JsonProvider} from "./providers";
+import {AccessFilters, LocationResource, NeedResource, ResponseEvent, Worker} from "./types";
 import * as token from "./utils/token";
 import { hasAccess } from "./utils";
+import createScheduleGC from "./utils/createScheduleGC";
+import createEtag from "./utils/createEtag";
+import createKeepAliveCallback from "./utils/createKeepAliveCallback";
+import createProvider from "./utils/createProvider";
 
+const keepAliveCallback = createKeepAliveCallback(30 * 60 * 1000);
 
-const keepAliveTimeout = 30 * 60 * 1000;
-const keepAliveCallback = debounce(() => {
-  console.log('Shutting down API due to inactivity.');
-  process.exit(0);
-}, keepAliveTimeout);
+const scheduleGC = createScheduleGC(30 * 1000);
 
-const provider: Provider = new JsonProvider({
-  basePath: process.env.DATA_BASE_PATH || (
-    fs.existsSync(path.resolve('/var/www/help.koro.si/data'))
-      ? path.resolve('/var/www/help.koro.si/data') : path.resolve(process.cwd(), './.data')
-  ),
-});
+const provider = createProvider('json');
 
 const getResponseHeaders = (headers: ResponseEvent["headers"] = {}) => ({
   'Content-Type': 'application/json; charset=utf-8',
@@ -28,22 +19,6 @@ const getResponseHeaders = (headers: ResponseEvent["headers"] = {}) => ({
   'Access-Control-Allow-Methods': 'POST, PUT, GET, DELETE, OPTIONS',
   ...headers,
 });
-
-const etag = (body: string, byteLength: number) => {
-  if (body.length === 0) {
-    // fast-path empty
-    return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
-  }
-
-  // compute hash of entity
-  const hash = crypto
-    .createHash('sha1')
-    .update(body, 'utf8')
-    .digest('base64')
-    .substring(0, 27);
-
-  return `"${byteLength.toString(16)}-${hash}"`
-};
 
 const createResponse = (statusCode: number, data: any, headers: ResponseEvent["headers"] = {}): ResponseEvent => {
   return ({
@@ -66,7 +41,7 @@ const createCacheableResponse = (
   const byteLength = Buffer.byteLength(body, 'utf8');
 
   let isModified = true;
-  const currentEtag = etag(body, byteLength);
+  const currentEtag = createEtag(body, byteLength);
 
   if (lastEtag === currentEtag) {
     isModified = false;
@@ -84,7 +59,7 @@ const createCacheableResponse = (
     ...headers,
     'Cache-Control': 'public, max-age=0',
     'Content-Length': byteLength.toString(),
-    'ETag': etag(body, byteLength),
+    'ETag': currentEtag,
     'Last-Modified': ifModifiedSince.toUTCString(),
   });
 }
@@ -408,6 +383,8 @@ const worker: Worker = async (event, callback) => {
     console.error(e);
     callback(createResponse(e.statusCode || 400, { message: e.message }));
     return;
+  } finally {
+    scheduleGC();
   }
 
   callback(createCacheableResponse(
