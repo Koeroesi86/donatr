@@ -5,11 +5,11 @@ const WebpackBar = require('webpackbar');
 
 process.env.PUBLIC_URL = process.env.PUBLIC_URL || '/';
 
-const isProd = process.env.NODE_ENV !== 'dev';
+const isProd = process.env.NODE_ENV !== 'development';
 
 module.exports = [
   {
-    devtool: 'cheap-module-source-map',
+    devtool: 'source-map',
     mode: isProd ? 'production' : 'development',
     entry: {
       bundle: './src/client.tsx',
@@ -22,6 +22,7 @@ module.exports = [
       chunkFilename: '[name].chunk.js',
       publicPath: process.env.PUBLIC_URL,
       path: path.resolve('./build/public'),
+      sourceMapFilename: "[name].js.map",
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.json', '.jsx'],
@@ -59,16 +60,6 @@ module.exports = [
         name: "bundle"
       }),
       new webpack.EnvironmentPlugin(['PUBLIC_URL']),
-      // new HtmlWebpackPlugin({
-      //   inject: true,
-      //   xhtml: true,
-      //   template: './src/pages/default/index.tsx',
-      //   chunks: ['bundle'],
-      //   publicPath: process.env.PUBLIC_URL,
-      //   templateParameters: {
-      //     PUBLIC_URL: process.env.PUBLIC_URL,
-      //   }
-      // }),
       new CopyPlugin({
         patterns: [
           {
@@ -100,7 +91,7 @@ module.exports = [
     ]
   },
   {
-    devtool: false,
+    devtool: isProd ? false : 'source-map',
     mode: isProd ? 'production' : 'development',
     entry: {
       'api/index': './src/api.ts',
@@ -116,6 +107,7 @@ module.exports = [
         type: "umd",
         export: "default",
       },
+      sourceMapFilename: "[name].js.map",
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.json', '.jsx'],

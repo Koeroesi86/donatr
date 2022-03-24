@@ -3,6 +3,7 @@ const webpack = require('webpack');
 
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
+process.env.NODE_OPTIONS='--enable-source-maps';
 
 process.on('unhandledRejection', err => {
   throw err;
