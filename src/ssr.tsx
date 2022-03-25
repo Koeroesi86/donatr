@@ -13,6 +13,7 @@ import createKeepAliveCallback from "./utils/createKeepAliveCallback";
 import createScheduleGC from "./utils/createScheduleGC";
 import ensureMode from "./utils/ensureMode";
 import routes from "./utils/routes";
+import SsrMainPage from "./components/ssr-main-page";
 
 const keepAliveCallback = createKeepAliveCallback(10 * 60 * 1000);
 
@@ -80,7 +81,7 @@ const worker: Worker = async (event, callback): Promise<void> => {
           'content-type': 'text/html; charset=utf-8'
         },
         body: '<!DOCTYPE html>' + renderToString(
-          <SsrPage
+          <SsrMainPage
             publicUrl={publicUrl}
             path={event.path}
             locale={locale}
