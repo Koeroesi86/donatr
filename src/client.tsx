@@ -1,8 +1,15 @@
 import React from 'react';
-import {render} from 'react-dom';
+import {hydrate} from 'react-dom';
 import {BrowserRouter} from "react-router-dom";
 import App from './components/app';
 import {getCookie} from "./utils/cookies";
+import {Translations} from "./types";
+
+declare global {
+  interface Window {
+    initialTranslations: Translations;
+  }
+}
 
 if (typeof window !== 'undefined') {
   if (window.location.hash.indexOf('#/') === 0) {
@@ -11,12 +18,18 @@ if (typeof window !== 'undefined') {
     target.pathname = window.location.hash.replace('#/', '/');
     window.location.replace(target);
   }
-  render(
+  const initialMode = getCookie('mode');
+  hydrate(
     <BrowserRouter>
-      <App initialLocale={getCookie('language') || navigator.language} />
+      <App
+        initialLocale={getCookie('language') || navigator.language}
+        initialTranslations={window.initialTranslations}
+        initialMode={('dark' === initialMode || 'light' === initialMode) ? initialMode : undefined}
+      />
     </BrowserRouter>,
     document.getElementById('root')
   );
+  document.querySelector('#server-css')?.remove();
 
   if('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/serviceWorker.js')

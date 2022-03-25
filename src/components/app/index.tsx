@@ -32,7 +32,7 @@ import NotFoundRoute from "../not-found-route";
 import ApiTokenProvider from "../api-token-provider";
 import EditRoute from "../edit-route";
 import TranslationsProvider from "../translations-provider";
-import {setCookie} from "../../utils/cookies";
+import {getCookie, setCookie} from "../../utils/cookies";
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
   const resolved = useResolvedPath(to);
@@ -75,23 +75,24 @@ const routes: RouteObject[] = [
 
 interface AppProps {
   initialLocale: string;
+  initialTranslations?: Translations;
+  initialMode?: 'dark' | 'light';
 }
 
-const getInitialMode = (prefersDarkMode: boolean): 'dark'|'light' => {
-  const storedMode: string|null = typeof window !== 'undefined' ? sessionStorage.getItem('mode') : null;
+const getInitialMode = (prefersDarkMode: boolean, storedMode?: 'dark' | 'light'): 'dark'|'light' => {
   if (storedMode === 'dark' || storedMode === 'light') {
     return storedMode;
   }
   return prefersDarkMode ? 'dark' : 'light';
 };
 
-const App: FC<AppProps> = ({ initialLocale })  => {
+const App: FC<AppProps> = ({ initialLocale, initialTranslations = {}, initialMode })  => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: typeof window !== 'undefined' });
-  const [mode, setMode] = useState<'dark'|'light'>(getInitialMode(prefersDarkMode));
+  const [mode, setMode] = useState<'dark'|'light'>(getInitialMode(prefersDarkMode, initialMode));
   const theme = useMemo(() => createTheme({
     palette: { mode },
   }), [mode]);
-  const [messages, setMessages] = useState<Translations>({});
+  const [messages, setMessages] = useState<Translations>(initialTranslations);
   const [locale, setLocale] = useState(initialLocale);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const routesElement = useRoutes(routes);
@@ -105,7 +106,7 @@ const App: FC<AppProps> = ({ initialLocale })  => {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') sessionStorage.setItem('mode', mode)
+    if (typeof window !== 'undefined') setCookie('mode', mode, 14);
   }, [mode]);
 
   return (

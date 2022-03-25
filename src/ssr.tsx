@@ -9,6 +9,7 @@ import SsrOrganisationPage from "./components/ssr-organisation-page";
 import SsrLocationPage from "./components/ssr-location-page";
 import createKeepAliveCallback from "./utils/createKeepAliveCallback";
 import createScheduleGC from "./utils/createScheduleGC";
+import ensureMode from "./utils/ensureMode";
 
 const keepAliveCallback = createKeepAliveCallback(10 * 60 * 1000);
 
@@ -59,7 +60,14 @@ const worker: Worker = async (event, callback): Promise<void> => {
           'content-type': 'text/html; charset=utf-8'
         },
         body: '<!DOCTYPE html>' + renderToString(
-          <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
+          <SsrPage
+            publicUrl={publicUrl}
+            path={event.path}
+            locale={locale}
+            title={pageTitle}
+            translationMessages={translation.translations}
+            initialMode={ensureMode(cookies.mode)}
+          />
         ),
       });
       return;
@@ -73,7 +81,14 @@ const worker: Worker = async (event, callback): Promise<void> => {
             'content-type': 'text/html; charset=utf-8'
           },
           body: '<!DOCTYPE html>' + renderToString(
-            <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
+            <SsrPage
+              publicUrl={publicUrl}
+              path={event.path}
+              locale={locale}
+              title={pageTitle}
+              translationMessages={translation.translations}
+              initialMode={ensureMode(cookies.mode)}
+            />
           ),
         });
         return;
@@ -90,9 +105,10 @@ const worker: Worker = async (event, callback): Promise<void> => {
               <SsrOrganisationPage
                 publicUrl={publicUrl}
                 path={event.path}
-               locale={locale}
-               title={pageTitle}
+                locale={locale}
+                title={pageTitle}
                 organisation={organisation}
+                translationMessages={translation.translations}
               />
             ),
           });
@@ -109,7 +125,14 @@ const worker: Worker = async (event, callback): Promise<void> => {
             'content-type': 'text/html; charset=utf-8'
           },
           body: '<!DOCTYPE html>' + renderToString(
-            <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle}/>
+            <SsrPage
+              publicUrl={publicUrl}
+              path={event.path}
+              locale={locale}
+              title={pageTitle}
+              translationMessages={translation.translations}
+              initialMode={ensureMode(cookies.mode)}
+            />
           ),
         });
         return;
@@ -132,6 +155,7 @@ const worker: Worker = async (event, callback): Promise<void> => {
                 title={pageTitle}
                 organisation={organisation}
                 location={location}
+                translationMessages={translation.translations}
               />
             ),
           });
@@ -147,7 +171,14 @@ const worker: Worker = async (event, callback): Promise<void> => {
           'content-type': 'text/html; charset=utf-8'
         },
         body: '<!DOCTYPE html>' + renderToString(
-          <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
+          <SsrPage
+            publicUrl={publicUrl}
+            path={event.path}
+            locale={locale}
+            title={pageTitle}
+            translationMessages={translation.translations}
+            initialMode={ensureMode(cookies.mode)}
+          />
         ),
       });
       return;
@@ -160,7 +191,14 @@ const worker: Worker = async (event, callback): Promise<void> => {
           'content-type': 'text/html; charset=utf-8'
         },
         body: '<!DOCTYPE html>' + renderToString(
-          <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
+          <SsrPage
+            publicUrl={publicUrl}
+            path={event.path}
+            locale={locale}
+            title={pageTitle}
+            translationMessages={translation.translations}
+            initialMode={ensureMode(cookies.mode)}
+          />
         ),
       });
       return;
@@ -172,7 +210,14 @@ const worker: Worker = async (event, callback): Promise<void> => {
         'content-type': 'text/html; charset=utf-8'
       },
       body: '<!DOCTYPE html>' + renderToString(
-        <SsrPage publicUrl={publicUrl} path={event.path} locale={locale} title={pageTitle} />
+        <SsrPage
+          publicUrl={publicUrl}
+          path={event.path}
+          locale={locale}
+          title={pageTitle}
+          translationMessages={translation.translations}
+          initialMode={ensureMode(cookies.mode)}
+        />
       ),
     });
   } catch (e) {
@@ -183,7 +228,14 @@ const worker: Worker = async (event, callback): Promise<void> => {
         'content-type': 'text/html; charset=utf-8'
       },
       body: '<!DOCTYPE html>' + renderToString(
-        <SsrPage publicUrl={publicUrl} path={event.path} locale={'en'} title={''} />
+        <SsrPage
+          publicUrl={publicUrl}
+          path={event.path}
+          locale={'en'}
+          title={''}
+          translationMessages={{}}
+          initialMode={ensureMode()}
+        />
       ),
     });
   } finally {

@@ -122,6 +122,14 @@ module.exports = [
       ]
     },
     plugins: [
+      new webpack.NormalModuleReplacementPlugin(
+        /leaflet/,
+        path.resolve('./src/components/ssr-react-leaflet/index.tsx')
+      ),
+      new webpack.NormalModuleReplacementPlugin(
+        /leaflet-control-geocoder/,
+        path.resolve('./src/components/ssr-react-leaflet/index.tsx')
+      ),
       new WebpackBar({
         name: "index"
       }),
