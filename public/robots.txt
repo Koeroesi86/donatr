@@ -3,3 +3,5 @@ Disallow: /edit
 
 User-agent: *
 Allow: /
+
+Sitemap: https://help.koro.si/sitemap.xml

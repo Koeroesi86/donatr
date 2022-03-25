@@ -2,6 +2,8 @@ import React from "react";
 import {renderToString} from "react-dom/server";
 import cookie from "cookie";
 import acceptLanguage from "accept-language";
+// @ts-ignore
+import {sitemapBuilder} from "react-router-sitemap";
 import {Worker} from "./types";
 import SsrPage from "./components/ssr-page";
 import createApiClient from "./utils/createApiClient";
@@ -10,6 +12,7 @@ import SsrLocationPage from "./components/ssr-location-page";
 import createKeepAliveCallback from "./utils/createKeepAliveCallback";
 import createScheduleGC from "./utils/createScheduleGC";
 import ensureMode from "./utils/ensureMode";
+import routes from "./utils/routes";
 
 const keepAliveCallback = createKeepAliveCallback(10 * 60 * 1000);
 
@@ -49,6 +52,23 @@ const worker: Worker = async (event, callback): Promise<void> => {
           display: 'standalone',
           background_color: "#fff",
         }, null, 2),
+      });
+      return;
+    }
+
+    if (event.path === '/sitemap.xml') {
+      const sitemap = sitemapBuilder(
+        publicUrl,
+        routes
+          .filter((r) => r.path !== '*' && r.path !== '/edit')
+          .map((r) => r.path)
+      );
+      callback({
+        statusCode: 200,
+        headers: {
+          'content-type': 'application/xml; charset=utf-8'
+        },
+        body: sitemap.toString(),
       });
       return;
     }

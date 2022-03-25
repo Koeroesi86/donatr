@@ -1,7 +1,5 @@
 import React, {FC, useCallback, useEffect, useMemo, useState} from "react";
-import OrganisationsRoute from "../organisations-route";
-import Home from "../home";
-import {Link as RLink, RouteObject, useMatch, useResolvedPath, useRoutes} from "react-router-dom";
+import {Link as RLink, useMatch, useResolvedPath, useRoutes} from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -20,19 +18,12 @@ import {FormattedMessage, IntlProvider} from "react-intl";
 import MenuIcon from '@mui/icons-material/Menu';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import {Translations, TranslationsResource} from "../../types";
-import Needs from "../needs";
-import LocationRoute from "../location-route";
-import EditRouteProtected from "../edit-route-protected";
-import EditRouteLogin from "../edit-route-login";
 import LocaleDropdown from "../locale-dropdown";
 import SidebarContents from "../sidebar-contents";
-import LocationsRoute from "../locations-route";
-import OrganisationRoute from "../organisation-route";
-import NotFoundRoute from "../not-found-route";
 import ApiTokenProvider from "../api-token-provider";
-import EditRoute from "../edit-route";
 import TranslationsProvider from "../translations-provider";
-import {getCookie, setCookie} from "../../utils/cookies";
+import {setCookie} from "../../utils/cookies";
+import routes from "../../utils/routes";
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
   const resolved = useResolvedPath(to);
@@ -44,34 +35,6 @@ const NavLink: FC<{ to: string }> = ({ to, children }) => {
     </Link>
   );
 };
-
-const routes: RouteObject[] = [
-  { path: "/", element: <Home /> },
-  {
-    path: "/organisations",
-    children: [
-      { index: true, element: <OrganisationsRoute /> },
-      { path: ":organisationId", element: <OrganisationRoute /> },
-    ],
-  },
-  {
-    path: "/locations",
-    children: [
-      { index: true, element: <LocationsRoute /> },
-      { path: ":locationId", element: <LocationRoute /> },
-    ],
-  },
-  { path: "/needs", element: <Needs /> },
-  {
-    path: "/edit",
-    element: <EditRoute />,
-    children: [
-      { index: true, element: <EditRouteLogin /> },
-      { path: ":code", element: <EditRouteProtected /> },
-    ],
-  },
-  { path: "*", element: <NotFoundRoute /> }
-];
 
 interface AppProps {
   initialLocale: string;
