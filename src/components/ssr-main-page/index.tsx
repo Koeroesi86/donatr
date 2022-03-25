@@ -23,7 +23,7 @@ const SsrMainPage: FC<SsrMainPageProps> = ({ initialMode, locale, path, publicUr
       <meta property="og:url" content={publicUrl} />
       <meta property="og:type" content="website" />
       <meta property="og:title" content={title} />
-      {/*<meta property="og:description" content="How much does culture influence creative thinking?" />*/}
+      {/*<meta property="og:description" content="" />*/}
       <meta property="og:image" content={`${publicUrl}/static/images/fb_cover.jpg`} />
       <meta property="og:locale" content={locale.replace('-', '_')} />
       <meta name="twitter:card" content="summary" />
