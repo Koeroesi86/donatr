@@ -5,7 +5,7 @@ import {
   Breadcrumbs,
   Card,
   CardContent,
-  CircularProgress,
+  CircularProgress, Container,
   Link,
   List,
   ListItem,
@@ -74,7 +74,7 @@ const LocationRoute: FC = () => {
   }
 
   return (
-    <>
+    <Container maxWidth="lg">
       <LocationRouteBreadCrumb location={location} />
       <Typography variant="h3" sx={{ my: 2 }}>
         {location.name}
@@ -119,7 +119,7 @@ const LocationRoute: FC = () => {
           </CardContent>
         </Card>
       )}
-    </>
+    </Container>
   )
 }
 

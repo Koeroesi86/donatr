@@ -122,9 +122,7 @@ const App: FC<AppProps> = ({ initialLocale, initialTranslations = {}, initialMod
                     </Toolbar>
                   </Container>
                 </AppBar>
-                <Container maxWidth="lg">
-                  {routesElement}
-                </Container>
+                {routesElement}
               </Box>
               <AppBar position="static" sx={{ mt: 2, py: 1 }}>
                 <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

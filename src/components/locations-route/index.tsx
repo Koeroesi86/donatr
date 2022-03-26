@@ -1,6 +1,6 @@
 import React, {FC, useState} from 'react';
 import {LatLngExpression} from "leaflet";
-import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
+import {CircularProgress, Container, Link, List, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
@@ -32,7 +32,7 @@ const LocationsRoute: FC = () => {
   const locationsWithGeo = locations.filter((l) => l.location);
 
   return (
-    <>
+    <Container maxWidth="lg">
       <Typography variant="h3" sx={{ my: 2 }}>
         <FormattedMessage id="page.locations" />
       </Typography>
@@ -74,7 +74,7 @@ const LocationsRoute: FC = () => {
           />
         ))}
       </List>
-    </>
+    </Container>
   );
 };
 

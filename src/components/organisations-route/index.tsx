@@ -1,7 +1,7 @@
-import React, {FC, useEffect, useState} from "react";
-import {Organisation} from "../../types";
+import React, {FC} from "react";
 import {
   CircularProgress,
+  Container,
   List,
   ListItemButton,
   ListItemIcon,
@@ -19,7 +19,7 @@ const OrganisationsRoute: FC = () => {
   const organisations = useOrganisations();
   const locations = useLocations();
   return (
-    <>
+    <Container maxWidth="lg">
       <Typography variant="h3" sx={{ my: 2 }}>
         <FormattedMessage id="page.organisations" />
       </Typography>
@@ -46,7 +46,7 @@ const OrganisationsRoute: FC = () => {
           </ListItemButton>
         ))}
       </List>
-    </>
+    </Container>
   )
 }
 

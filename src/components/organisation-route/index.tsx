@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useMemo, useState} from "react";
 import {Link as RLink, useParams} from "react-router-dom";
 import {createStyles, makeStyles} from "@mui/styles";
-import {CircularProgress, Link, List, Theme, Typography} from "@mui/material";
+import {CircularProgress, Container, Link, List, Theme, Typography} from "@mui/material";
 import {LatLngExpression} from "leaflet";
 import ReactMarkdown from "react-markdown";
 import RemarkBreaks from "remark-breaks";
@@ -45,7 +45,7 @@ const OrganisationRoute: FC = () => {
   const locationsWithGeo = locations.filter((l) => l.location);
 
   return (
-    <>
+    <Container maxWidth="lg">
       <Typography variant="h3" sx={{ my: 2 }}>
         {organisation.name}
       </Typography>
@@ -96,7 +96,7 @@ const OrganisationRoute: FC = () => {
           />
         ))}
       </List>
-    </>
+    </Container>
   );
 };
 

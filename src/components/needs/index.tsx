@@ -1,6 +1,7 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
 import debounce from "lodash.debounce";
 import {
+  Container,
   IconButton,
   InputAdornment,
   Link,
@@ -17,7 +18,7 @@ import {FormattedMessage, useIntl} from "react-intl";
 import {createStyles, makeStyles} from "@mui/styles";
 import {LatLngExpression} from "leaflet";
 import ClearIcon from '@mui/icons-material/Clear';
-import {Location, LocationResource, Need, NeedResource} from "../../types";
+import {LocationResource, NeedResource} from "../../types";
 import {sortByNames} from "../../utils";
 import MapBlock from "../map-block";
 import useApiClient from "../../hooks/useApiClient";
@@ -74,7 +75,7 @@ const Needs: FC = () => {
   }, [term, search]);
 
   return (
-    <>
+    <Container maxWidth="lg">
       <TextField
         label={intl.formatMessage({ id: 'input.needs.search.label' })}
         value={term}
@@ -141,7 +142,7 @@ const Needs: FC = () => {
           }))}
         />
       )}
-    </>
+    </Container>
   )
 }
 
