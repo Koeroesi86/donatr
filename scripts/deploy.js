@@ -19,7 +19,7 @@ execSync(`rm -rf ./.cache/*.tar`);
 execSync(`ssh vps "cd ${remoteFolder} && rm -rf ./${buildName}.tar`);
 
 console.log(`Install prod dependencies on remote`);
-execSync(`ssh vps "cd ${remoteFolder} && yarn install --prod --frozen-lockfile && sudo chown -R www-data:www-data /var/www`);
+execSync(`ssh vps "cd ${remoteFolder}/${buildName} && yarn install --prod --frozen-lockfile && sudo chown -R www-data:www-data /var/www`);
 
 console.log(`Replacing symlink`);
 execSync(`ssh vps "cd ${remoteFolder} && rm -rf build && ln -s ${buildName} build"`);
