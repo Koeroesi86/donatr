@@ -13,30 +13,72 @@ const staticFiles = [
 ];
 
 sw.addEventListener('install', (e) => {
-  // e.waitUntil();
-
   caches.open(cacheName)
     .then((cache) => cache.addAll(staticFiles));
+
+  sw.skipWaiting();
 });
 
 sw.addEventListener('activate', (e) => sw.clients.claim());
 
+const getAssetCacheTimeout = (href: string): number => {
+  const url = new URL(href);
+
+  if (url.origin === 'http://localhost:3000') {
+    return 0;
+  }
+
+  if (url.pathname.match(/^\/api\//)) {
+    return 5 * 1000;
+  }
+
+  if (url.pathname.match(/^\/static\//)) {
+    return 30 * 60 * 1000;
+  }
+
+  return 30 * 1000;
+};
+
+const shouldCache = (href: string): boolean => {
+  const url = new URL(href);
+
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    return false;
+  }
+
+  if (url.pathname.match(/^\/api\/resolve-access/)) {
+    return false;
+  }
+
+  return true;
+}
+
 sw.addEventListener('fetch', (e) => {
   e.respondWith((async () => {
     const cache = await caches.open(cacheName);
+    const cacheMatch = await cache.match(e.request);
     try {
+      if (!sw.navigator.onLine) {
+        return cacheMatch;
+      }
+
+      if (
+        cacheMatch
+        && cacheMatch.headers.has('Date')
+        && new Date(cacheMatch.headers.get('Date')).valueOf() < (Date.now() - getAssetCacheTimeout(cacheMatch.url))
+      ) {
+        return cacheMatch;
+      }
+
       const response = await fetch(e.request);
-      const url = new URL(e.request.url);
-      if (['http:', 'https:'].includes(url.protocol) && response.status < 400 && response.status > 100) {
+      if (response.status < 400 && response.status > 100 && shouldCache(e.request.url)) {
         const clonedResponse = response.clone();
-        await cache.put(e.request, clonedResponse);
+        cache.put(e.request, clonedResponse).catch(console.error);
       }
       return response;
     } catch (err) {
-      const response = await cache.match(e.request);
-      console.log(err)
-      if (response) return response;
+      if (cacheMatch) return cacheMatch;
       throw err;
     }
   })());
-});
+}, { passive: true });
