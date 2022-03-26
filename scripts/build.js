@@ -1,3 +1,5 @@
+const { execSync } = require('child_process');
+const path = require('path');
 const fs = require('fs-extra');
 const webpack = require('webpack');
 
@@ -34,4 +36,6 @@ compiler.run((err, stats) => {
     }));
     console.log('Compiled successfully.\n');
   }
+
+  execSync('yarn install --prod --frozen-lockfile', { cwd: path.resolve('./build') });
 });

@@ -18,8 +18,12 @@ console.log(`Clean up compressed archive`);
 execSync(`rm -rf ./.cache/*.tar`);
 execSync(`ssh vps "cd ${remoteFolder} && rm -rf ./${buildName}.tar`);
 
-console.log(`Install prod dependencies on remote`);
-execSync(`ssh vps "cd ${remoteFolder}/${buildName} && yarn install --prod --frozen-lockfile && sudo chown -R www-data:www-data /var/www`);
+// TODO: The engine "node" is incompatible with this module. Expected version ">= 12.20.0".
+// console.log(`Install prod dependencies on remote`);
+// execSync(`ssh vps "cd ${remoteFolder}/${buildName} && yarn install --production --frozen-lockfile`);
+
+console.log(`Fix remote file permissions`);
+execSync(`ssh vps "sudo chown -R www-data:www-data /var/www`);
 
 console.log(`Replacing symlink`);
 execSync(`ssh vps "cd ${remoteFolder} && rm -rf build && ln -s ${buildName} build"`);
