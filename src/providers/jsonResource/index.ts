@@ -95,7 +95,7 @@ export default class JsonResource<T extends BaseResource> {
     const fileName = path.resolve(this.basePath, `./${id}.json`);
 
     if (!fs.existsSync(fileName)) {
-      return { data: undefined, modified: 0 };
+      return { data: undefined, modified: Date.now() };
     }
 
     const content = await fs.promises.readFile(fileName, 'utf8');

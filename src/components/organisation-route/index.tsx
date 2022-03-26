@@ -3,15 +3,13 @@ import {Link as RLink, useParams} from "react-router-dom";
 import {createStyles, makeStyles} from "@mui/styles";
 import {CircularProgress, Container, Link, List, Theme, Typography} from "@mui/material";
 import {LatLngExpression} from "leaflet";
-import ReactMarkdown from "react-markdown";
-import RemarkBreaks from "remark-breaks";
-import RemarkGfm from "remark-gfm";
 import {Organisation} from "../../types";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
 import useApiClient from "../../hooks/useApiClient";
 import useLocations from "../../hooks/useLocations";
 import useNeeds from "../../hooks/useNeeds";
+import OrganisationDescription from "../organisation-description";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -79,13 +77,7 @@ const OrganisationRoute: FC = () => {
         }))}
       />
       {organisation.description && (
-        <ReactMarkdown
-          linkTarget="_blank"
-          skipHtml
-          unwrapDisallowed
-          children={organisation.description}
-          remarkPlugins={[RemarkBreaks, RemarkGfm]}
-        />
+        <OrganisationDescription description={organisation.description} />
       )}
       <List>
         {locations.map((loc) => (

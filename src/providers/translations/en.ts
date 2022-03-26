@@ -49,6 +49,7 @@ const en: Translations = {
   'page.home.edit.title.translations': 'Translations access',
   'page.home.edit.intro.translations': 'If you have access to edit translations, you can add new or edit existing localisations of the site',
   'page.organisations.locations.count': '{count} locations',
+  'page.organisations.more': 'More',
   'page.notfound.title': 'Uh oh.',
   'page.notfound.description': 'There is no page like {path}',
 };

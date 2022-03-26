@@ -65,7 +65,7 @@ sw.addEventListener('fetch', (e) => {
       if (
         cacheMatch
         && cacheMatch.headers.has('Date')
-        && new Date(cacheMatch.headers.get('Date')).valueOf() < (Date.now() - getAssetCacheTimeout(cacheMatch.url))
+        && Date.parse(cacheMatch.headers.get('Date')) > (Date.now() - getAssetCacheTimeout(cacheMatch.url))
       ) {
         return cacheMatch;
       }

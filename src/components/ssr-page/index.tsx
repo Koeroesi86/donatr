@@ -52,7 +52,7 @@ const SsrPage: FC<SsrPageProps> = ({ headers, initialMode, locale, path, publicU
               window.initialTranslations = ${JSON.stringify(translationMessages)}
             `
       }}/>
-      <script defer src={`${publicUrl}bundle.js`}/>
+      <script defer src={`${publicUrl}static/bundle.js`}/>
       {headers}
       <style
         id="server-css"

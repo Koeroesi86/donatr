@@ -110,7 +110,7 @@ export default class JsonProvider implements Provider {
           id: 'en',
           translations: translations.en,
         },
-        modified: 0,
+        modified: Date.now(),
       };
     }
 

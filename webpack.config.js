@@ -12,7 +12,7 @@ module.exports = [
     devtool: 'source-map',
     mode: isProd ? 'production' : 'development',
     entry: {
-      bundle: './src/client.tsx',
+      'static/bundle': './src/client.tsx',
       serviceWorker: './src/serviceWorker.tsx',
     },
     target: 'web',
@@ -57,7 +57,10 @@ module.exports = [
     },
     plugins: [
       new WebpackBar({
-        name: "bundle"
+        name: "static/bundle"
+      }),
+      new WebpackBar({
+        name: "serviceWorker"
       }),
       new webpack.EnvironmentPlugin(['PUBLIC_URL']),
       new CopyPlugin({
