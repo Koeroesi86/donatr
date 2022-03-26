@@ -54,6 +54,7 @@ const OrganisationRoute: FC = () => {
         markers={locationsWithGeo.map((loc) => ({
           lat: loc.location.lat,
           lng: loc.location.lng,
+          key: `${loc.id}-marker`,
           popup: (
             <>
               <Link

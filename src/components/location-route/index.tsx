@@ -87,6 +87,7 @@ const LocationRoute: FC = () => {
           markers={[{
             lat: location.location.lat,
             lng: location.location.lng,
+            key: `${location.id}-marker`,
             popup: <>
               {location.location.text}
               <Link

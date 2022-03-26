@@ -6,7 +6,7 @@ interface MapBlockProps {
   center?: LatLngExpression;
   className?: string;
   zoom?: number;
-  markers: { lat: number; lng: number; popup: ReactNode }[];
+  markers: { lat: number; lng: number; popup: ReactNode, key: string }[];
 }
 
 const MapBlock: FC<MapBlockProps> = ({ markers, className, center, zoom = 6 }) => {
@@ -22,7 +22,7 @@ const MapBlock: FC<MapBlockProps> = ({ markers, className, center, zoom = 6 }) =
       />
       {markers.map((marker) => (
         <Marker
-          key={`marker-${marker.lat}-${marker.lng}`}
+          key={marker.key}
           position={{lat: marker.lat, lng: marker.lng}}
           ref={m => {
             if (markers.length === 1 && m && m.openPopup) {
