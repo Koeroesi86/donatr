@@ -11,6 +11,7 @@ import useNeeds from "../../hooks/useNeeds";
 import OrganisationDescription from "../organisation-description";
 import {useAppDispatch, useAppSelector} from "../../redux";
 import organisationsReducer from "../../redux/organisationsReducer";
+import {getOrganisation} from "../../redux/selectors";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -25,7 +26,7 @@ const OrganisationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
   const api = useApiClient<'organisations'>('organisations');
-  const organisation = useAppSelector((s) => s.organisations[params.organisationId]);
+  const organisation = useAppSelector(getOrganisation(params.organisationId));
   const dispatch = useAppDispatch();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,

@@ -1,18 +1,22 @@
 import useApiClient from "../useApiClient";
-import {useEffect, useState} from "react";
-import {OrganisationResource} from "../../types";
+import {useEffect} from "react";
 import {sortByNames} from "../../utils";
+import {useAppDispatch, useAppSelector} from "../../redux";
+import {getOrganisations} from "../../redux/selectors";
+import organisationsReducer from "../../redux/organisationsReducer";
 
 const useOrganisations = () => {
   const api = useApiClient<'organisations'>('organisations');
-  const [organisations, setOrganisations] = useState<OrganisationResource[]>([]);
+  const organisations = useAppSelector(getOrganisations());
+  const dispatch = useAppDispatch();
   
   useEffect(() => {
-    api.all().then((o) => setOrganisations(o.sort(sortByNames))).catch(console.error);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (organisations.length === 0) {
+      api.all().then((o) => dispatch(organisationsReducer.actions.setOrganisations(o))).catch(console.error);
+    }
+  }, [api, dispatch, organisations.length]);
   
-  return organisations;
+  return organisations.sort(sortByNames);
 };
 
 export default useOrganisations;

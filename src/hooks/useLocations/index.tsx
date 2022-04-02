@@ -1,18 +1,25 @@
 import useApiClient from "../useApiClient";
-import {useEffect, useState} from "react";
-import {LocationResource, LocationsFilters} from "../../types";
+import {useEffect} from "react";
+import {LocationsFilters} from "../../types";
 import {sortByNames} from "../../utils";
+import {useAppDispatch, useAppSelector} from "../../redux";
+import {getLocations} from "../../redux/selectors";
+import locationsReducer from "../../redux/locationsReducer";
 
 const useLocations = (filter?: LocationsFilters) => {
   const api = useApiClient<'locations'>('locations');
-  const [locations, setLocations] = useState<LocationResource[]>([]);
+  const locations = useAppSelector(getLocations());
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    api.all(filter).then((l) => setLocations(l.sort(sortByNames))).catch(console.error);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+    if (locations.length === 0) {
+      api.all().then((l) => dispatch(locationsReducer.actions.setLocations(l))).catch(console.error);
+    }
+  }, [api, dispatch, locations.length]);
 
-  return locations;
+  return locations
+    .filter(l => filter && filter.organisationId ? l.organisationId === filter.organisationId : true)
+    .sort(sortByNames);
 }
 
 export default useLocations;

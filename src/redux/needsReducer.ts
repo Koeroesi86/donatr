@@ -9,11 +9,11 @@ const needsReducer = createSlice({
   name: 'needs',
   initialState: {} as NeedCollection,
   reducers: {
-    setLocation: (state, action: PayloadAction<Need>) => ({
+    setNeed: (state, action: PayloadAction<Need>) => ({
       ...state,
       [action.payload.id]: action.payload,
     }),
-    setLocations: (state, action: PayloadAction<Need[]>) =>
+    setNeeds: (state, action: PayloadAction<Need[]>) =>
       action.payload.reduce(
         (result, current) => ({ ...result, [current.id]: current }),
         {} as NeedCollection

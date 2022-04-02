@@ -1,18 +1,28 @@
 import useApiClient from "../useApiClient";
-import {useEffect, useState} from "react";
-import {Need, NeedsFilters} from "../../types";
+import {useEffect} from "react";
+import {NeedsFilters} from "../../types";
 import {sortByNames} from "../../utils";
+import {useAppDispatch, useAppSelector} from "../../redux";
+import {getNeeds} from "../../redux/selectors";
+import needsReducer from "../../redux/needsReducer";
 
 const useNeeds = (filter?: NeedsFilters) => {
   const api = useApiClient<'needs'>('needs');
-  const [needs, setNeeds] = useState<Need[]>([]);
+  const needs = useAppSelector(getNeeds());
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    api.all(filter).then((n) => setNeeds(n.sort(sortByNames))).catch(console.error);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+    if (needs.length === 0) {
+      api.all()
+        .then((n) => dispatch(needsReducer.actions.setNeeds(n)))
+        .catch(console.error);
+    }
+  }, [api, dispatch, needs.length]);
 
-  return needs;
+  return needs
+    .filter(n => filter && filter.search ? n.name.includes(filter.search) : true)
+    .filter(n => filter && filter.locationId ? n.locationId === filter.locationId : true)
+    .sort(sortByNames);
 }
 
 export default useNeeds;

@@ -1,11 +1,12 @@
-import React, {FC, useEffect, useMemo, useState} from "react";
+import React, {FC, useEffect, useMemo} from "react";
 import {Link as RLink, useParams} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
 import {
   Breadcrumbs,
   Card,
   CardContent,
-  CircularProgress, Container,
+  CircularProgress,
+  Container,
   Link,
   List,
   ListItem,
@@ -23,6 +24,7 @@ import useNeeds from "../../hooks/useNeeds";
 import {useAppDispatch, useAppSelector} from "../../redux";
 import locationsReducer from "../../redux/locationsReducer";
 import organisationsReducer from "../../redux/organisationsReducer";
+import {getLocation, getOrganisation} from "../../redux/selectors";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -35,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 const LocationRouteBreadCrumb: FC<{ location: LocationResource }> = ({ location }) => {
   const apiOrganisation = useApiClient<'organisations'>('organisations');
-  const organisation = useAppSelector((s) => s.organisations[location.organisationId]);
+  const organisation = useAppSelector(getOrganisation(location.organisationId));
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -66,7 +68,7 @@ const LocationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
   const api = useApiClient<'locations'>('locations');
-  const location = useAppSelector((s) => s.locations[params.locationId]);
+  const location = useAppSelector(getLocation(params.locationId));
   const dispatch = useAppDispatch();
   const filter = useMemo<NeedsFilters>(() => ({
     locationId: params.locationId,
