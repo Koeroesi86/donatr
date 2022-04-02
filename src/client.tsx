@@ -4,7 +4,8 @@ import {BrowserRouter} from "react-router-dom";
 import App from './components/app';
 import {getCookie} from "./utils/cookies";
 import {Translations} from "./types";
-import {AppState} from "./redux";
+import {AppState, store} from "./redux";
+import {Provider} from "react-redux";
 
 declare global {
   interface Window {
@@ -23,11 +24,13 @@ if (typeof window !== 'undefined') {
   const initialMode = getCookie('mode');
   render(
     <BrowserRouter>
-      <App
-        initialLocale={getCookie('language') || navigator.language}
-        initialTranslations={window.initialTranslations}
-        initialMode={('dark' === initialMode || 'light' === initialMode) ? initialMode : undefined}
-      />
+      <Provider store={store}>
+        <App
+          initialLocale={getCookie('language') || navigator.language}
+          initialTranslations={window.initialTranslations}
+          initialMode={('dark' === initialMode || 'light' === initialMode) ? initialMode : undefined}
+        />
+      </Provider>
     </BrowserRouter>,
     document.getElementById('root')
   );

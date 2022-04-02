@@ -1,11 +1,14 @@
 import React, {FC, ReactNode} from "react";
 import {StaticRouter} from "react-router-dom/server";
 import {renderToString} from "react-dom/server";
-import { CacheProvider } from "@emotion/react";
+import {CacheProvider} from "@emotion/react";
 import createEmotionServer from "@emotion/server/create-instance";
 import createCache from "@emotion/cache";
+import {Provider} from "react-redux";
+import {configureStore} from "@reduxjs/toolkit";
 import App from "../app";
 import {Translations} from "../../types";
+import createInitialState from "../../redux/createInitialState";
 
 interface SsrPageProps {
   publicUrl: string;
@@ -23,7 +26,26 @@ const SsrPage: FC<SsrPageProps> = ({ headers, initialMode, locale, path, publicU
   const content = renderToString(
     <CacheProvider value={cache}>
       <StaticRouter location={path}>
-        <App initialLocale={locale} initialTranslations={translationMessages} initialMode={initialMode} />
+        <Provider
+          store={configureStore({
+            preloadedState: createInitialState({
+              locations: {},
+              organisations: {},
+              needs: {},
+              translations: {},
+              accesses: {},
+            }),
+            reducer: {
+              locations: s => s || {},
+              organisations: s => s || {},
+              needs: s => s || {},
+              translations: s => s || {},
+              accesses: s => s || {},
+            },
+          })}
+        >
+          <App initialLocale={locale} initialTranslations={translationMessages} initialMode={initialMode} />
+        </Provider>
       </StaticRouter>
     </CacheProvider>
   );

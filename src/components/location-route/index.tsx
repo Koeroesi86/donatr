@@ -15,11 +15,14 @@ import {
   Typography
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import {LocationResource, NeedsFilters, OrganisationResource} from "../../types";
+import {LocationResource, NeedsFilters} from "../../types";
 import MapBlock from "../map-block";
 import {createStyles, makeStyles} from "@mui/styles";
 import useApiClient from "../../hooks/useApiClient";
 import useNeeds from "../../hooks/useNeeds";
+import {useAppDispatch, useAppSelector} from "../../redux";
+import locationsReducer from "../../redux/locationsReducer";
+import organisationsReducer from "../../redux/organisationsReducer";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -32,11 +35,16 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 const LocationRouteBreadCrumb: FC<{ location: LocationResource }> = ({ location }) => {
   const apiOrganisation = useApiClient<'organisations'>('organisations');
-  const [organisation, setOrganisation] = useState<OrganisationResource>();
+  const organisation = useAppSelector((s) => s.organisations[location.organisationId]);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    apiOrganisation.one(location.organisationId).then(setOrganisation).catch(console.error);
-  }, [apiOrganisation, location]);
+    if (!organisation) {
+      apiOrganisation.one(location.organisationId)
+        .then((o) => dispatch(organisationsReducer.actions.setOrganisation(o)))
+        .catch(console.error);
+    }
+  }, [apiOrganisation, dispatch, location, organisation]);
 
   if (!organisation) {
     return <CircularProgress />;
@@ -58,14 +66,19 @@ const LocationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
   const api = useApiClient<'locations'>('locations');
-  const [location, setLocation] = useState<LocationResource>();
+  const location = useAppSelector((s) => s.locations[params.locationId]);
+  const dispatch = useAppDispatch();
   const filter = useMemo<NeedsFilters>(() => ({
     locationId: params.locationId,
   }),[params.locationId]);
   const needs = useNeeds(filter);
 
   useEffect(() => {
-    api.one(params.locationId).then(setLocation).catch(console.error);
+    if (!location) {
+      api.one(params.locationId)
+        .then((l) => dispatch(locationsReducer.actions.setLocation(l)))
+        .catch(console.error);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 

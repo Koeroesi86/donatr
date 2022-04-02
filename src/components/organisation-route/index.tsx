@@ -3,13 +3,14 @@ import {Link as RLink, useParams} from "react-router-dom";
 import {createStyles, makeStyles} from "@mui/styles";
 import {CircularProgress, Container, Link, List, Theme, Typography} from "@mui/material";
 import {LatLngExpression} from "leaflet";
-import {Organisation} from "../../types";
 import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
 import useApiClient from "../../hooks/useApiClient";
 import useLocations from "../../hooks/useLocations";
 import useNeeds from "../../hooks/useNeeds";
 import OrganisationDescription from "../organisation-description";
+import {useAppDispatch, useAppSelector} from "../../redux";
+import organisationsReducer from "../../redux/organisationsReducer";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -24,7 +25,8 @@ const OrganisationRoute: FC = () => {
   const params = useParams();
   const styles = useStyles();
   const api = useApiClient<'organisations'>('organisations');
-  const [organisation, setOrganisation] = useState<Organisation>();
+  const organisation = useAppSelector((s) => s.organisations[params.organisationId]);
+  const dispatch = useAppDispatch();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
@@ -34,7 +36,11 @@ const OrganisationRoute: FC = () => {
   const needs = useNeeds();
 
   useEffect(() => {
-    api.one(params.organisationId).then(setOrganisation).catch(console.error);
+    if (!organisation) {
+      api.one(params.organisationId)
+        .then((o) => dispatch(organisationsReducer.actions.setOrganisation(o)))
+        .catch(console.error);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
