@@ -4,10 +4,12 @@ import {BrowserRouter} from "react-router-dom";
 import App from './components/app';
 import {getCookie} from "./utils/cookies";
 import {Translations} from "./types";
+import {AppState} from "./redux";
 
 declare global {
   interface Window {
     initialTranslations: Translations;
+    initialState: AppState;
   }
 }
 
