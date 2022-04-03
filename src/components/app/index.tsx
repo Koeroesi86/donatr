@@ -93,14 +93,11 @@ const App: FC<AppProps> = ({ initialLocale, initialTranslations = {}, initialMod
                       >
                         <MenuIcon />
                       </IconButton>
-                      <Typography variant="h6" component="div">
+                      <Typography variant="h6" component={RLink} to="/" color="inherit" sx={{ textDecoration: "none"}}>
                         <FormattedMessage id="site.name" />
                       </Typography>
                       <Box sx={{ flexGrow: 1, padding: '0 20px' }}>
                         <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                          <NavLink to="/">
-                            <FormattedMessage id="page.home" />
-                          </NavLink>
                           <NavLink to="/organisations">
                             <FormattedMessage id="page.organisations" />
                           </NavLink>
