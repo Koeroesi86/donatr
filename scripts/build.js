@@ -5,7 +5,7 @@ const webpack = require('webpack');
 
 process.env.BABEL_ENV = 'production';
 process.env.NODE_ENV = 'production';
-process.env.PUBLIC_URL = 'https://help.koro.si/';
+process.env.PUBLIC_URL = 'https://donatr.eu/';
 const config = require('../webpack.config');
 
 process.on('unhandledRejection', err => {

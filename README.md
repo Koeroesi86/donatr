@@ -1,4 +1,4 @@
-# [help.koro.si](https://help.koro.si) [![CI](https://github.com/Koeroesi86/help.koro.si/actions/workflows/ci.yml/badge.svg)](https://github.com/Koeroesi86/help.koro.si/actions/workflows/ci.yml)
+# [donatr.eu](https://donatr.eu) [![CI](https://github.com/Koeroesi86/donatr/actions/workflows/ci.yml/badge.svg)](https://github.com/Koeroesi86/donatr/actions/workflows/ci.yml)
 
 A platform to help donations reach the place where they are most needed.
 

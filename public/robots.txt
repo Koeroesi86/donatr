@@ -4,4 +4,4 @@ Disallow: /edit
 User-agent: *
 Allow: /
 
-Sitemap: https://help.koro.si/sitemap.xml
+Sitemap: https://donatr.eu/sitemap.xml

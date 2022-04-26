@@ -1,7 +1,7 @@
 const {execSync} = require('child_process');
 
 const buildName = `build.${Date.now()}`;
-const remoteFolder = '/var/www/help.koro.si';
+const remoteFolder = '/var/www/donatr.eu';
 
 execSync(`rm -rf ./.cache/*.tar`);
 

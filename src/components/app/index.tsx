@@ -123,7 +123,7 @@ const App: FC<AppProps> = ({ initialLocale, initialTranslations = {}, initialMod
               </Box>
               <AppBar position="static" sx={{ mt: 2, py: 1 }}>
                 <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Link href="https://github.com/Koeroesi86/help.koro.si" target="_blank" title="Github" color="inherit">
+                  <Link href="https://github.com/Koeroesi86/donatr" target="_blank" title="Github" color="inherit">
                     <GitHubIcon />
                   </Link>
                 </Container>

@@ -1,14 +1,14 @@
 const path = require('path');
 
 module.exports = {
-  hostname: 'help.koro.si', //defines what host to provide the instance for
+  hostname: 'donatr.eu', //defines what host to provide the instance for
   protocol: 'http', //defines what protocol to use. http/https
   type: 'worker',
   options: {
-    root: '/var/www/help.koro.si/build/public/',
+    root: '/var/www/donatr.eu/build/public/',
     env: {
-      DATA_BASE_PATH: '/var/www/help.koro.si/data',
-      PUBLIC_URL: 'https://help.koro.si/',
+      DATA_BASE_PATH: '/var/www/donatr.eu/data',
+      PUBLIC_URL: 'https://donatr.eu/',
     },
     limit: 0,
     limitPerPath: 1,
