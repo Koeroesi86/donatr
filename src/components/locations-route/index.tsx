@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {LatLngExpression} from "leaflet";
 import {CircularProgress, Container, Link, List, Theme, Typography} from "@mui/material";
 import {createStyles, makeStyles} from '@mui/styles';
@@ -8,6 +8,10 @@ import MapBlock from "../map-block";
 import LocationListItem from "../location-list-item";
 import useLocations from "../../hooks/useLocations";
 import useNeeds from "../../hooks/useNeeds";
+import useApiClient from "../../hooks/useApiClient";
+import {useAppDispatch, useAppSelector} from "../../redux";
+import {getOrganisation, getOrganisations} from "../../redux/selectors";
+import organisationsReducer from "../../redux/organisationsReducer";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   map: {
@@ -26,8 +30,21 @@ const LocationsRoute: FC = () => {
     lat: 47.497913,
     lng: 19.040236,
   });
+  const apiOrganisation = useApiClient<'organisations'>('organisations');
+  const organisations = useAppSelector(getOrganisations());
+  const dispatch = useAppDispatch();
 
-  if (!locations.length) return <CircularProgress />;
+  useEffect(() => {
+    if (!organisations.length) {
+      apiOrganisation.all()
+        .then((o) => dispatch(organisationsReducer.actions.setOrganisations(o)))
+        .catch(console.error);
+    }
+  }, [apiOrganisation, dispatch, organisations]);
+
+  if (!locations.length || !organisations.length) {
+    return <CircularProgress />;
+  }
 
   const locationsWithGeo = locations.filter((l) => l.location);
 

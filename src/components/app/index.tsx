@@ -88,7 +88,7 @@ const App: FC<AppProps> = ({ initialLocale, initialTranslations = {}, initialMod
                         edge="start"
                         color="inherit"
                         aria-label="menu"
-                        sx={{ mr: 2 }}
+                        sx={{ mr: 2, display: { xs: 'inline-block', md: 'none' } }}
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                       >
                         <MenuIcon />

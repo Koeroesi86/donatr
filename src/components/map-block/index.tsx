@@ -1,5 +1,5 @@
-import React, {FC, ReactNode, useEffect, useRef} from "react";
-import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
+import React, {FC, ReactNode, useEffect, useRef, useState} from "react";
+import {MapContainer, Marker, Popup, TileLayer, useMapEvents} from "react-leaflet";
 import {LatLngExpression} from "leaflet";
 
 interface MapBlockProps {
@@ -9,17 +9,33 @@ interface MapBlockProps {
   markers: { lat: number; lng: number; popup: ReactNode, key: string }[];
 }
 
-const MapBlock: FC<MapBlockProps> = ({ markers, className, center, zoom = 6 }) => {
+const LocationMarker: FC = () => {
+  const map = useMapEvents({
+    locationfound(e) {
+      map.flyTo(e.latlng, map.getZoom() * 2);
+    }
+  });
+
+  // TODO: Add control
+  // return <Button onClick={() => map.locate()}>L</Button>;
+  return null;
+};
+
+const MapBlock: FC<MapBlockProps> = ({ markers, className, center: initialCenter, zoom = 6 }) => {
   const timer = useRef();
+  const [center] = useState(initialCenter);
+
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
-  }, [markers])
+  }, [markers]);
+
   return (
     <MapContainer center={center} zoom={zoom} className={className}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <LocationMarker />
       {markers.map((marker) => (
         <Marker
           key={marker.key}

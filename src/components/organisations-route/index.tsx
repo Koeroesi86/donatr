@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   CardActions,
-  CardContent,
   CardHeader,
   CircularProgress,
   Container,
@@ -13,11 +12,15 @@ import {
   Typography
 } from "@mui/material";
 import {FormattedMessage, useIntl} from "react-intl";
-import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import {Link as RLink} from "react-router-dom";
 import useOrganisations from "../../hooks/useOrganisations";
 import useLocations from "../../hooks/useLocations";
-import OrganisationDescription from "../organisation-description";
+
+const capitalLetters = (value: string) =>
+  value
+    .split('')
+    .filter((a) => a.toUpperCase() === a && a.trim() === a)
+    .join('')
 
 const OrganisationsRoute: FC = () => {
   const intl = useIntl();
@@ -49,14 +52,9 @@ const OrganisationsRoute: FC = () => {
                 { id: 'page.organisations.locations.count' },
                 { count: locations.filter((l) => l.organisationId === organisation.id).length }
               )}
-              avatar={<Avatar><CorporateFareIcon /></Avatar>}
+              avatar={<Avatar>{capitalLetters(organisation.name).substring(0, 2)}</Avatar>}
             />
-            <CardContent sx={{ flexGrow: 1 }}>
-              {organisation.description && (
-                <OrganisationDescription description={organisation.description} />
-              )}
-            </CardContent>
-            <CardActions>
+            <CardActions sx={{ justifyContent: 'flex-end' }}>
               <Button component={RLink} to={`/organisations/${organisation.id}`}>
                 <FormattedMessage id="page.organisations.more" />
               </Button>

@@ -16,7 +16,7 @@ const Home: FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: { xs: 300, sm: 400, md: 400, lg: 600, xl: 600 },
+        height: { xs: 300, sm: 400, md: 400, lg: 400, xl: 400 },
         boxShadow: 1,
       }}>
         <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

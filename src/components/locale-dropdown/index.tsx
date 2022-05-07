@@ -1,5 +1,5 @@
 import React, {FC, useCallback, useContext, useEffect, useState} from "react";
-import {IconButton, Menu, MenuItem, Tooltip} from "@mui/material";
+import {Box, IconButton, Menu, MenuItem, Tooltip} from "@mui/material";
 import {useIntl} from "react-intl";
 import CountryFlag from "../country-flag";
 import {TranslationsContext} from "../translations-provider";
@@ -68,8 +68,10 @@ const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale }) => {
               setLocale(t);
               handleClose();
             }}
+            aria-label={t.id}
           >
             <CountryFlag code={t.id.split('-').pop().toLowerCase()} width="30" />
+            <Box sx={{ px: 1, display: { xs: 'none', md: 'block' } }}>{t.id}</Box>
           </MenuItem>
         ))}
       </Menu>
