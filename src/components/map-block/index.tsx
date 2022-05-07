@@ -1,6 +1,9 @@
 import React, {FC, ReactNode, useEffect, useRef, useState} from "react";
+import {render} from "react-dom";
 import {MapContainer, Marker, Popup, TileLayer, useMapEvents} from "react-leaflet";
-import {LatLngExpression} from "leaflet";
+import {LatLngExpression, DomUtil, Control} from "leaflet";
+import {Box} from "@mui/material";
+import LocationIcon from '@mui/icons-material/GpsFixed';
 
 interface MapBlockProps {
   center?: LatLngExpression;
@@ -12,12 +15,45 @@ interface MapBlockProps {
 const LocationMarker: FC = () => {
   const map = useMapEvents({
     locationfound(e) {
-      map.flyTo(e.latlng, map.getZoom() * 2);
+      const zoom = map.getZoom();
+      map.flyTo(e.latlng, zoom < 9 ? zoom * 2 : 18);
     }
   });
 
-  // TODO: Add control
-  // return <Button onClick={() => map.locate()}>L</Button>;
+  useEffect(() => {
+    const centerControl = new Control({ position: 'topleft' });
+
+    centerControl.onAdd = () => {
+      const div = DomUtil.create('div', '');
+      render(
+        <Box
+          onClick={() => map.locate()}
+          sx={{
+            width: '34px',
+            height: '34px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            border: '2px solid rgba(0, 0, 0, 0.2)',
+            color: '#000',
+            borderRadius: '4px',
+            boxSizing: 'border-box',
+            cursor: 'pointer',
+            '&:hover': {
+              backgroundColor: '#f4f4f4',
+            },
+        }}
+        >
+          <LocationIcon width={20} height={20} />
+        </Box>,
+        div
+      );
+      return div;
+    };
+
+    map.addControl(centerControl);
+  }, [map]);
   return null;
 };
 
