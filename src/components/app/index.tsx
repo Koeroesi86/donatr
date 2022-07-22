@@ -24,6 +24,8 @@ import ApiTokenProvider from "../api-token-provider";
 import TranslationsProvider from "../translations-provider";
 import {setCookie} from "../../utils/cookies";
 import routes from "../../utils/routes";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
 
 const NavLink: FC<{ to: string }> = ({ to, children }) => {
   const resolved = useResolvedPath(to);
@@ -110,7 +112,18 @@ const App: FC<AppProps> = ({ initialLocale, initialTranslations = {}, initialMod
                           <NavLink to="/edit">
                             <FormattedMessage id="page.edit" />
                           </NavLink>
+                          <NavLink to="/contact">
+                            <FormattedMessage id="page.contact" />
+                          </NavLink>
                         </Box>
+                      </Box>
+                      <Box sx={{ display: { xs: 'none', md: 'inline-block' } }}>
+                        <IconButton
+                          onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+                          color="inherit"
+                        >
+                          {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+                        </IconButton>
                       </Box>
                       <LocaleDropdown
                         locale={locale}

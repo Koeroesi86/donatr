@@ -7,6 +7,7 @@ const en: Translations = {
   'page.needs': 'Needs',
   'page.needs.location.link': 'location',
   'page.edit': 'Edit',
+  'page.contact': 'Contact',
   'input.need.name': 'Needed donation',
   'input.need.name.new': 'Add needed donation',
   'input.location.name': 'Location\'s name',
@@ -52,6 +53,7 @@ const en: Translations = {
   'page.organisations.more': 'More',
   'page.notfound.title': 'Uh oh.',
   'page.notfound.description': 'There is no page like {path}',
+  'page.contact.iframe': 'https://docs.google.com/forms/d/e/1FAIpQLSeuUIX3ya2mFBFaHjLjPEy3eEriWrG11CQ3Sm75_isTURl_5w/viewform?embedded=true',
 };
 
 export default en;

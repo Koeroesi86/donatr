@@ -10,6 +10,7 @@ import EditRouteLogin from "../components/edit-route-login";
 import EditRouteProtected from "../components/edit-route-protected";
 import NotFoundRoute from "../components/not-found-route";
 import React from "react";
+import ContactRoute from "../components/contact-route";
 
 const routes: RouteObject[] = [
   { path: "/", element: <Home /> },
@@ -35,6 +36,10 @@ const routes: RouteObject[] = [
       { index: true, element: <EditRouteLogin /> },
       { path: ":code", element: <EditRouteProtected /> },
     ],
+  },
+  {
+    path: "/contact",
+    element: <ContactRoute />,
   },
   { path: "*", element: <NotFoundRoute /> }
 ];

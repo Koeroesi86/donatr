@@ -7,6 +7,7 @@ import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ListIcon from '@mui/icons-material/List';
 import EditIcon from '@mui/icons-material/Edit';
+import ContactPageIcon from '@mui/icons-material/MailOutline';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -73,6 +74,9 @@ const SidebarContents: FC<SidebarContentsProps> = ({ onClose, toggleThemeMode })
         </RouteLink>
         <RouteLink to="/needs" translation="page.needs" onClick={onClose}>
           <ListIcon />
+        </RouteLink>
+        <RouteLink to="/contact" translation="page.contact" onClick={onClose}>
+          <ContactPageIcon />
         </RouteLink>
       </List>
       <Divider />
