@@ -23,6 +23,8 @@ const publicUrl: string = process.env.PUBLIC_URL || '/';
 
 const apiClient = createApiClient(publicUrl);
 
+const definedRoutes = routes.filter(route => route.path && route.path !== '*').map(route => route.path);
+
 const worker: Worker = async (event, callback): Promise<void> => {
   keepAliveCallback();
 
@@ -226,7 +228,7 @@ const worker: Worker = async (event, callback): Promise<void> => {
     }
 
     callback({
-      statusCode: 404,
+      statusCode: definedRoutes.includes(event.path) ? 200 : 404,
       headers: {
         'content-type': 'text/html; charset=utf-8'
       },
