@@ -40,7 +40,7 @@ export default class JsonProvider implements Provider {
     this.translationResources = new JsonResource<TranslationsResource>(translationResourcesPath);
   }
 
-  getLocation = async (id: string, language?: string): Promise<ProviderResult<LocationResource | undefined>> => {
+  getLocation = async (id: string): Promise<ProviderResult<LocationResource | undefined>> => {
     const location = await this.locationResources.one(id);
 
     return { result: location.data, modified: location.modified };

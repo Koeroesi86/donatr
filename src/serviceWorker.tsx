@@ -1,7 +1,6 @@
 const cacheName = 'help-koro-si-v1';
 
-// eslint-disable-next-line no-restricted-globals
-const sw: ServiceWorkerGlobalScope & typeof globalThis = self as any;
+const sw = self as unknown as ServiceWorkerGlobalScope & typeof globalThis;
 
 const staticFiles = [
   '/static/leaflet.css',
@@ -12,14 +11,14 @@ const staticFiles = [
   '/static/images/marker-shadow.png',
 ];
 
-sw.addEventListener('install', (e) => {
+sw.addEventListener('install', () => {
   caches.open(cacheName)
     .then((cache) => cache.addAll(staticFiles));
 
   sw.skipWaiting();
 });
 
-sw.addEventListener('activate', (e) => sw.clients.claim());
+sw.addEventListener('activate', () => sw.clients.claim());
 
 const getAssetCacheTimeout = (href: string): number => {
   const url = new URL(href);
@@ -59,13 +58,14 @@ sw.addEventListener('fetch', (e) => {
     const cacheMatch = await cache.match(e.request);
     try {
       if (!sw.navigator.onLine) {
-        return cacheMatch;
+        if (cacheMatch) return cacheMatch;
+        throw new Error('Offline and not cached.');
       }
 
       if (
         cacheMatch
         && cacheMatch.headers.has('Date')
-        && Date.parse(cacheMatch.headers.get('Date')) > (Date.now() - getAssetCacheTimeout(cacheMatch.url))
+        && Date.parse(cacheMatch.headers.get('Date') ?? '') > (Date.now() - getAssetCacheTimeout(cacheMatch.url))
       ) {
         return cacheMatch;
       }

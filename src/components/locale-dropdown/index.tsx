@@ -1,6 +1,7 @@
 import React, {FC, useCallback, useContext, useEffect, useState} from "react";
 import {Box, IconButton, Menu, MenuItem, Tooltip} from "@mui/material";
 import {useIntl} from "react-intl";
+import getCountryCode from "../../utils/getCountryCode";
 import CountryFlag from "../country-flag";
 import {TranslationsContext} from "../translations-provider";
 import {TranslationsResource} from "../../types";
@@ -13,7 +14,7 @@ interface LocaleDropdownProps {
 const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale }) => {
   const intl = useIntl();
   const translations = useContext(TranslationsContext);
-  const [anchorElement, setAnchorElement] = useState(null);
+  const [anchorElement, setAnchorElement] = useState<Element | null>(null);
   const open = Boolean(anchorElement);
   const handleClick = useCallback((event: React.SyntheticEvent) => {
     setAnchorElement(event.currentTarget);
@@ -51,7 +52,7 @@ const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale }) => {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
         >
-          <CountryFlag code={locale.split('-').pop().toLowerCase()} width="30" />
+          <CountryFlag code={getCountryCode(locale)} width="30" />
         </IconButton>
       </Tooltip>
       <Menu
@@ -70,7 +71,7 @@ const LocaleDropdown: FC<LocaleDropdownProps> = ({ locale, setLocale }) => {
             }}
             aria-label={t.id}
           >
-            <CountryFlag code={t.id.split('-').pop().toLowerCase()} width="30" />
+            <CountryFlag code={getCountryCode(t.id)} width="30" />
             <Box sx={{ px: 1, display: { xs: 'none', md: 'block' } }}>{t.id}</Box>
           </MenuItem>
         ))}

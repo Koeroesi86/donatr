@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useEffect, useMemo, useState} from "react";
+import React, {FC, PropsWithChildren, useCallback, useEffect, useMemo, useState} from "react";
 import {Link as RLink, useMatch, useResolvedPath, useRoutes} from "react-router-dom";
 import {
   AppBar,
@@ -27,7 +27,7 @@ import routes from "../../utils/routes";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 
-const NavLink: FC<{ to: string }> = ({ to, children }) => {
+const NavLink: FC<PropsWithChildren<{ to: string }>> = ({ to, children }) => {
   const resolved = useResolvedPath(to);
   const match = useMatch({path: resolved.pathname, end: true});
 

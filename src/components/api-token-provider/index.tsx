@@ -1,4 +1,4 @@
-import React, {createContext, FC, useCallback, useState} from "react";
+import React, {createContext, FC, PropsWithChildren, useCallback, useState} from "react";
 
 interface ApiTokenProviderContext {
   setToken: (token: string) => void;
@@ -14,7 +14,7 @@ interface ApiTokenProviderProps {
   initialToken?: string;
 }
 
-const ApiTokenProvider: FC<ApiTokenProviderProps> = ({ children, initialToken = '' }) => {
+const ApiTokenProvider: FC<PropsWithChildren<ApiTokenProviderProps>> = ({ children, initialToken = '' }) => {
   const [token, setToken] = useState(initialToken);
   const getToken = useCallback<ApiTokenProviderContext['getToken']>(() => token, [token]);
   return (

@@ -1,7 +1,7 @@
 import React, {FC} from "react";
 import {useIntl} from "react-intl";
-import {styled} from "@mui/styles";
 import {Container} from "@mui/material";
+import {styled} from "@mui/material/styles";
 
 const Iframe = styled('iframe')({
   display: 'block',

@@ -1,9 +1,8 @@
 const { execSync } = require('child_process');
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs');
 const webpack = require('webpack');
 
-process.env.BABEL_ENV = 'production';
 process.env.NODE_ENV = 'production';
 process.env.PUBLIC_URL = 'https://donatr.eu/';
 const config = require('../webpack.config');
@@ -12,7 +11,10 @@ process.on('unhandledRejection', err => {
   throw err;
 });
 
-config.forEach(c => fs.emptyDirSync(c.output.path));
+config.forEach(c => {
+  fs.rmSync(c.output.path, { recursive: true, force: true });
+  fs.mkdirSync(c.output.path, { recursive: true });
+});
 
 const compiler = webpack(config);
 
@@ -37,5 +39,5 @@ compiler.run((err, stats) => {
     console.log('Compiled successfully.\n');
   }
 
-  execSync('yarn install --prod --frozen-lockfile', { cwd: path.resolve('./build') });
+  execSync('npm ci --omit=dev', { cwd: path.resolve('./build') });
 });

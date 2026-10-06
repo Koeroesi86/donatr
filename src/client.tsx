@@ -1,5 +1,5 @@
 import React from 'react';
-import {render} from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import {BrowserRouter} from "react-router-dom";
 import App from './components/app';
 import {getCookie} from "./utils/cookies";
@@ -22,7 +22,7 @@ if (typeof window !== 'undefined') {
     window.location.replace(target);
   }
   const initialMode = getCookie('mode');
-  render(
+  createRoot(document.getElementById('root') ?? document.body).render(
     <BrowserRouter>
       <Provider store={store}>
         <App
@@ -31,8 +31,7 @@ if (typeof window !== 'undefined') {
           initialMode={('dark' === initialMode || 'light' === initialMode) ? initialMode : undefined}
         />
       </Provider>
-    </BrowserRouter>,
-    document.getElementById('root')
+    </BrowserRouter>
   );
   document.querySelector('#server-css')?.remove();
 
@@ -43,7 +42,7 @@ if (typeof window !== 'undefined') {
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           // Listen for when the new worker is ready:
-          newWorker.addEventListener('statechange', () => {
+          newWorker?.addEventListener('statechange', () => {
             switch (newWorker.state) {
               case 'installed':
                 if (navigator.serviceWorker.controller) {

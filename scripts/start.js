@@ -1,7 +1,6 @@
 const { spawn, execSync } = require('child_process');
 const webpack = require('webpack');
 
-process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 process.env.NODE_OPTIONS='--enable-source-maps';
 process.env.PUBLIC_URL = 'http://localhost:3000/';
@@ -37,7 +36,7 @@ compiler.watch({
   }
   console.log(stats.toString());
   instance = spawn(
-    'yarn',
+    'npx',
     [
       'nws-cli',
       '--config',

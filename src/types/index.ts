@@ -87,18 +87,17 @@ export interface TranslationsResource {
   translations: Translations;
 }
 
-export interface Organisation extends OrganisationResource{
-}
+export type GeoLocationResource = LocationResource & { location: PickedLocation };
 
-export interface Location extends LocationResource {
-}
+export type Organisation = OrganisationResource;
+
+export type Location = LocationResource;
 
 export interface Need extends NeedResource {
   originalName: string;
 }
 
-export interface Translation extends TranslationsResource {
-}
+export type Translation = TranslationsResource;
 
 export type CreateNeedResource = Omit<NeedResource, 'id'>;
 export type CreateLocationResource = Omit<LocationResource, 'id'>;
@@ -123,10 +122,10 @@ export interface PathToResource {
 }
 
 export interface PathToFilters {
-  organisations: {};
+  organisations: Record<string, never>;
   locations: LocationsFilters;
   needs: NeedsFilters;
-  translations: {};
+  translations: Record<string, never>;
   access: AccessFilters;
 }
 

@@ -29,7 +29,7 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
   const intl = useIntl();
   const [isExpanded, setIsExpanded] = useState(initialOpen);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
-  const [location, setLocation] = useState<LocationResource>(initialState);
+  const [location, setLocation] = useState<LocationResource | undefined>(initialState);
   const api = useApiClient<'locations'>('locations');
   const debouncedUpdate = debounce((data: LocationResource) => {
     api.update(data).then(() => refresh());
@@ -67,12 +67,11 @@ const EditLocation: FC<EditLocationProps> = ({ id, initialState, initialOpen = t
                 name: e.target.value,
               })}
               onKeyPress={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
                   debouncedUpdate({
                     id: location.id,
                     organisationId: location.organisationId,
                     location: location.location,
-                    // @ts-ignore
                     name: e.target.value,
                   });
                 }

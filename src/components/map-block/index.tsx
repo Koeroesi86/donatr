@@ -1,8 +1,9 @@
 import React, {FC, ReactNode, useEffect, useRef, useState} from "react";
-import {render} from "react-dom";
+import {createRoot} from "react-dom/client";
 import {MapContainer, Marker, Popup, TileLayer, useMapEvents} from "react-leaflet";
 import {LatLngExpression, DomUtil, Control} from "leaflet";
 import {Box} from "@mui/material";
+import {styled} from "@mui/material/styles";
 import LocationIcon from '@mui/icons-material/GpsFixed';
 
 interface MapBlockProps {
@@ -25,7 +26,7 @@ const LocationMarker: FC = () => {
 
     centerControl.onAdd = () => {
       const div = DomUtil.create('div', '');
-      render(
+      createRoot(div).render(
         <Box
           onClick={() => map.locate()}
           sx={{
@@ -46,8 +47,7 @@ const LocationMarker: FC = () => {
         }}
         >
           <LocationIcon width={20} height={20} />
-        </Box>,
-        div
+        </Box>
       );
       return div;
     };
@@ -58,7 +58,7 @@ const LocationMarker: FC = () => {
 };
 
 const MapBlock: FC<MapBlockProps> = ({ markers, className, center: initialCenter, zoom = 6 }) => {
-  const timer = useRef();
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [center] = useState(initialCenter);
 
   useEffect(() => {
@@ -78,7 +78,6 @@ const MapBlock: FC<MapBlockProps> = ({ markers, className, center: initialCenter
           position={{lat: marker.lat, lng: marker.lng}}
           ref={m => {
             if (markers.length === 1 && m && m.openPopup) {
-              // @ts-ignore
               timer.current = setTimeout(() => m.openPopup(), 10);
             }
           }}
@@ -91,5 +90,12 @@ const MapBlock: FC<MapBlockProps> = ({ markers, className, center: initialCenter
     </MapContainer>
   );
 };
+
+export const SizedMapBlock = styled(MapBlock)({
+  height: '400px',
+  width: '100%',
+  minWidth: '200px',
+  boxSizing: 'border-box',
+});
 
 export default MapBlock;

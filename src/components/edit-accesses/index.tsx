@@ -9,6 +9,12 @@ import AddIcon from "@mui/icons-material/Add";
 import useApiClient from "../../hooks/useApiClient";
 import useOrganisations from "../../hooks/useOrganisations";
 
+const withoutId = (access: Access): Omit<Access, 'id'> => {
+  const copy: Omit<Access, 'id'> & { id?: string } = { ...access };
+  delete copy.id;
+  return copy;
+};
+
 interface EditAccessesProps {
   currentCode: string;
 }
@@ -59,9 +65,7 @@ const EditAccesses: FC<EditAccessesProps> = ({ currentCode }) => {
             <Button
               variant="contained"
               onClick={() => {
-                const a = { ...newAccess };
-                delete a.id;
-                accessApi.create(a).then(() => {
+                accessApi.create(withoutId(newAccess)).then(() => {
                   refresh();
                   setNewAccess({ id: 'new', all: true, code: '' });
                 });

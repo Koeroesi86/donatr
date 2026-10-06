@@ -5,20 +5,20 @@ A platform to help donations reach the place where they are most needed.
 Let's help Ukraine! 🕊
 
 ### Dependencies
-* Yarn
-* NodeJS
+* npm
+* NodeJS (LTS, see `.nvmrc` — run `nvm use`)
 
 **Build**
 ```shell script
-yarn build
+npm run build
 ```
 
 **Run locally**
 ```shell script
-yarn start
+npm start
 ```
 
 **Test**
 ```shell script
-yarn test
+npm test
 ```

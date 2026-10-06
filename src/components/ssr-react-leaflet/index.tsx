@@ -12,9 +12,9 @@ export const MapContainer: FC<{className: string}> = ({ className }) =>
 export const Marker = shim;
 export const Popup = shim;
 export const TileLayer = shim;
-export const MapConsumer = shim;
+export const useMap = shim;
 export const useMapEvents = shim;
 
 export const geocoders= {
-  nominatim: class {}
+  Nominatim: class {}
 };

@@ -1,29 +1,19 @@
 import React, {FC, useEffect, useState} from 'react';
 import {LatLngExpression} from "leaflet";
-import {CircularProgress, Container, Link, List, Theme, Typography} from "@mui/material";
-import {createStyles, makeStyles} from '@mui/styles';
+import {CircularProgress, Container, Link, List, Typography} from "@mui/material";
 import {Link as RLink} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
-import MapBlock from "../map-block";
+import {hasGeoLocation} from "../../utils";
+import {SizedMapBlock} from "../map-block";
 import LocationListItem from "../location-list-item";
 import useLocations from "../../hooks/useLocations";
 import useNeeds from "../../hooks/useNeeds";
 import useApiClient from "../../hooks/useApiClient";
 import {useAppDispatch, useAppSelector} from "../../redux";
-import {getOrganisation, getOrganisations} from "../../redux/selectors";
+import {getOrganisations} from "../../redux/selectors";
 import organisationsReducer from "../../redux/organisationsReducer";
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  map: {
-    height: '400px',
-    width: '100%',
-    minWidth: '200px',
-    boxSizing: 'border-box',
-  },
-}));
-
 const LocationsRoute: FC = () => {
-  const styles = useStyles();
   const locations = useLocations();
   const needs = useNeeds();
   const [center] = useState<LatLngExpression>({
@@ -46,17 +36,16 @@ const LocationsRoute: FC = () => {
     return <CircularProgress />;
   }
 
-  const locationsWithGeo = locations.filter((l) => l.location);
+  const locationsWithGeo = locations.filter(hasGeoLocation);
 
   return (
     <Container maxWidth="lg">
       <Typography variant="h3" sx={{ my: 2 }}>
         <FormattedMessage id="page.locations" />
       </Typography>
-      <MapBlock
+      <SizedMapBlock
         center={center}
         zoom={6}
-        className={styles.map}
         markers={locationsWithGeo.map((loc) => ({
           lat: loc.location.lat,
           lng: loc.location.lng,

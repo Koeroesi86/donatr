@@ -38,18 +38,14 @@ module.exports = [
             },
             {
               test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/],
-              loader: 'url-loader',
-              options: {
-                limit: 10000,
-                name: 'static/media/[name].[hash:8].[ext]',
-              },
+              type: 'asset',
+              parser: { dataUrlCondition: { maxSize: 10000 } },
+              generator: { filename: 'static/media/[name].[hash:8][ext]' },
             },
             {
               exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
-              loader: 'file-loader',
-              options: {
-                name: 'static/media/[name].[hash:8].[ext]',
-              },
+              type: 'asset/resource',
+              generator: { filename: 'static/media/[name].[hash:8][ext]' },
             }
           ]
         }
@@ -57,10 +53,7 @@ module.exports = [
     },
     plugins: [
       new WebpackBar({
-        name: "static/bundle"
-      }),
-      new WebpackBar({
-        name: "serviceWorker"
+        name: "client"
       }),
       new webpack.EnvironmentPlugin(['PUBLIC_URL']),
       new CopyPlugin({
@@ -74,8 +67,8 @@ module.exports = [
             to: path.resolve('./build/package.json'),
           },
           {
-            from: path.resolve('./yarn.lock'),
-            to: path.resolve('./build/yarn.lock'),
+            from: path.resolve('./package-lock.json'),
+            to: path.resolve('./build/package-lock.json'),
           },
           {
             from: path.resolve('./serverConfig.js'),
@@ -134,10 +127,7 @@ module.exports = [
         path.resolve('./src/components/ssr-react-leaflet/index.tsx')
       ),
       new WebpackBar({
-        name: "index"
-      }),
-      new WebpackBar({
-        name: "api/index"
+        name: "server"
       }),
     ],
   }

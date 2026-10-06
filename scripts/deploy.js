@@ -20,7 +20,7 @@ execSync(`ssh vps "cd ${remoteFolder} && rm -rf ./${buildName}.tar`);
 
 // TODO: The engine "node" is incompatible with this module. Expected version ">= 12.20.0".
 // console.log(`Install prod dependencies on remote`);
-// execSync(`ssh vps "cd ${remoteFolder}/${buildName} && yarn install --production --frozen-lockfile`);
+// execSync(`ssh vps "cd ${remoteFolder}/${buildName} && npm ci --omit=dev`);
 
 console.log(`Fix remote file permissions`);
 execSync(`ssh vps "sudo chown -R www-data:www-data /var/www`);

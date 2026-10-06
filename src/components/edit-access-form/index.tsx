@@ -69,7 +69,7 @@ const EditAccessForm: FC<EditAccessFormProps> = ({ access, onChange, organisatio
                       const a: OrganisationsAccess = {
                         id: access.id,
                         code: access.code,
-                        translations: access.translations,
+                        translations: access.translations ?? false,
                         organisationIds: "organisationIds" in access ? access.organisationIds : []
                       };
                       if (e.target.checked) {
@@ -95,7 +95,7 @@ const EditAccessForm: FC<EditAccessFormProps> = ({ access, onChange, organisatio
                           const a: OrganisationsAccess = {
                             id: access.id,
                             code: access.code,
-                            translations: access.translations,
+                            translations: access.translations ?? false,
                             organisationIds: "locationIds" in access ? access.locationIds : []
                           };
                           if (e.target.checked) {

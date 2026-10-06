@@ -10,18 +10,16 @@ interface OrganisationDescriptionProps {
 
 const OrganisationDescription: FC<OrganisationDescriptionProps> = ({ description }) => (
   <ReactMarkdown
-    linkTarget="_blank"
     skipHtml
     unwrapDisallowed
-    children={description}
     remarkPlugins={[RemarkBreaks, RemarkGfm]}
     components={{
-      link: (p) =>
-        <Link target="_blank" href={p.href}>{p.children}</Link>,
       a: (p) =>
         <Link target="_blank" href={p.href}>{p.children}</Link>,
     }}
-  />
+  >
+    {description}
+  </ReactMarkdown>
 );
 
 export default OrganisationDescription;

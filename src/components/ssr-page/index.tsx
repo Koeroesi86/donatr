@@ -1,5 +1,5 @@
 import React, {FC, ReactNode} from "react";
-import {StaticRouter} from "react-router-dom/server";
+import {StaticRouter} from "react-router-dom";
 import {renderToString} from "react-dom/server";
 import {CacheProvider} from "@emotion/react";
 import createEmotionServer from "@emotion/server/create-instance";

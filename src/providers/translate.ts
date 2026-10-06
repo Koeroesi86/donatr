@@ -43,7 +43,7 @@ const tryLibretranslate = async (text: string, targetLocale: string): Promise<st
     'https://libretranslate.pussthecat.org/translate',
   ];
 
-  for (let url of urls) {
+  for (const url of urls) {
     try {
       const { data: { translatedText } } = await axios.request<{ translatedText: string }>({
         url,
@@ -60,13 +60,15 @@ const tryLibretranslate = async (text: string, targetLocale: string): Promise<st
         }),
       });
       return translatedText;
-    } catch (e) {
-      // console.log('error', e);
+    } catch {
+      // try the next endpoint
     }
   }
 
   return '';
 }
+
+const isLibretranslateEnabled = false;
 
 const translate = async (text: string, targetLocale: string): Promise<string> => {
   if (cache[getKey(text, targetLocale)]) {
@@ -74,7 +76,7 @@ const translate = async (text: string, targetLocale: string): Promise<string> =>
   }
 
   // TODO: translations are bad
-  if (false && libretranslateLanguages.includes(targetLocale)) {
+  if (isLibretranslateEnabled && libretranslateLanguages.includes(targetLocale)) {
     const translatedText = await tryLibretranslate(text, targetLocale);
 
     if (translatedText) {
