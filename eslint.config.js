@@ -8,7 +8,7 @@ module.exports = tseslint.config(
   { ignores: ['build/', '.cache/', 'node_modules/'] },
   js.configs.recommended,
   tseslint.configs.recommended,
-  react.configs.flat.recommended,
+  { ...react.configs.flat.recommended, files: ['src/**/*.{ts,tsx}'] },
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { 'react-hooks': reactHooks },

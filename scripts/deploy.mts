@@ -1,4 +1,4 @@
-const {execSync} = require('child_process');
+import {execSync} from 'node:child_process';
 
 const buildName = `build.${Date.now()}`;
 const remoteFolder = '/var/www/donatr.eu';

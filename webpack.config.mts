@@ -1,13 +1,13 @@
-const path = require('path');
-const webpack = require('webpack');
-const CopyPlugin = require('copy-webpack-plugin');
-const WebpackBar = require('webpackbar');
+import path from 'node:path';
+import webpack, {type Configuration} from 'webpack';
+import CopyPlugin from 'copy-webpack-plugin';
+import WebpackBar from 'webpackbar';
 
 process.env.PUBLIC_URL = process.env.PUBLIC_URL || '/';
 
 const isProd = process.env.NODE_ENV !== 'development';
 
-module.exports = [
+const config: Configuration[] = [
   {
     devtool: 'source-map',
     mode: isProd ? 'production' : 'development',
@@ -132,3 +132,5 @@ module.exports = [
     ],
   }
 ];
+
+export default config;

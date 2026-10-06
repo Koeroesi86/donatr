@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "npm test && node scripts/build.js",
-    "deploy": "npm run build && node scripts/deploy.js",
-    "test": "npm run lint && node scripts/test.js",
-    "lint": "eslint --cache --cache-location .cache/eslint/ src"
+    "start": "node scripts/start.mts",
+    "build": "npm test && node scripts/build.mts",
+    "deploy": "npm run build && node scripts/deploy.mts",
+    "test": "npm run lint && npm run typecheck && node scripts/test.mts",
+    "lint": "eslint --cache --cache-location .cache/eslint/ src scripts webpack.config.mts",
+    "typecheck": "tsc -p tsconfig.node.json"
   },
   "devDependencies": {
     "@emotion/cache": "^11.14.0",
