@@ -15,6 +15,12 @@ export const TileLayer = shim;
 export const useMap = shim;
 export const useMapEvents = shim;
 
-export const geocoders= {
+// Only used in client side effects (see map-block), so they are never called on the server
+export const Control = class {};
+export const DomUtil = {
+  create: () => null,
+};
+
+export const geocoders = {
   Nominatim: class {}
 };
