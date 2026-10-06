@@ -18,7 +18,9 @@ npm run build
 npm start
 ```
 
-**Test**
+**Test** (lint, type check and unit tests)
 ```shell script
 npm test
 ```
+
+Jest runs through `npm run jest`, which enables Node's `--experimental-vm-modules`. Several dependencies are ESM-only and need it, so set `NODE_OPTIONS=--experimental-vm-modules` when running jest from an IDE.
