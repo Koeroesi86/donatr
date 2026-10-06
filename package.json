@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node scripts/start.mts",
-    "build": "npm test && node scripts/build.mts",
+    "build": "npm test && webpack --config webpack.config.mts --mode production && npm ci --omit=dev --prefix build",
     "deploy": "npm run build && node scripts/deploy.mts",
-    "test": "npm run lint && npm run typecheck && node scripts/test.mts",
+    "test": "npm run lint && npm run typecheck && jest",
     "lint": "eslint --cache --cache-location .cache/eslint/ src scripts webpack.config.mts",
     "typecheck": "tsc -p tsconfig.node.json"
   },
@@ -55,6 +55,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1",
     "webpack": "^5.111.1",
+    "webpack-cli": "^7.2.3",
     "webpackbar": "^7.0.0"
   },
   "dependencies": {

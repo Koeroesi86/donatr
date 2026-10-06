@@ -1,18 +1,16 @@
 import {type ChildProcess, execSync, spawn} from 'node:child_process';
 import path from 'node:path';
 import webpack from 'webpack';
+import createConfig from '../webpack.config.mts';
 
 process.env.NODE_ENV = 'development';
 process.env.NODE_OPTIONS = '--enable-source-maps';
-process.env.PUBLIC_URL = 'http://localhost:3000/';
 
 process.on('unhandledRejection', (err) => {
   throw err;
 });
 
-const {default: config} = await import('../webpack.config.mts');
-
-const compiler = webpack(config);
+const compiler = webpack(createConfig(undefined, { mode: 'development' }));
 let instance: ChildProcess | undefined;
 
 const killInstance = () => {
