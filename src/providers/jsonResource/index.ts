@@ -1,7 +1,6 @@
 import path from "path";
-import fs from "graceful-fs";
+import fs from "fs";
 import chokidar, {FSWatcher} from "chokidar";
-import {Promise as Bluebird} from "bluebird";
 
 interface BaseResource {
   id: string;
@@ -9,7 +8,7 @@ interface BaseResource {
 
 export default class JsonResource<T extends BaseResource> {
   private readonly basePath: string;
-  private readonly cache: { [k: string]: { content: string; modified: number; } } = {};
+  private readonly cache: { [k: string]: { content: string; modified: number; } | undefined } = {};
   private watcher: FSWatcher;
   private isCacheReady: boolean = false;
 
@@ -37,11 +36,11 @@ export default class JsonResource<T extends BaseResource> {
 
 
         if (event === 'add' && !(id in this.cache)) {
-          this.cache[id] = null;
+          this.cache[id] = undefined;
         }
 
         if (event === 'change') {
-          this.cache[id] = null;
+          this.cache[id] = undefined;
         }
 
         if (event === 'unlink' && id in this.cache) {
@@ -68,15 +67,14 @@ export default class JsonResource<T extends BaseResource> {
 
   all = async (): Promise<{ data: T[]; modified: number }> => {
     const ids = await this.getIds();
-    const all = (await Bluebird.map(
-      ids,
-      async (id) => this.one(id),
-      { concurrency: 1 }
-    )).filter(Boolean);
+    const all = await ids.reduce<Promise<Awaited<ReturnType<typeof this.one>>[]>>(
+      async (previous, id) => [...await previous, await this.one(id)],
+      Promise.resolve([])
+    );
     this.isCacheReady = true;
 
     return {
-      data: all.map((one) => one.data),
+      data: all.flatMap((one) => one.data ? [one.data] : []),
       modified: all.reduce(
         (result, one) => one.modified > result ? one.modified : result,
         0

@@ -12,28 +12,17 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Theme,
   Typography
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import {LocationResource, NeedsFilters} from "../../types";
-import MapBlock from "../map-block";
-import {createStyles, makeStyles} from "@mui/styles";
+import {SizedMapBlock} from "../map-block";
 import useApiClient from "../../hooks/useApiClient";
 import useNeeds from "../../hooks/useNeeds";
 import {useAppDispatch, useAppSelector} from "../../redux";
 import locationsReducer from "../../redux/locationsReducer";
 import organisationsReducer from "../../redux/organisationsReducer";
 import {getLocation, getOrganisation} from "../../redux/selectors";
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  map: {
-    height: '400px',
-    width: '100%',
-    minWidth: '200px',
-    boxSizing: 'border-box',
-  },
-}));
 
 const LocationRouteBreadCrumb: FC<{ location: LocationResource }> = ({ location }) => {
   const apiOrganisation = useApiClient<'organisations'>('organisations');
@@ -65,24 +54,23 @@ const LocationRouteBreadCrumb: FC<{ location: LocationResource }> = ({ location 
 }
 
 const LocationRoute: FC = () => {
-  const params = useParams();
-  const styles = useStyles();
+  const { locationId = '' } = useParams();
   const api = useApiClient<'locations'>('locations');
-  const location = useAppSelector(getLocation(params.locationId));
+  const location = useAppSelector(getLocation(locationId));
   const dispatch = useAppDispatch();
   const filter = useMemo<NeedsFilters>(() => ({
-    locationId: params.locationId,
-  }),[params.locationId]);
+    locationId: locationId,
+  }),[locationId]);
   const needs = useNeeds(filter);
 
   useEffect(() => {
     if (!location) {
-      api.one(params.locationId)
+      api.one(locationId)
         .then((l) => dispatch(locationsReducer.actions.setLocation(l)))
         .catch(console.error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [locationId]);
 
   if (!location) {
     return <CircularProgress />;
@@ -95,9 +83,8 @@ const LocationRoute: FC = () => {
         {location.name}
       </Typography>
       {location.location && (
-        <MapBlock
+        <SizedMapBlock
           center={{ lat: location.location.lat, lng: location.location.lng }}
-          className={styles.map}
           zoom={12}
           markers={[{
             lat: location.location.lat,

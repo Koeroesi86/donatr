@@ -1,23 +1,22 @@
-import React, {FC, useCallback, useEffect, useState} from "react";
+import React, {FC, useEffect, useMemo, useState} from "react";
 import {LatLngExpression} from "leaflet";
-import {MapConsumer, MapContainer, Marker, Popup, TileLayer, useMapEvents} from "react-leaflet";
-import * as LCG from "leaflet-control-geocoder";
-import {GeocodingResult} from "leaflet-control-geocoder/dist/geocoders";
+import {MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents} from "react-leaflet";
+import {geocoders} from "leaflet-control-geocoder";
 import {Autocomplete, Button, TextField} from "@mui/material";
 import {FormattedMessage, useIntl} from "react-intl";
 import debounce from "lodash.debounce";
 import {PickedLocation} from "../../types";
 
-// @ts-ignore
-const geocoder = new LCG.geocoders.nominatim();
+const geocoder = new geocoders.Nominatim();
 
 interface PickerProps {
-  onPick: (pick: { lat: number; lng: number; }) => void | Promise<void>;
+  onPick: (pick: { lat: number; lng: number; }, zoom: number) => void | Promise<void>;
 }
 const Picker: FC<PickerProps> = ({ onPick }) => {
+  const map = useMap();
   useMapEvents({
     click: (e) => {
-      onPick(e.latlng);
+      onPick(e.latlng, map.getZoom());
     },
   });
 
@@ -32,8 +31,8 @@ const Search: FC<SearchProps> = ({ picked, onSelect }) => {
   const intl = useIntl();
   const [term, setTerm] = useState(picked?.text || '');
   const [options, setOptions] = useState<PickedLocation[]>([]);
-  const search = useCallback(debounce((t: string) => {
-    geocoder.geocode(t, (results: GeocodingResult[]) => {
+  const search = useMemo(() => debounce((t: string) => {
+    geocoder.geocode(t).then((results) => {
       setOptions(results.map<PickedLocation>((r) => ({
         lat: r.center.lat,
         lng: r.center.lng,
@@ -74,7 +73,7 @@ interface LocationPickerProps {
 }
 
 const LocationPicker: FC<LocationPickerProps> = ({ onSave, picked }) => {
-  const [pickedLocation, setPickedLocation] = useState<PickedLocation>(picked);
+  const [pickedLocation, setPickedLocation] = useState<PickedLocation | undefined>(picked);
   const [center] = useState<LatLngExpression>({
     lat: picked?.lat || 47.497913,
     lng: picked?.lng || 19.040236,
@@ -91,28 +90,24 @@ const LocationPicker: FC<LocationPickerProps> = ({ onSave, picked }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         />
-        <MapConsumer>
-          {(map) => (
-            <Picker
-              onPick={(p) => {
-                geocoder.reverse(p, map.getZoom(), (results: GeocodingResult[]) => {
-                  if (!results[0]) return;
-                  const current = results[0];
+        <Picker
+          onPick={(p, zoom) => {
+            geocoder.reverse(p, zoom).then((results) => {
+              if (!results[0]) return;
+              const current = results[0];
 
-                  setPickedLocation({
-                    lat: current.center.lat,
-                    lng: current.center.lng,
-                    text: current.name,
-                  });
-                })
-              }}
-            />
-          )}
-        </MapConsumer>
+              setPickedLocation({
+                lat: current.center.lat,
+                lng: current.center.lng,
+                text: current.name,
+              });
+            });
+          }}
+        />
         {pickedLocation && (
           <Marker
             position={{ lat: pickedLocation.lat, lng: pickedLocation.lng }}
-            ref={m => m && m.openPopup && m.openPopup()}
+            ref={m => { m?.openPopup?.(); }}
           >
             <Popup>
               {pickedLocation.text}
@@ -120,7 +115,7 @@ const LocationPicker: FC<LocationPickerProps> = ({ onSave, picked }) => {
           </Marker>
         )}
       </MapContainer>
-      <Button onClick={() => onSave(pickedLocation)} disabled={!pickedLocation}>
+      <Button onClick={() => pickedLocation && onSave(pickedLocation)} disabled={!pickedLocation}>
         <FormattedMessage id="input.location.set.location.label" />
       </Button>
     </>

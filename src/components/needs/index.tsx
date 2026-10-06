@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useEffect, useState} from "react";
+import React, {FC, useEffect, useMemo, useRef, useState} from "react";
 import debounce from "lodash.debounce";
 import {
   Container,
@@ -9,28 +9,17 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  TextField,
-  Theme
+  TextField
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import {Link as RLink, useSearchParams} from "react-router-dom";
 import {FormattedMessage, useIntl} from "react-intl";
-import {createStyles, makeStyles} from "@mui/styles";
 import {LatLngExpression} from "leaflet";
 import ClearIcon from '@mui/icons-material/Clear';
-import {LocationResource, NeedResource} from "../../types";
-import {sortByNames} from "../../utils";
-import MapBlock from "../map-block";
+import {GeoLocationResource, NeedResource} from "../../types";
+import {hasGeoLocation, sortByNames} from "../../utils";
+import {SizedMapBlock} from "../map-block";
 import useApiClient from "../../hooks/useApiClient";
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  map: {
-    height: '400px',
-    width: '100%',
-    minWidth: '200px',
-    boxSizing: 'border-box',
-  },
-}));
 
 const Needs: FC = () => {
   const intl = useIntl();
@@ -38,13 +27,16 @@ const Needs: FC = () => {
   const apiLocations = useApiClient<'locations'>('locations');
   const [searchParams, setSearchParams] = useSearchParams();
   const [term, setTerm] = useState<string>(
-    searchParams.has('s')
-      ? searchParams.get('s')
-      : ''
+    searchParams.get('s') ?? ''
   );
-  const search = useCallback(debounce((search: string) => {
-    if (searchParams.get('s') !== search) {
-      setSearchParams(search ? { s: search } : {});
+  const routerRef = useRef({ searchParams, setSearchParams });
+  useEffect(() => {
+    routerRef.current = { searchParams, setSearchParams };
+  });
+  const search = useMemo(() => debounce((search: string) => {
+    const { searchParams: currentParams, setSearchParams: setCurrentParams } = routerRef.current;
+    if (currentParams.get('s') !== search) {
+      setCurrentParams(search ? { s: search } : {});
     }
     api.all({ search })
       .then((data) => data.sort(sortByNames))
@@ -53,7 +45,7 @@ const Needs: FC = () => {
         if (search) {
           const locationIds = Array.from(new Set(data.map((n) => n.locationId)));
           Promise.all(locationIds.map((id) => apiLocations.one(id)))
-            .then((locations) => locations.filter((l) => l.location))
+            .then((locations) => locations.filter(hasGeoLocation))
             .then(setLocations)
             .catch(console.error);
         } else {
@@ -61,10 +53,9 @@ const Needs: FC = () => {
         }
       })
       .catch(console.error);
-  }, 200), []);
+  }, 200), [api, apiLocations]);
   const [listing, setListing] = useState<NeedResource[]>([]);
-  const [locations, setLocations] = useState<LocationResource[]>([]);
-  const styles = useStyles();
+  const [locations, setLocations] = useState<GeoLocationResource[]>([]);
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
@@ -83,7 +74,7 @@ const Needs: FC = () => {
         onChange={(e) => setTerm(e.target.value)}
         sx={{ my: 2 }}
         fullWidth
-        InputProps={{
+        slotProps={{ input: {
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
@@ -96,7 +87,7 @@ const Needs: FC = () => {
               </IconButton>
             </InputAdornment>
           )
-        }}
+        } }}
       />
       <List sx={{ maxHeight: 400, overflow: 'auto', mb: 2 }}>
         {listing.map(need => (
@@ -112,10 +103,9 @@ const Needs: FC = () => {
         ))}
       </List>
       {locations.length > 0 && (
-        <MapBlock
+        <SizedMapBlock
           center={center}
           zoom={6}
-          className={styles.map}
           markers={locations.map((loc) => ({
             lat: loc.location.lat,
             lng: loc.location.lng,

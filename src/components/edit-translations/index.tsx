@@ -3,6 +3,7 @@ import {Accordion, AccordionDetails, AccordionSummary, CircularProgress, TextFie
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {FormattedMessage} from "react-intl";
 import {TranslationsResource} from "../../types";
+import getCountryCode from "../../utils/getCountryCode";
 import CountryFlag from "../country-flag";
 import debounce from "lodash.debounce";
 import CreateTranslationForm from "../create-translation-form";
@@ -53,7 +54,7 @@ const EditTranslations: FC = () => {
       {translations.map((translation) => (
         <Accordion key={`edit-translation-${translation.id}`}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <CountryFlag code={translation.id.split('-').pop().toLowerCase()} width="30" />
+            <CountryFlag code={getCountryCode(translation.id)} width="30" />
           </AccordionSummary>
           <AccordionDetails>
             {Object.keys(fallback.translations).sort().map((key) => (

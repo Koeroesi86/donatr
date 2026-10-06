@@ -1,13 +1,11 @@
-import React, {FC, useEffect} from "react";
+import React, {FC} from "react";
 import {Link as RLink} from "react-router-dom";
-import {Badge, CircularProgress, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
 import {LocationResource, Need} from "../../types";
-import {useAppDispatch, useAppSelector} from "../../redux";
+import {useAppSelector} from "../../redux";
 import {getOrganisation} from "../../redux/selectors";
-import organisationsReducer from "../../redux/organisationsReducer";
-import useApiClient from "../../hooks/useApiClient";
 
 interface LocationListItemProps {
   location: LocationResource;

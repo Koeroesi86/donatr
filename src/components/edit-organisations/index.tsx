@@ -1,5 +1,5 @@
 import React, {FC, useCallback, useEffect, useState} from "react";
-import {Organisation, OrganisationResource} from "../../types";
+import {OrganisationResource} from "../../types";
 import {Box, Button, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {useIntl} from "react-intl";
@@ -14,7 +14,7 @@ const EditOrganisations: FC = () => {
   const [enteredText, setEnteredText] = useState('');
   const refresh = useCallback(() => {
     api.all().then(o => setOrganisations(o.sort(sortByNames)));
-  }, []);
+  }, [api]);
   useEffect(() => {
     refresh();
   }, [refresh]);

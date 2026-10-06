@@ -1,8 +1,7 @@
 import React from "react";
 import {renderToString} from "react-dom/server";
-import cookie from "cookie";
+import {parseCookie} from "cookie";
 import acceptLanguage from "accept-language";
-// @ts-ignore
 import {sitemapBuilder} from "react-router-sitemap";
 import {Worker} from "./types";
 import SsrPage from "./components/ssr-page";
@@ -29,7 +28,7 @@ const worker: Worker = async (event, callback): Promise<void> => {
   keepAliveCallback();
 
   try {
-    const cookies = cookie.parse(event.headers.cookie || '');
+    const cookies = parseCookie(event.headers.cookie || '');
     const locales = await apiClient.all<'translations'>('translations');
     const localeIds = locales.map((l) => l.id);
     acceptLanguage.languages(localeIds);
@@ -38,8 +37,11 @@ const worker: Worker = async (event, callback): Promise<void> => {
       ? cookies.language
       : acceptLanguage.get(event.headers['accept-language']);
     const translation = locales.find((t) => t.id === detectedLanguage);
-    let pageTitle = translation.translations['site.name'] || '';
-    let locale = translation.id;
+    if (!translation) {
+      throw new Error(`Missing translation for ${detectedLanguage}`);
+    }
+    const pageTitle = translation.translations['site.name'] || '';
+    const locale = translation.id;
 
     if (event.path === '/manifest.json') {
       callback({
@@ -63,8 +65,7 @@ const worker: Worker = async (event, callback): Promise<void> => {
       const sitemap = sitemapBuilder(
         publicUrl,
         routes
-          .filter((r) => r.path !== '*' && r.path !== '/edit')
-          .map((r) => r.path)
+          .flatMap((r) => r.path && r.path !== '*' && r.path !== '/edit' ? [r.path] : [])
       );
       callback({
         statusCode: 200,

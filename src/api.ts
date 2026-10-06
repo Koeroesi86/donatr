@@ -20,7 +20,7 @@ const getResponseHeaders = (headers: ResponseEvent["headers"] = {}) => ({
   ...headers,
 });
 
-const createResponse = (statusCode: number, data: any, headers: ResponseEvent["headers"] = {}): ResponseEvent => {
+const createResponse = (statusCode: number, data: unknown, headers: ResponseEvent["headers"] = {}): ResponseEvent => {
   return ({
     statusCode,
     headers: getResponseHeaders(headers),
@@ -31,7 +31,7 @@ const createResponse = (statusCode: number, data: any, headers: ResponseEvent["h
 
 const createCacheableResponse = (
   statusCode: number,
-  data: any,
+  data: unknown,
   ifModifiedSince: Date,
   lastEtag?: string,
   lastModified?: string,
@@ -173,7 +173,7 @@ const worker: Worker = async (event, callback) => {
           const loc = await provider.getLocation(event.pathFragments[2]);
           if (
             !hasAccess({ locationId: event.pathFragments[2] }, tokenAccess)
-            && !hasAccess({ organisationId: loc.result.organisationId }, tokenAccess)
+            && !hasAccess({ organisationId: loc.result?.organisationId }, tokenAccess)
           ) {
             callback(createResponse(401, { message: "Nope." }));
             return;
@@ -218,7 +218,7 @@ const worker: Worker = async (event, callback) => {
           const location = await provider.getLocation(content.locationId);
           const tokenAccess = await token.deserialize(event.headers['x-access-token']);
           if (
-            !hasAccess({ organisationId: location.result.organisationId }, tokenAccess)
+            !hasAccess({ organisationId: location.result?.organisationId }, tokenAccess)
             && !hasAccess({ locationId: content.locationId }, tokenAccess)
           ) {
             callback(createResponse(401, { message: "Nope." }));
@@ -246,11 +246,11 @@ const worker: Worker = async (event, callback) => {
       if (event.pathFragments.length === 3) {
         if (['PUT', 'DELETE'].includes(event.httpMethod)) {
           const need = await provider.getNeed(event.pathFragments[2]);
-          const location = await provider.getLocation(need.result.locationId);
+          const location = await provider.getLocation(need.result?.locationId ?? '');
           const tokenAccess = await token.deserialize(event.headers['x-access-token']);
           if (
-            !hasAccess({ locationId: need.result.locationId }, tokenAccess)
-            && !hasAccess({ organisationId: location.result.organisationId }, tokenAccess)
+            !hasAccess({ locationId: need.result?.locationId }, tokenAccess)
+            && !hasAccess({ organisationId: location.result?.organisationId }, tokenAccess)
           ) {
             callback(createResponse(401, { message: "Nope." }));
             return;

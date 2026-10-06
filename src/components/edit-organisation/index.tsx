@@ -20,7 +20,7 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
   const intl = useIntl();
   const api = useApiClient<'organisations'>('organisations');
   const [isExpanded, setIsExpanded] = useState(initialOpen);
-  const [organisation, setOrganisation] = useState<OrganisationResource>(initialState);
+  const [organisation, setOrganisation] = useState<OrganisationResource | undefined>(initialState);
   const filters = useMemo(() => ({ organisationId: id }), [id]);
   const locations = useLocations(filters);
 
@@ -55,11 +55,10 @@ const EditOrganisation: FC<EditOrganisationProps> = ({ id, initialState, initial
                 name: e.target.value,
               })}
               onKeyPress={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
                   debouncedUpdate({
                     id: organisation.id,
                     description: organisation.description,
-                    // @ts-ignore
                     name: e.target.value,
                   });
                 }

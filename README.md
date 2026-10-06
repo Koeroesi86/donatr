@@ -5,20 +5,22 @@ A platform to help donations reach the place where they are most needed.
 Let's help Ukraine! 🕊
 
 ### Dependencies
-* Yarn
-* NodeJS
+* npm
+* NodeJS (LTS, see `.nvmrc` — run `nvm use`)
 
 **Build**
 ```shell script
-yarn build
+npm run build
 ```
 
 **Run locally**
 ```shell script
-yarn start
+npm start
 ```
 
-**Test**
+**Test** (lint, type check and unit tests)
 ```shell script
-yarn test
+npm test
 ```
+
+Jest runs through `npm run jest`, which enables Node's `--experimental-vm-modules`. Several dependencies are ESM-only and need it, so set `NODE_OPTIONS=--experimental-vm-modules` when running jest from an IDE.

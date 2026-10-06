@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useMemo, useState} from "react";
+import React, {FC, PropsWithChildren, useEffect, useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {Box, CircularProgress, Tab, Tabs} from "@mui/material";
 import {useIntl} from "react-intl";
@@ -16,7 +16,7 @@ interface TabPanelProps {
   value: string;
 }
 
-const TabPanel: FC<TabPanelProps> = ({ value, current, children }) => {
+const TabPanel: FC<PropsWithChildren<TabPanelProps>> = ({ value, current, children }) => {
   if (value !== current) return null;
   return (
     <Box sx={{ p: 2 }}>
@@ -26,7 +26,7 @@ const TabPanel: FC<TabPanelProps> = ({ value, current, children }) => {
 }
 
 const EditRouteProtected: FC = () => {
-  const {code} = useParams();
+  const {code = ''} = useParams();
   const intl = useIntl();
   const apiClient = useApiClient<'access'>('access');
   const resolveAccess = useResolveAccess();
@@ -35,28 +35,37 @@ const EditRouteProtected: FC = () => {
   const tabs = useMemo(() => {
     if (!access) return [];
 
+    const hasAll = "all" in access && !!access.all;
+    const hasOrganisations = "organisationIds" in access && access.organisationIds.length > 0;
+    const hasLocations = "locationIds" in access && !!access.locationIds && access.locationIds.length > 0;
+
     return [
-      ("all" in access && access.all && {
+      {
+        visible: hasAll,
         label: intl.formatMessage({ id: 'page.edit.organisations.title' }),
         key: 'edit-all-organisations',
-      }),
-      ("organisationIds" in access && access.organisationIds.length && {
+      },
+      {
+        visible: hasOrganisations,
         label: intl.formatMessage({ id: 'page.edit.organisations.title' }),
         key: 'edit-organisations',
-      }),
-      ("locationIds" in access && access.locationIds && access.locationIds.length && {
+      },
+      {
+        visible: hasLocations,
         label: intl.formatMessage({ id: 'page.edit.locations.title' }),
         key: 'edit-locations',
-      }),
-      ("all" in access && access.all && {
+      },
+      {
+        visible: hasAll,
         label: intl.formatMessage({ id: 'page.edit.accesses.title' }),
         key: 'edit-accesses',
-      }),
-      (access.translations && {
+      },
+      {
+        visible: !!access.translations,
         label: intl.formatMessage({ id: 'edit.translations.title' }),
         key: 'edit-translations',
-      }),
-    ].filter(Boolean);
+      },
+    ].filter((tab) => tab.visible);
   }, [access, intl]);
   const [selectedTab, setSelectedTab] = useState<string>();
   

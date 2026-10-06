@@ -2,19 +2,19 @@ name: CI
 on: push
 env:
   NODE_ENV: "development"
-  YARN_CACHE_FOLDER: ${{ github.workspace }}/.cache/yarn
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-      - uses: actions/cache@v2
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/.cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-      - run: yarn install --frozen-lockfile
-      - run: yarn test
+          key: ${{ runner.os }}-tools-${{ hashFiles('**/package-lock.json') }}
+      - run: npm ci
+      - run: npm test

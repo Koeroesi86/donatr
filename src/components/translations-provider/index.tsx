@@ -1,12 +1,10 @@
-import React, {createContext, FC, useEffect, useState} from "react";
+import React, {createContext, FC, PropsWithChildren, useEffect, useState} from "react";
 import {TranslationsResource} from "../../types";
 import useApiClient from "../../hooks/useApiClient";
 
 export const TranslationsContext = createContext<TranslationsResource[]>([]);
 
-interface TranslationsProviderProps {}
-
-const TranslationsProvider: FC<TranslationsProviderProps> = ({ children }) => {
+const TranslationsProvider: FC<PropsWithChildren> = ({ children }) => {
   const api = useApiClient<'translations'>('translations');
   const [translations, setTranslations] = useState<TranslationsResource[]>([]);
   

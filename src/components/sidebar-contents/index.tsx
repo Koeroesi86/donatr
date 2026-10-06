@@ -1,4 +1,4 @@
-import React, {FC} from "react";
+import React, {FC, PropsWithChildren} from "react";
 import {useIntl} from "react-intl";
 import {Box, Divider, IconButton, List, ListItemButton, ListItemIcon, ListItemText, useTheme} from "@mui/material";
 import {Link, useMatch, useResolvedPath} from "react-router-dom";
@@ -7,7 +7,7 @@ import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ListIcon from '@mui/icons-material/List';
 import EditIcon from '@mui/icons-material/Edit';
-import ContactPageIcon from '@mui/icons-material/MailOutline';
+import ContactPageIcon from '@mui/icons-material/EmailOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -18,7 +18,7 @@ interface RouteLinkProps {
   translation: string;
   onClick: () => void | Promise<void>;
 }
-const RouteLink: FC<RouteLinkProps> = ({ children, onClick, to, translation }) => {
+const RouteLink: FC<PropsWithChildren<RouteLinkProps>> = ({ children, onClick, to, translation }) => {
   const intl = useIntl();
   const resolved = useResolvedPath(to);
   const match = useMatch({ path: resolved.pathname, end: true });

@@ -1,9 +1,9 @@
 import React, {FC, useEffect, useMemo, useState} from "react";
 import {Link as RLink, useParams} from "react-router-dom";
-import {createStyles, makeStyles} from "@mui/styles";
-import {CircularProgress, Container, Link, List, Theme, Typography} from "@mui/material";
+import {CircularProgress, Container, Link, List, Typography} from "@mui/material";
 import {LatLngExpression} from "leaflet";
-import MapBlock from "../map-block";
+import {hasGeoLocation} from "../../utils";
+import {SizedMapBlock} from "../map-block";
 import LocationListItem from "../location-list-item";
 import useApiClient from "../../hooks/useApiClient";
 import useLocations from "../../hooks/useLocations";
@@ -13,51 +13,40 @@ import {useAppDispatch, useAppSelector} from "../../redux";
 import organisationsReducer from "../../redux/organisationsReducer";
 import {getOrganisation} from "../../redux/selectors";
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  map: {
-    height: '400px',
-    width: '100%',
-    minWidth: '200px',
-    boxSizing: 'border-box',
-  },
-}));
-
 const OrganisationRoute: FC = () => {
-  const params = useParams();
-  const styles = useStyles();
+  const { organisationId = '' } = useParams();
   const api = useApiClient<'organisations'>('organisations');
-  const organisation = useAppSelector(getOrganisation(params.organisationId));
+  const organisation = useAppSelector(getOrganisation(organisationId));
   const dispatch = useAppDispatch();
   const [center] = useState<LatLngExpression>({
     lat: 47.497913,
     lng: 19.040236,
   });
-  const filter = useMemo(() => ({ organisationId: params.organisationId }), [params.organisationId]);
+  const filter = useMemo(() => ({ organisationId: organisationId }), [organisationId]);
   const locations = useLocations(filter);
   const needs = useNeeds();
 
   useEffect(() => {
     if (!organisation) {
-      api.one(params.organisationId)
+      api.one(organisationId)
         .then((o) => dispatch(organisationsReducer.actions.setOrganisation(o)))
         .catch(console.error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [organisationId]);
 
   if (!organisation) return <CircularProgress />;
 
-  const locationsWithGeo = locations.filter((l) => l.location);
+  const locationsWithGeo = locations.filter(hasGeoLocation);
 
   return (
     <Container maxWidth="lg">
       <Typography variant="h3" sx={{ my: 2 }}>
         {organisation.name}
       </Typography>
-      <MapBlock
+      <SizedMapBlock
         center={center}
         zoom={6}
-        className={styles.map}
         markers={locationsWithGeo.map((loc) => ({
           lat: loc.location.lat,
           lng: loc.location.lng,

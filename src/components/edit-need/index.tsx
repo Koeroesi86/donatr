@@ -1,4 +1,4 @@
-import React, {FC, useCallback} from "react";
+import React, {FC, useCallback, useMemo} from "react";
 import {Box, Button, TextField} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {Need, NeedResource} from "../../types";
@@ -18,7 +18,7 @@ const EditNeed: FC<EditNeedProps> = ({ need, onUpdate, onRemove }) => {
   const update = useCallback((data: NeedResource) => {
     api.update(data).then(() => onUpdate());
   }, [api, onUpdate]);
-  const debouncedUpdate = useCallback(debounce(
+  const debouncedUpdate = useMemo(() => debounce(
     (data: NeedResource) => update(data),
     2000
   ), [update]);
@@ -36,11 +36,10 @@ const EditNeed: FC<EditNeedProps> = ({ need, onUpdate, onRemove }) => {
             name: e.target.value,
           })}
           onKeyPress={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
               update({
                 id: need.id,
                 locationId: need.locationId,
-                // @ts-ignore
                 name: e.target.value,
               });
             }

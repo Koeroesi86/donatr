@@ -8,7 +8,7 @@ export const serialize = async (access: Access): Promise<string> => {
     access,
   }, secret, { expiresIn: '7d' }, (err: Error | null, token?: string) => {
     if (err) reject(err);
-    resolve(token);
+    resolve(token ?? '');
   }));
   return result;
 };
