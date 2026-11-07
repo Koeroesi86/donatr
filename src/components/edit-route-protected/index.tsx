@@ -68,6 +68,7 @@ const EditRouteProtected: FC = () => {
     ].filter((tab) => tab.visible);
   }, [access, intl]);
   const [selectedTab, setSelectedTab] = useState<string>();
+  const currentTab = selectedTab ?? tabs[0]?.key;
   
   useEffect(() => {
     resolveAccess(code)
@@ -86,29 +87,29 @@ const EditRouteProtected: FC = () => {
   return (
     <>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={selectedTab} onChange={(e, t) => setSelectedTab(t)} aria-label="tabs">
+        <Tabs value={currentTab ?? false} onChange={(e, t) => setSelectedTab(t)} aria-label="tabs">
           {tabs.map((tab) => (
             <Tab label={tab.label} value={tab.key} key={`tab-control-${tab.key}`} />
           ))}
         </Tabs>
       </Box>
-      <TabPanel value="edit-all-organisations" current={selectedTab}>
+      <TabPanel value="edit-all-organisations" current={currentTab}>
         <EditOrganisations />
       </TabPanel>
-      <TabPanel value="edit-organisations" current={selectedTab}>
+      <TabPanel value="edit-organisations" current={currentTab}>
         {"organisationIds" in access && access.organisationIds.map((id) => (
           <EditOrganisation key={`edit-organisaion-${id}`} id={id} />
         ))}
       </TabPanel>
-      <TabPanel value="edit-locations" current={selectedTab}>
+      <TabPanel value="edit-locations" current={currentTab}>
         {"locationIds" in access && access.locationIds.map((id) => (
           <EditLocation key={`edit-location-${id}`} id={id} />
         ))}
       </TabPanel>
-      <TabPanel value="edit-accesses" current={selectedTab}>
+      <TabPanel value="edit-accesses" current={currentTab}>
         <EditAccesses currentCode={code} />
       </TabPanel>
-      <TabPanel value="edit-translations" current={selectedTab}>
+      <TabPanel value="edit-translations" current={currentTab}>
         <EditTranslations />
       </TabPanel>
     </>
