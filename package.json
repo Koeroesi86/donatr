@@ -17,7 +17,7 @@
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.14.1",
     "@eslint/js": "^9.39.5",
-    "@koeroesi86/node-webserver-cli": "^26.10.37037987262-master",
+    "@koeroesi86/node-webserver-cli": "^26.11.41841859648-master",
     "@mui/icons-material": "^9.4.0",
     "@mui/material": "^9.4.0",
     "@reduxjs/toolkit": "^2.13.0",
@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "accept-language": "^3.0.20",
-    "chokidar": "^5.0.0",
+    "chokidar": "^6.0.0",
     "cookie": "^2.0.1",
     "jsonwebtoken": "^9.0.3",
     "uuid": "^14.0.2"
