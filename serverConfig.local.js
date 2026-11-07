@@ -2,7 +2,6 @@ const serverConfig = require('./build/serverConfig');
 const path = require("path");
 
 module.exports = {
-  protocol: 'http',
   portHttp: 3000,
   portHttps: 3443,
   servers: [
