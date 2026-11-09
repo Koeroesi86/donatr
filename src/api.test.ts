@@ -3,6 +3,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import {Readable} from "node:stream";
 import {Access, RequestEvent, ResponseEvent} from "./types";
 import {createTempDir, removeDir} from "./test/createTempDir";
 
@@ -75,7 +76,7 @@ describe('api', () => {
           queryStringParameters: query,
           headers: { ...(accessToken ? { 'x-access-token': accessToken } : {}), ...headers },
           remoteAddress: '127.0.0.1',
-          body: body === undefined ? '' : typeof body === 'string' ? body : JSON.stringify(body),
+          bodyStream: Readable.from(body === undefined ? [] : [typeof body === 'string' ? body : JSON.stringify(body)]),
           rootPath: '/',
         }, (response) => resolve({ ...response, json: response.body ? JSON.parse(response.body) : undefined }));
       });

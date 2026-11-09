@@ -1,3 +1,5 @@
+import type { Readable } from 'node:stream';
+
 export interface RequestEvent {
   httpMethod: 'POST' | 'PUT'| 'GET' | 'DELETE' | 'OPTIONS';
   protocol: string;
@@ -6,8 +8,9 @@ export interface RequestEvent {
   queryStringParameters: { [key: string]: string };
   headers: { [key: string]: string };
   remoteAddress: string;
-  body: string;
   rootPath: string;
+  hasBody?: boolean;
+  bodyStream: Readable;
 }
 
 export interface ResponseEvent {

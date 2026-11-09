@@ -6,6 +6,7 @@ import createScheduleGC from "./utils/createScheduleGC";
 import createEtag from "./utils/createEtag";
 import createKeepAliveCallback from "./utils/createKeepAliveCallback";
 import createProvider from "./utils/createProvider";
+import readBody from "./utils/readBody";
 
 const keepAliveCallback = createKeepAliveCallback(30 * 60 * 1000);
 
@@ -74,6 +75,9 @@ const worker: Worker = async (event, callback) => {
   keepAliveCallback();
 
   try {
+    // the body arrives as a stream that can only be read once
+    const body = await readBody(event);
+
     if (event.pathFragments[1] === 'organisations') {
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
@@ -83,7 +87,7 @@ const worker: Worker = async (event, callback) => {
             return;
           }
           await provider.setOrganisation({
-            ...JSON.parse(event.body),
+            ...JSON.parse(body),
             id: uuid(),
           });
         }
@@ -104,7 +108,7 @@ const worker: Worker = async (event, callback) => {
             callback(createResponse(401, { message: "Nope." }));
             return;
           }
-          const content = JSON.parse(event.body);
+          const content = JSON.parse(body);
           ensureId(event.pathFragments[2], content);
           await provider.setOrganisation(content);
         }
@@ -144,7 +148,7 @@ const worker: Worker = async (event, callback) => {
     if (event.pathFragments[1] === 'locations') {
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
-          const content = JSON.parse(event.body) as LocationResource;
+          const content = JSON.parse(body) as LocationResource;
           const tokenAccess = await token.deserialize(event.headers['x-access-token']);
           if (!hasAccess({ organisationId: content.organisationId }, tokenAccess)) {
             callback(createResponse(401, { message: "Nope." }));
@@ -180,7 +184,7 @@ const worker: Worker = async (event, callback) => {
           }
         }
         if (event.httpMethod === 'PUT') {
-          const content = JSON.parse(event.body);
+          const content = JSON.parse(body);
           ensureId(event.pathFragments[2], content);
           await provider.setLocation(content);
         }
@@ -214,7 +218,7 @@ const worker: Worker = async (event, callback) => {
     if (event.pathFragments[1] === 'needs') {
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
-          const content = JSON.parse(event.body) as NeedResource;
+          const content = JSON.parse(body) as NeedResource;
           const location = await provider.getLocation(content.locationId);
           const tokenAccess = await token.deserialize(event.headers['x-access-token']);
           if (
@@ -225,7 +229,7 @@ const worker: Worker = async (event, callback) => {
             return;
           }
           await provider.setNeed({
-            ...JSON.parse(event.body),
+            ...JSON.parse(body),
             id: uuid(),
           })
         }
@@ -257,7 +261,7 @@ const worker: Worker = async (event, callback) => {
           }
         }
         if (event.httpMethod === 'PUT') {
-          const content = JSON.parse(event.body);
+          const content = JSON.parse(body);
           ensureId(event.pathFragments[2], content);
           await provider.setNeed(content);
         }
@@ -308,7 +312,7 @@ const worker: Worker = async (event, callback) => {
             callback(createResponse(401, { message: "Nope." }));
             return;
           }
-          const content = JSON.parse(event.body);
+          const content = JSON.parse(body);
           ensureId(event.pathFragments[2], content);
           await provider.setTranslations(content);
         }
@@ -343,7 +347,7 @@ const worker: Worker = async (event, callback) => {
       if (event.pathFragments.length === 2) {
         if (event.httpMethod === 'POST') {
           await provider.setAccess({
-            ...JSON.parse(event.body),
+            ...JSON.parse(body),
             id: uuid(),
           });
         }
@@ -355,7 +359,7 @@ const worker: Worker = async (event, callback) => {
 
       if (event.pathFragments.length === 3) {
         if (event.httpMethod === 'PUT') {
-          const content = JSON.parse(event.body);
+          const content = JSON.parse(body);
           ensureId(event.pathFragments[2], content);
           await provider.setAccess(content);
         }

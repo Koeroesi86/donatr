@@ -1,3 +1,4 @@
+import {Readable} from "node:stream";
 import {RequestEvent, ResponseEvent, TranslationsResource} from "./types";
 
 const mockApi = {
@@ -25,7 +26,7 @@ const request = (path: string, headers: RequestEvent['headers'] = {}): RequestEv
   queryStringParameters: {},
   headers,
   remoteAddress: '127.0.0.1',
-  body: '',
+  bodyStream: Readable.from([]),
   rootPath: '/',
 });
 
