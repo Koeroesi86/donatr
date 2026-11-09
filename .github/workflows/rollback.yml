@@ -1,0 +1,24 @@
+name: Rollback
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Release folder to activate, e.g. build.1794236607897 (empty = the previous release)
+        required: false
+jobs:
+  rollback:
+    name: Roll back
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: deploy-donatr
+      cancel-in-progress: false
+    steps:
+      - uses: Koeroesi86/deploy-action/rollback@v1
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          user: ${{ vars.DEPLOY_USER }}
+          path: /var/www/donatr.eu
+          release: ${{ inputs.release }}
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known-hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
