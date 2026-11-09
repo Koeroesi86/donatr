@@ -1,10 +1,17 @@
 name: CI
-on: push
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      rollback:
+        description: Roll back instead of building. Release folder to activate (empty = the previous release).
+        required: false
 env:
   NODE_ENV: "development"
 jobs:
   build:
     name: Build
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -17,4 +24,56 @@ jobs:
           path: ${{ github.workspace }}/.cache
           key: ${{ runner.os }}-tools-${{ hashFiles('**/package-lock.json') }}
       - run: npm ci
-      - run: npm test
+      # runs lint, typecheck and tests, then bundles and installs production dependencies into ./build
+      - run: npm run build
+      - if: github.ref == 'refs/heads/main'
+        run: tar -cf build.tar build
+      - if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v7
+        with:
+          name: build
+          path: build.tar
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: deploy-donatr
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: build
+      - run: tar -xf build.tar
+      - uses: Koeroesi86/deploy-action@v1
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          user: ${{ vars.DEPLOY_USER }}
+          path: /var/www/donatr.eu
+          source: build
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known-hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          pre-activate: node -e "require('./serverConfig.js')"
+          health-url: https://donatr.eu/
+
+  rollback:
+    name: Roll back
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: deploy-donatr
+      cancel-in-progress: false
+    steps:
+      - uses: Koeroesi86/deploy-action/rollback@v1
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          user: ${{ vars.DEPLOY_USER }}
+          path: /var/www/donatr.eu
+          release: ${{ inputs.rollback }}
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known-hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}

@@ -5,7 +5,6 @@
   "scripts": {
     "start": "node scripts/start.mts",
     "build": "npm test && webpack --config webpack.config.mts --mode production && npm ci --omit=dev --prefix build",
-    "deploy": "npm run build && node scripts/deploy.mts",
     "test": "npm run lint && npm run typecheck && npm run jest",
     "lint": "eslint --cache --cache-location .cache/eslint/ src scripts webpack.config.mts",
     "typecheck": "tsc -p tsconfig.node.json",
